@@ -43,16 +43,38 @@
 
     .search-shell{margin-top:14px;background:var(--card);padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,0.03)}
     .search-row{display:flex;gap:10px;align-items:center}
-    .search-row input{flex:1;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px}
+    .search-inner{flex:1;position:relative;min-width:0}
+    .search-row input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px}
     .actions{display:flex;gap:10px}
     .btn{padding:10px 14px;border-radius:12px;border:0;cursor:pointer;font-weight:700}
     .btn-search{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020}
     .btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+    .btn[disabled]{opacity:0.6;cursor:not-allowed}
 
+    /* suggestions - constrained to input width */
     .suggestions{position:relative}
-    .suggest-list{position:absolute;left:0;right:0;top:44px;background:var(--card);border-radius:10px;padding:6px;border:1px solid rgba(255,255,255,0.03);z-index:10}
-    .suggest-item{padding:8px;border-radius:8px;cursor:pointer;color:var(--text)}
+    .suggest-list{
+      position:absolute;
+      left:0;
+      top: calc(100% + 8px);
+      width:100%;
+      background:var(--card);
+      border-radius:10px;padding:6px;border:1px solid rgba(255,255,255,0.03);
+      z-index:1000;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+      max-height:260px; overflow:auto;
+    }
+    .suggest-item{padding:8px;border-radius:8px;cursor:pointer;color:var(--text);display:flex;justify-content:space-between;align-items:center}
     .suggest-item:hover{background:rgba(255,255,255,0.02)}
+
+    /* history chips - moved under the search shell */
+    .history-panel{margin-top:12px;background:transparent;color:var(--muted);font-size:13px;display:flex;gap:8px;flex-wrap:wrap}
+    .history-chip{
+      padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.02);cursor:pointer;border:1px solid rgba(255,255,255,0.03);
+      display:inline-flex;align-items:center;gap:8px;
+    }
+    .chip-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
+    .chip-remove{background:transparent;border:0;color:var(--muted);cursor:pointer;font-weight:700;padding-left:6px}
 
     .results{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
     .card{background:var(--card);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
@@ -65,23 +87,23 @@
     .progress-shell{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
     .progress-bar{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .6s ease}
 
-    /* indicator */
     .ms-change{display:inline-flex;gap:6px;align-items:center;font-weight:700}
     .ms-change.up{color:var(--success)} .ms-change.down{color:var(--danger)}
-
-    .history-panel{margin-top:12px;background:transparent;color:var(--muted);font-size:13px;display:flex;gap:8px;flex-wrap:wrap}
-    .history-chip{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.02);cursor:pointer;border:1px solid rgba(255,255,255,0.03)}
 
     .bottom-actions{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
     .share-btn{padding:8px 12px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));cursor:pointer;font-weight:700;color:#061020}
 
-    /* skeleton */
     .skeleton{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.04), rgba(255,255,255,0.02));height:14px;border-radius:6px}
+
+    footer{margin-top:18px;display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px}
+    .powered{display:flex;gap:8px;align-items:center}
+    .powered img{width:40px;height:40px;border-radius:8px;object-fit:cover;box-shadow:0 8px 22px rgba(0,0,0,0.5)}
 
     @media (max-width:520px){
       .toprow{flex-direction:column;align-items:flex-start;gap:8px}
-      .search-row{flex-direction:column}
-      .suggest-list{top:56px}
+      .search-row{flex-direction:column;align-items:stretch}
+      .suggest-list{top:calc(100% + 8px)}
+      .chip-text{max-width:120px}
     }
   </style>
 </head>
@@ -104,9 +126,9 @@
 
     <div class="search-shell" role="search">
       <div class="search-row">
-        <div style="flex:1;position:relative" class="suggestions">
+        <div class="search-inner suggestions">
           <input id="username" type="text" placeholder="@your_handle" autocomplete="off" />
-          <div id="suggestList" class="suggest-list" style="display:none"></div>
+          <div id="suggestList" class="suggest-list" style="display:none" aria-hidden="true"></div>
         </div>
 
         <div class="actions">
@@ -115,20 +137,31 @@
         </div>
       </div>
 
+      <!-- history chips below the search row (not overlapping buttons) -->
+      <div id="historyPanel" class="history-panel" style="display:none"></div>
+
       <div class="bottom-actions">
-        <div id="historyPanel" class="history-panel" style="display:none"></div>
         <button id="shareBtn" class="share-btn" title="Generate share image">Share Card</button>
       </div>
     </div>
 
     <div id="resultArea" class="results"></div>
+
+    <footer style="margin-top:20px">
+      <div>Made with ❤️ for Zama — love & powered by madara</div>
+      <a id="poweredLink" class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer">
+        <img id="poweredAvatar" src="madara.png" alt="madara avatar">
+        <div>
+          <div style="font-size:12px;color:var(--muted)">Powered by</div>
+          <div style="font-weight:700">madara</div>
+        </div>
+      </a>
+    </footer>
   </div>
 
-  <!-- hidden canvas for share card -->
   <canvas id="cardCanvas" width="1200" height="630" style="display:none"></canvas>
 
   <script>
-    // --------- helpers ---------
     const apiBase = '/api/check';
     const STORAGE_KEY = 'zama_history_v1';
     const THEME_KEY = 'zama_theme_v1';
@@ -156,12 +189,10 @@
       const t = localStorage.getItem(THEME_KEY);
       if(t) setTheme(t);
       else {
-        // prefer dark by default
         setTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme:light)').matches ? 'light' : '');
       }
     }
 
-    // progress percent: prefer rank100_mindshare ratio; fallback by rank
     function computeProgress(meta){
       if(!meta) return 0;
       const ms = Number(meta.mindshare);
@@ -170,13 +201,11 @@
         return Math.max(0, Math.min(1, ms / rank100_ms));
       }
       if(isFinite(meta.rank)){
-        // fallback: closer to #1 -> higher percent; use top 1500 as baseline
         return Math.max(0, Math.min(1, (1500 - meta.rank) / 1500));
       }
       return 0;
     }
 
-    // compute change between this timeframe and the next (24h vs 7d, 7d vs month), return {dir:'up'|'down'|'same', pct:..}
     function computeChange(curr, next){
       const a = Number(curr?.mindshare); const b = Number(next?.mindshare);
       if(!isFinite(a) || !isFinite(b)) return {dir:'same', pct:0};
@@ -186,7 +215,6 @@
       return {dir: diff > 0 ? 'up' : (diff < 0 ? 'down' : 'same'), pct: Math.round(pct*10)/10};
     }
 
-    // skeleton card
     function skeletonCard(){
       const c = document.createElement('div'); c.className='card';
       c.innerHTML = '<h3 class="skeleton" style="width:90px;height:18px"></h3>'
@@ -196,19 +224,14 @@
       return c;
     }
 
-    // build card UI with features
     function mkCard(title, meta, neighborMeta=null){
       const c = document.createElement('div'); c.className='card';
       const rank = meta?.rank ?? null;
       const ms = meta?.mindshare ?? null;
-      const total = 1500; // fixed
-
+      const total = 1500;
       const progressPct = Math.round(computeProgress(meta)*100);
-
-      // change indicator (compare to neighbor timeframe)
       const change = computeChange(meta, neighborMeta);
       const changeHtml = change.dir === 'same' ? '-' : `<span class="ms-change ${change.dir}">${change.dir==='up' ? '▲' : '▼'} ${change.pct}%</span>`;
-
       c.innerHTML = `
         <h3>${title}</h3>
         <div class="row"><div class="label">Rank</div><div class="value">${rank ?? '-'}</div></div>
@@ -222,7 +245,7 @@
       return c;
     }
 
-    // suggestions UI
+    // suggestions & history UI wiring
     const usernameEl = document.getElementById('username');
     const suggestList = document.getElementById('suggestList');
     function showSuggestions(filter=''){
@@ -230,7 +253,7 @@
       const list = arr.filter(x => x.includes(filter.toLowerCase())).slice(0,8);
       if(list.length === 0){ suggestList.style.display='none'; return; }
       suggestList.innerHTML = list.map(h => `<div class="suggest-item" data-h="${h}">@${h}</div>`).join('');
-      suggestList.style.display = 'block';
+      suggestList.style.display='block';
     }
     suggestList.addEventListener('click', (e) => {
       const item = e.target.closest('.suggest-item'); if(!item) return;
@@ -243,38 +266,38 @@
     });
     document.addEventListener('click', (e) => { if(!e.target.closest('.suggestions')) suggestList.style.display='none'; });
 
-    // history panel
+    // history panel rendering
     const historyPanel = document.getElementById('historyPanel');
     function renderHistory(){
       const arr = loadHistory();
       if(arr.length === 0){ historyPanel.style.display='none'; return; }
       historyPanel.style.display = 'flex';
-      historyPanel.innerHTML = arr.map(h => `<div class="history-chip" data-h="${h}">@${h} ✕</div>`).join('');
+      historyPanel.innerHTML = arr.map(h => `
+        <div class="history-chip" data-h="${h}">
+          <div class="chip-text">@${h}</div>
+          <button class="chip-remove" aria-label="remove">✕</button>
+        </div>`).join('');
     }
     historyPanel.addEventListener('click', (e) => {
       const chip = e.target.closest('.history-chip'); if(!chip) return;
       const handle = chip.dataset.h;
-      // if clicked on text or X, decide - we'll treat whole chip click as run; X delete when clicked near end - simple approach: prompt
-      if(confirm(`Run search @${handle}? (Cancel to remove from history)`)) {
-        usernameEl.value = handle; performSearch();
-      } else {
+      if(e.target.closest('.chip-remove')) {
         // remove
         let arr = loadHistory(); arr = arr.filter(x => x !== handle); localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); renderHistory();
+      } else {
+        usernameEl.value = handle; performSearch();
       }
     });
 
-    // share card generator - simple canvas image
+    // share card generator
     async function generateShareCard(handle, data){
       const canvas = document.getElementById('cardCanvas');
       const ctx = canvas.getContext('2d');
-      // background
       ctx.fillStyle = '#071025';
       ctx.fillRect(0,0,canvas.width,canvas.height);
-      // header
       ctx.fillStyle = '#ffd24b';
       ctx.font = 'bold 48px Inter, Arial';
       ctx.fillText(handle.startsWith('@')?handle:`@${handle}`, 60, 120);
-      // draw three boxes for 24h,7d,month
       const keys = ['24h','7d','month'];
       ctx.font = 'bold 36px Inter, Arial';
       for(let i=0;i<3;i++){
@@ -288,11 +311,8 @@
         ctx.fillText('Rank: ' + (meta.rank || '-'), x+18, y+100);
         ctx.fillText('MS: ' + (meta.mindshare ? Number(meta.mindshare).toFixed(6) : '-'), x+18, y+150);
       }
-
-      // return blob URL
       return new Promise(resolve => canvas.toBlob(blob => resolve(blob)));
     }
-
     async function downloadShare(handle, data){
       const blob = await generateShareCard(handle, data);
       if(!blob) return alert('Failed to generate image');
@@ -303,7 +323,7 @@
       a.remove(); URL.revokeObjectURL(url);
     }
 
-    // --------- main search logic ---------
+    // main
     const resultArea = document.getElementById('resultArea');
     const searchBtn = document.getElementById('searchBtn');
     const clearBtn = document.getElementById('clearBtn');
@@ -314,11 +334,9 @@
       const raw = (usernameEl.value||'').trim();
       if(!raw) { usernameEl.focus(); return; }
       const handle = raw.replace(/^@/,'');
-      // UI: show skeletons
       resultArea.innerHTML = '';
       for(let i=0;i<3;i++) resultArea.appendChild(skeletonCard());
       saveHistory(handle); renderHistory(); showSuggestions('');
-
       searchBtn.disabled = true;
       try{
         const r = await fetch(`${apiBase}?username=${encodeURIComponent(handle)}`);
@@ -331,23 +349,20 @@
           const neighbor = order[i+1] ? data.results[order[i+1]] : null;
           resultArea.appendChild(mkCard(key, data.results[key], neighbor));
         }
-        // attach share action payload
         shareBtn.onclick = () => downloadShare(handle, data);
       } catch(err){
         resultArea.innerHTML = `<div class="card"><h3>Error</h3><div style="color:var(--muted);margin-top:6px">${err.message}</div></div>`;
       } finally { searchBtn.disabled = false }
     }
 
-    // buttons
+    // wire up buttons
     searchBtn.addEventListener('click', performSearch);
     clearBtn.addEventListener('click', ()=>{ usernameEl.value=''; resultArea.innerHTML=''; });
-    openHistoryBtn.addEventListener('click', ()=>{ const panel = document.getElementById('historyPanel'); panel.style.display = panel.style.display==='flex'?'none':'flex'; });
+    openHistoryBtn.addEventListener('click', ()=>{ historyPanel.style.display = historyPanel.style.display==='flex'?'none':'flex'; });
 
-    // share button fallback when no search yet
     shareBtn.addEventListener('click', async () => {
       const handle = (usernameEl.value||'').trim();
       if(!handle) return alert('Search for a handle first to generate card');
-      // try fetch latest data quickly
       try{ const r = await fetch(`${apiBase}?username=${encodeURIComponent(handle.replace(/^@/,''))}`); const data = await r.json(); await downloadShare(handle.replace(/^@/,''), data); }
       catch(e){ alert('Failed to generate card: '+e.message) }
     });
@@ -356,8 +371,13 @@
     initTheme();
     renderHistory();
     showSuggestions('');
-    // keyboard Enter submits
     usernameEl.addEventListener('keydown', (e) => { if(e.key==='Enter') performSearch(); });
+
+    // theme toggle
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      setTheme(current === 'light' ? '' : 'light');
+    });
   </script>
 </body>
 </html>
