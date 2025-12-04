@@ -39,7 +39,6 @@
 
     .controls{display:flex;gap:12px;align-items:center}
     .theme-toggle{padding:8px 12px;border-radius:10px;border:0;background:transparent;color:var(--muted);cursor:pointer}
-    .history-btn{padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--muted);cursor:pointer}
 
     .search-shell{margin-top:14px;background:var(--card);padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,0.03)}
     .search-row{display:flex;gap:10px;align-items:center}
@@ -50,31 +49,6 @@
     .btn-search{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020}
     .btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
     .btn[disabled]{opacity:0.6;cursor:not-allowed}
-
-    /* suggestions - constrained to input width */
-    .suggestions{position:relative}
-    .suggest-list{
-      position:absolute;
-      left:0;
-      top: calc(100% + 8px);
-      width:100%;
-      background:var(--card);
-      border-radius:10px;padding:6px;border:1px solid rgba(255,255,255,0.03);
-      z-index:1000;
-      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
-      max-height:260px; overflow:auto;
-    }
-    .suggest-item{padding:8px;border-radius:8px;cursor:pointer;color:var(--text);display:flex;justify-content:space-between;align-items:center}
-    .suggest-item:hover{background:rgba(255,255,255,0.02)}
-
-    /* history chips - moved under the search shell */
-    .history-panel{margin-top:12px;background:transparent;color:var(--muted);font-size:13px;display:flex;gap:8px;flex-wrap:wrap}
-    .history-chip{
-      padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.02);cursor:pointer;border:1px solid rgba(255,255,255,0.03);
-      display:inline-flex;align-items:center;gap:8px;
-    }
-    .chip-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
-    .chip-remove{background:transparent;border:0;color:var(--muted);cursor:pointer;font-weight:700;padding-left:6px}
 
     .results{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
     .card{background:var(--card);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
@@ -102,8 +76,6 @@
     @media (max-width:520px){
       .toprow{flex-direction:column;align-items:flex-start;gap:8px}
       .search-row{flex-direction:column;align-items:stretch}
-      .suggest-list{top:calc(100% + 8px)}
-      .chip-text{max-width:120px}
     }
   </style>
 </head>
@@ -120,15 +92,13 @@
 
       <div class="controls">
         <button id="themeToggle" class="theme-toggle">Toggle theme</button>
-        <button id="openHistory" class="history-btn">History</button>
       </div>
     </div>
 
     <div class="search-shell" role="search">
       <div class="search-row">
-        <div class="search-inner suggestions">
+        <div class="search-inner">
           <input id="username" type="text" placeholder="@your_handle" autocomplete="off" />
-          <div id="suggestList" class="suggest-list" style="display:none" aria-hidden="true"></div>
         </div>
 
         <div class="actions">
@@ -136,9 +106,6 @@
           <button id="clearBtn" class="btn btn-clear">Clear</button>
         </div>
       </div>
-
-      <!-- history chips below the search row (not overlapping buttons) -->
-      <div id="historyPanel" class="history-panel" style="display:none"></div>
 
       <div class="bottom-actions">
         <button id="shareBtn" class="share-btn" title="Generate share image">Share Card</button>
@@ -162,23 +129,12 @@
   <canvas id="cardCanvas" width="1200" height="630" style="display:none"></canvas>
 
   <script>
+    // ---- config
     const apiBase = '/api/check';
-    const STORAGE_KEY = 'zama_history_v1';
     const THEME_KEY = 'zama_theme_v1';
 
+    // ---- helpers
     function fmtNum(n,dec=8){ if(n==null||!isFinite(Number(n))) return '-'; return Number(n).toFixed(dec) }
-
-    function saveHistory(handle){
-      handle = handle.toLowerCase();
-      if(!handle) return;
-      const arr = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      const idx = arr.indexOf(handle);
-      if(idx !== -1) arr.splice(idx,1);
-      arr.unshift(handle);
-      if(arr.length > 20) arr.length = 20;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
-    }
-    function loadHistory(){ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') }
 
     function setTheme(t){
       if(t) document.documentElement.setAttribute('data-theme', t);
@@ -188,9 +144,7 @@
     function initTheme(){
       const t = localStorage.getItem(THEME_KEY);
       if(t) setTheme(t);
-      else {
-        setTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme:light)').matches ? 'light' : '');
-      }
+      else setTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme:light)').matches ? 'light' : '');
     }
 
     function computeProgress(meta){
@@ -245,51 +199,7 @@
       return c;
     }
 
-    // suggestions & history UI wiring
-    const usernameEl = document.getElementById('username');
-    const suggestList = document.getElementById('suggestList');
-    function showSuggestions(filter=''){
-      const arr = loadHistory();
-      const list = arr.filter(x => x.includes(filter.toLowerCase())).slice(0,8);
-      if(list.length === 0){ suggestList.style.display='none'; return; }
-      suggestList.innerHTML = list.map(h => `<div class="suggest-item" data-h="${h}">@${h}</div>`).join('');
-      suggestList.style.display='block';
-    }
-    suggestList.addEventListener('click', (e) => {
-      const item = e.target.closest('.suggest-item'); if(!item) return;
-      usernameEl.value = item.dataset.h; suggestList.style.display='none';
-    });
-
-    usernameEl.addEventListener('input', (e) => {
-      const v = e.target.value || '';
-      showSuggestions(v.replace(/^@/,''));
-    });
-    document.addEventListener('click', (e) => { if(!e.target.closest('.suggestions')) suggestList.style.display='none'; });
-
-    // history panel rendering
-    const historyPanel = document.getElementById('historyPanel');
-    function renderHistory(){
-      const arr = loadHistory();
-      if(arr.length === 0){ historyPanel.style.display='none'; return; }
-      historyPanel.style.display = 'flex';
-      historyPanel.innerHTML = arr.map(h => `
-        <div class="history-chip" data-h="${h}">
-          <div class="chip-text">@${h}</div>
-          <button class="chip-remove" aria-label="remove">✕</button>
-        </div>`).join('');
-    }
-    historyPanel.addEventListener('click', (e) => {
-      const chip = e.target.closest('.history-chip'); if(!chip) return;
-      const handle = chip.dataset.h;
-      if(e.target.closest('.chip-remove')) {
-        // remove
-        let arr = loadHistory(); arr = arr.filter(x => x !== handle); localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); renderHistory();
-      } else {
-        usernameEl.value = handle; performSearch();
-      }
-    });
-
-    // share card generator
+    // ---- share card generator
     async function generateShareCard(handle, data){
       const canvas = document.getElementById('cardCanvas');
       const ctx = canvas.getContext('2d');
@@ -323,20 +233,20 @@
       a.remove(); URL.revokeObjectURL(url);
     }
 
-    // main
+    // ---- main
     const resultArea = document.getElementById('resultArea');
     const searchBtn = document.getElementById('searchBtn');
     const clearBtn = document.getElementById('clearBtn');
     const shareBtn = document.getElementById('shareBtn');
-    const openHistoryBtn = document.getElementById('openHistory');
 
     async function performSearch(){
-      const raw = (usernameEl.value||'').trim();
-      if(!raw) { usernameEl.focus(); return; }
+      const raw = (document.getElementById('username').value||'').trim();
+      if(!raw) { document.getElementById('username').focus(); return; }
       const handle = raw.replace(/^@/,'');
+      // skeleton UI
       resultArea.innerHTML = '';
       for(let i=0;i<3;i++) resultArea.appendChild(skeletonCard());
-      saveHistory(handle); renderHistory(); showSuggestions('');
+
       searchBtn.disabled = true;
       try{
         const r = await fetch(`${apiBase}?username=${encodeURIComponent(handle)}`);
@@ -355,29 +265,26 @@
       } finally { searchBtn.disabled = false }
     }
 
-    // wire up buttons
+    // buttons
     searchBtn.addEventListener('click', performSearch);
-    clearBtn.addEventListener('click', ()=>{ usernameEl.value=''; resultArea.innerHTML=''; });
-    openHistoryBtn.addEventListener('click', ()=>{ historyPanel.style.display = historyPanel.style.display==='flex'?'none':'flex'; });
-
+    clearBtn.addEventListener('click', ()=>{ document.getElementById('username').value=''; resultArea.innerHTML=''; });
     shareBtn.addEventListener('click', async () => {
-      const handle = (usernameEl.value||'').trim();
+      const handle = (document.getElementById('username').value||'').trim();
       if(!handle) return alert('Search for a handle first to generate card');
       try{ const r = await fetch(`${apiBase}?username=${encodeURIComponent(handle.replace(/^@/,''))}`); const data = await r.json(); await downloadShare(handle.replace(/^@/,''), data); }
       catch(e){ alert('Failed to generate card: '+e.message) }
     });
-
-    // init
-    initTheme();
-    renderHistory();
-    showSuggestions('');
-    usernameEl.addEventListener('keydown', (e) => { if(e.key==='Enter') performSearch(); });
 
     // theme toggle
     document.getElementById('themeToggle').addEventListener('click', () => {
       const current = document.documentElement.getAttribute('data-theme');
       setTheme(current === 'light' ? '' : 'light');
     });
+
+    // init theme
+    initTheme();
+    // enter key submits
+    document.getElementById('username').addEventListener('keydown', (e) => { if(e.key==='Enter') performSearch(); });
   </script>
 </body>
 </html>
