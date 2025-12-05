@@ -15,19 +15,21 @@
     --footer-h:84px;
   }
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));background-attachment:fixed;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;}
-  body{display:flex;flex-direction:column;min-height:100vh;}
-  /* content wrap reserves space for footer so you won't see color glitches */
-  .wrap{max-width:940px;margin:18px auto;padding:18px;flex:1;display:flex;flex-direction:column;gap:14px;min-height:calc(100vh - var(--footer-h) - 36px);}
+  html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));}
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;}
 
-  .topbar{display:flex;align-items:center;gap:12px}
+  #app{min-height:100vh;display:flex;flex-direction:column;}
+  /* reserve footer area so content never runs under footer */
+  .wrap{max-width:940px;margin:18px auto;padding:18px 18px 8px;flex:1;display:flex;flex-direction:column;padding-bottom:calc(var(--footer-h) + 18px);min-height:calc(100vh - var(--footer-h) - 36px);}
+
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
   .brand{display:flex;gap:12px;align-items:center}
   .logo{width:48px;height:48px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(0,0,0,0.45)}
   .logo img{width:100%;height:100%;object-fit:cover}
-  h1{margin:0;font-size:20px}
+  h1{margin:0;font-size:18px}
   .subtitle{color:var(--muted);font-size:13px;margin-top:2px}
 
-  .search-shell{margin-top:6px;background:var(--card);padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 36px rgba(0,0,0,0.45)}
+  .search-shell{margin-top:14px;background:var(--card);padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 36px rgba(0,0,0,0.45)}
   .search-row{display:flex;gap:12px;align-items:center}
   .search-inner{flex:1;min-width:0}
   input[type="text"]{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px; height:48px;}
@@ -38,12 +40,12 @@
   .btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);min-width:84px}
   .btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#061020; min-width:132px;}
 
-  .results{margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;align-items:start}
-  .card{background:var(--card);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 22px rgba(0,0,0,0.45)}
-  .card h3{margin:0 0 8px;font-size:14px}
-  .row{display:flex;justify-content:space-between;align-items:center;margin:6px 0}
+  .results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start}
+  .card{background:var(--card);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 28px rgba(0,0,0,0.45)}
+  .card h3{margin:0 0 10px;font-size:14px}
+  .row{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
   .label{color:var(--muted);font-size:13px}
-  .value{font-size:18px;font-weight:800}
+  .value{font-size:20px;font-weight:800}
 
   .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;font-size:13px}
   .badge.ok{background:rgba(62,230,168,0.12);color:var(--ok);border:1px solid rgba(62,230,168,0.12)}
@@ -53,9 +55,22 @@
   .progress-bar{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .6s ease}
   .ms-change{display:inline-flex;gap:6px;align-items:center;font-weight:700}
   .ms-change.up{color:var(--ok)} .ms-change.down{color:var(--bad)}
-  hr.sep{border:none;border-top:1px solid rgba(255,255,255,0.03);margin:8px 0}
+  hr.sep{border:none;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0}
 
-  footer{padding:18px;max-width:940px;margin:0 auto;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center}
+  /* footer placed in normal flow but reserved with padding-bottom on .wrap */
+  footer{
+    padding:18px;
+    max-width:940px;
+    margin:0 auto;
+    color:var(--muted);
+    font-size:13px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background: linear-gradient(180deg, rgba(0,0,0,0.00), rgba(0,0,0,0.02));
+    position:relative;
+    z-index:1;
+  }
   a.powered{ text-decoration:none;color:inherit;display:flex;gap:8px;align-items:center}
   a.powered img{ width:48px; height:48px; border-radius:8px; object-fit:cover; box-shadow:0 8px 22px rgba(0,0,0,0.45) }
 
@@ -63,62 +78,62 @@
   @media (max-width:560px){
     .search-row{flex-direction:column;align-items:stretch}
     .actions{justify-content:space-between}
-    .btn-share{min-width:110px}
-    .logo{width:44px;height:44px}
-    footer{padding:14px}
+    footer{padding-left:12px;padding-right:12px}
   }
 </style>
 </head>
 <body>
-  <div class="wrap" id="wrap">
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo"><img id="logoImg" src="zama-logo.png" alt="Zama"></div>
-        <div>
-          <h1>ZAMA SZN 5 RANK</h1>
-          <div class="subtitle">Search X handle (e.g. @0x_madara_)</div>
+  <div id="app">
+    <div class="wrap">
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo"><img id="logoImg" src="zama-logo.png" alt="Zama"></div>
+          <div>
+            <h1>ZAMA SZN 5 RANK</h1>
+            <div class="subtitle">Search X handle (e.g. @0x_madara_)</div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="search-shell" role="search" aria-label="Search X handle">
-      <div class="search-row">
-        <div class="search-inner">
-          <input id="username" type="text" placeholder="@your_handle" aria-label="Search handle" />
-        </div>
-        <div class="actions">
-          <button id="searchBtn" class="btn btn-search">🔎 Search</button>
-          <button id="clearBtn" class="btn btn-clear">Clear</button>
-          <button id="shareCardBtn" class="btn btn-share">Share Card</button>
+      <div class="search-shell" role="search" aria-label="Search X handle">
+        <div class="search-row">
+          <div class="search-inner">
+            <input id="username" type="text" placeholder="@your_handle" aria-label="Search handle" />
+          </div>
+          <div class="actions">
+            <button id="searchBtn" class="btn btn-search">🔎 Search</button>
+            <button id="clearBtn" class="btn btn-clear">Clear</button>
+            <button id="shareCardBtn" class="btn btn-share">Share Card</button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- results area -->
-    <div id="resultArea" class="results" aria-live="polite" style="display:none"></div>
+      <!-- results area: hidden until a search is performed -->
+      <div id="resultArea" class="results" aria-live="polite" style="display:none"></div>
+
+      <footer>
+        <div>Made with ❤️ for Zama — love & powered by madara</div>
+        <a class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer">
+          <img id="poweredAvatar" src="madara.png" alt="madara">
+          <div style="font-size:13px">
+            <div style="color:var(--muted);font-size:12px">Powered by</div>
+            <div style="font-weight:700">madara</div>
+          </div>
+        </a>
+      </footer>
+    </div>
   </div>
-
-  <footer id="siteFooter">
-    <div>Made with ❤️ for Zama</div>
-    <a id="poweredLink" class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer">
-      <img id="poweredAvatar" src="madara.png" alt="madara">
-      <div style="font-size:13px">
-        <div style="color:var(--muted);font-size:12px">Powered by</div>
-        <div style="font-weight:700">madara</div>
-      </div>
-    </a>
-  </footer>
 
   <canvas id="cardCanvas" width="1600" height="900" style="display:none"></canvas>
 
 <script>
 /* -------- CONFIG -------- */
-const API_BASE = '/api/check';
+const API_BASE = '/api/check';           // server endpoint
 const TOTAL_FETCHED = 1500;
 const OG_NFT_TOP = 1006;
 const SHARE_TOP = 100;
 
-/* quick helpers */
+/* small helpers */
 const $ = id => document.getElementById(id);
 function fmtNum(n, d=8){ if(n==null || !isFinite(Number(n))) return '-'; return Number(n).toFixed(d); }
 function money(n){ if(n==null || !isFinite(Number(n))) return '-'; return '$' + Number(n).toLocaleString(); }
@@ -143,7 +158,7 @@ function preloadStatic(){
 }
 preloadStatic();
 
-/* fetch avatar from unavatar.io */
+/* avatar from unavatar */
 async function loadAvatar(handle){
   return new Promise(resolve=>{
     const img = new Image(); img.crossOrigin='anonymous';
@@ -153,14 +168,35 @@ async function loadAvatar(handle){
   });
 }
 
-/* results hide/show */
+/* UI: show/hide results area */
 function hideResults(){ $('resultArea').style.display = 'none'; }
 function showResults(){ $('resultArea').style.display = 'grid'; }
+
+/* initial state: hide results */
 hideResults();
 
-/* small result card builder */
+/* create rounded rect helper for canvas */
+function roundRect(ctx, x, y, w, h, r, fill, stroke){
+  if (typeof r === 'number') r = {tl: r, tr: r, br: r, bl: r};
+  ctx.beginPath();
+  ctx.moveTo(x + r.tl, y);
+  ctx.lineTo(x + w - r.tr, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r.tr);
+  ctx.lineTo(x + w, y + h - r.br);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r.br, y + h);
+  ctx.lineTo(x + r.bl, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r.bl);
+  ctx.lineTo(x, y + r.tl);
+  ctx.quadraticCurveTo(x, y, x + r.tl, y);
+  ctx.closePath();
+  if(fill){ ctx.fill(); }
+  if(stroke){ ctx.stroke(); }
+}
+
+/* build a single card (title: '24h'|'7d'|'month') */
 function mkCard(title, meta, neighbor){
   const el = document.createElement('div'); el.className='card';
+
   const found = !!meta && meta.found === true && Number.isFinite(Number(meta.rank));
   const rank = found ? Number(meta.rank) : null;
   const ms = found ? meta.mindshare : null;
@@ -177,6 +213,7 @@ function mkCard(title, meta, neighbor){
 
   let payoutHtml = '-';
   if(title === 'month' && found && rank <= SHARE_TOP){
+    // simple linear assumption: top1 ~ 1500, top100 ~ 150
     const topMin = 1500, topMax=2000, min100=150, max100=260;
     const t = (Math.min(100, Math.max(1, rank)) - 1)/99;
     const min = Math.round(topMin + (min100 - topMin)*t);
@@ -187,7 +224,7 @@ function mkCard(title, meta, neighbor){
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center">
       <h3>${title}</h3>
-      <div style="text-align:right;font-weight:800;font-size:18px">${found?rank:'-'}</div>
+      <div style="text-align:right;font-weight:800;font-size:20px">${found?rank:'-'}</div>
     </div>
     <div class="row"><div class="label">Mindshare</div><div class="value">${found?fmtNum(ms):'-'}</div></div>
     <div class="row"><div class="label">Change vs next</div><div class="value">${found? (changeHtml + absHtml) : '-'}</div></div>
@@ -202,174 +239,177 @@ function mkCard(title, meta, neighbor){
   return el;
 }
 
-/* ===== drawCanvas: high-fidelity share card (mockup) =====
-   Layout:
-   - left: big avatar + handle
-   - row with three small timeframe cards (24h, 7d, month)
-   - right: big summary card with big rank, month mindshare, eligible flag, assumed payout
-*/
+/* draw share canvas, returns dataURL */
 function drawCanvas(handle, data){
-  const canvas = $('cardCanvas');
-  const ctx = canvas.getContext('2d');
+  const canvas = $('cardCanvas'); const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
-  // clear
   ctx.clearRect(0,0,W,H);
 
-  // background: slightly patterned green-ish like your mock
-  ctx.fillStyle = '#0e3233';
+  // background
+  ctx.fillStyle = '#0f3130';
   ctx.fillRect(0,0,W,H);
-  // subtle arcs
-  ctx.globalAlpha = 0.08;
-  ctx.fillStyle = '#062b2f';
-  ctx.beginPath(); ctx.ellipse(W*0.85, H*0.15, W*0.8, H*0.6, 0, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(-W*0.15, H*0.92, W*0.9, H*0.6, 0, 0, Math.PI*2); ctx.fill();
-  ctx.globalAlpha = 1;
 
-  // card rounded container background
+  // rounded card area (we'll clip to it safely)
   const pad = 48;
   const cardW = W - pad*2, cardH = H - pad*2;
-  const rx = 20;
-  ctx.fillStyle = 'rgba(255,255,255,0.03)';
-  roundRect(ctx, pad, pad, cardW, cardH, rx, true, false);
-  ctx.clip(); // clip content to card
+  const rx = 28;
 
-  // draw avatar (circle) - left top
-  const avatarSize = Math.floor(cardH*0.28);
-  const avatarX = pad + 22, avatarY = pad + 26;
-  if(_pre.avatar){
+  ctx.save(); // <<-- save before clip (fix 1)
+  ctx.fillStyle = 'rgba(0,0,0,0.12)';
+  roundRect(ctx, pad, pad, cardW, cardH, rx, true, false);
+  ctx.clip();
+
+  // draw subtle decorative shapes
+  ctx.globalAlpha = 0.06;
+  ctx.fillStyle = '#062f2c';
+  roundRect(ctx, pad + cardW*0.25, pad + cardH*0.02, cardW*0.6, cardH*0.6, 240, true, false);
+  ctx.globalAlpha = 1;
+
+  // avatar area
+  const avatar = _pre.avatar;
+  const avatarSize = 140;
+  const margin = pad + 12;
+  if(avatar){
+    // circular avatar
     ctx.save();
-    const img = _pre.avatar;
-    const cx = avatarX + avatarSize/2, cy = avatarY + avatarSize/2;
-    ctx.beginPath(); ctx.arc(cx, cy, avatarSize/2, 0, Math.PI*2); ctx.closePath(); ctx.clip();
-    ctx.drawImage(img, avatarX, avatarY, avatarSize, avatarSize);
+    ctx.beginPath();
+    const avX = margin + avatarSize/2, avY = margin + avatarSize/2;
+    ctx.arc(avX, avY, avatarSize/2, 0, Math.PI*2);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(avatar, margin, margin, avatarSize, avatarSize);
     ctx.restore();
   } else {
-    // fallback square with logo
-    ctx.fillStyle = '#233b3b'; ctx.fillRect(avatarX, avatarY, avatarSize, avatarSize);
+    ctx.fillStyle = '#ffd24b';
+    ctx.fillRect(margin, margin, avatarSize, avatarSize);
   }
 
-  // handle text
-  ctx.fillStyle = '#fff'; ctx.font = `700 ${Math.floor(cardH*0.07)}px Inter, Arial`;
-  const displayHandle = handle.startsWith('@')?handle:`@${handle}`;
-  ctx.fillText(displayHandle, avatarX + avatarSize + 28, avatarY + Math.floor(avatarSize*0.45));
+  // handle/title next to avatar
+  const nameX = margin + avatarSize + 28;
+  const nameY = margin + 46;
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '700 46px Inter, Arial';
+  ctx.fillText(handle.startsWith('@')? handle : '@' + handle, nameX, nameY);
 
-  // subtitle small
-  ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.font = `400 ${Math.floor(cardH*0.03)}px Inter, Arial`;
-  ctx.fillText('Zama rank card', avatarX + avatarSize + 28, avatarY + Math.floor(avatarSize*0.45) + 36);
+  ctx.fillStyle = '#9fb0bf';
+  ctx.font = '400 14px Inter, Arial';
+  ctx.fillText('Zama rank card', nameX, nameY + 24);
 
-  // small timeframe boxes (three)
-  const smallW = Math.floor((cardW - 48 - (avatarSize + 28)) / 3) - 12;
-  const smallH = Math.floor(cardH*0.13);
-  const smallY = avatarY + avatarSize*0.55;
-  const leftStart = avatarX;
-  const timeframes = ['24h','7d','month'];
-  for(let i=0;i<3;i++){
-    const x = avatarX + (avatarSize + 28) + (smallW + 12) * i;
-    drawSmallBox(ctx, x, smallY, smallW, smallH, timeframes[i], data.results?.[timeframes[i]] || {});
+  // SMALL SUMMARY boxes (three small boxes in a row)
+  const boxW = Math.max(160, Math.floor((cardW - (avatarSize + 28) - 60) / 3));
+  const boxH = 88;
+  const boxesY = margin + 120;
+  const leftStart = nameX;
+  const labels = ['24h','7d','month'];
+  for(let i=0;i<labels.length;i++){
+    const x = leftStart + i*(boxW + 20);
+    // small box rect
+    ctx.fillStyle = 'rgba(255,255,255,0.02)';
+    roundRect(ctx, x, boxesY, boxW, boxH, 12, true, false);
+    // header + rank right
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '700 18px Inter, Arial';
+    ctx.fillText(labels[i].toUpperCase(), x + 12, boxesY + 26);
+    const meta = (data.results && data.results[labels[i]]) ? data.results[labels[i]] : {};
+    const found = !!meta && meta.found===true && Number.isFinite(Number(meta.rank));
+    ctx.font = '700 20px Inter, Arial';
+    ctx.textAlign = 'right';
+    ctx.fillText(found?String(meta.rank):'-', x + boxW - 12, boxesY + 26);
+    ctx.textAlign = 'left';
+    // mindshare line
+    ctx.font = '400 12px Inter, Arial';
+    ctx.fillStyle = '#9fb0bf';
+    ctx.fillText('Mindshare: ' + (found?Number(meta.mindshare).toFixed(6):'-'), x + 12, boxesY + 50);
+    // progress bar small
+    const prog = found ? Math.round(progressToTop100(Number(meta.rank))*100) : 0;
+    ctx.fillStyle = 'rgba(255,255,255,0.04)';
+    ctx.fillRect(x + 12, boxesY + 58, boxW - 24, 10);
+    if(found){
+      ctx.fillStyle = '#ffd24b';
+      ctx.fillRect(x + 12, boxesY + 58, Math.max(8, (boxW - 24) * prog / 100), 10);
+    }
   }
 
-  // Right large summary panel
-  const summaryW = Math.floor(cardW*0.36);
-  const summaryX = pad + cardW - summaryW - 28;
-  const summaryY = pad + 28;
-  const summaryH = Math.floor(cardH*0.6);
-  // rounded rect
-  ctx.fillStyle = 'rgba(0,0,0,0.08)';
-  roundRect(ctx, summaryX, summaryY, summaryW, summaryH, 18, true, false);
+  // Right summary area (month big number + details) on the right side
+  const summaryW = pad + cardW - (leftStart + (boxW*3 + 40));
+  const summaryX = leftStart + (boxW*3 + 48);
+  const summaryY = margin + 40;
+  const summaryH = 420;
 
-  // big rank top-right
-  const monthMeta = data.results?.month || {};
-  const monthFound = monthMeta && monthMeta.found === true && Number.isFinite(Number(monthMeta.rank));
+  // big rank text (safely measured/clamped to avoid overlap) (fix 2)
+  const monthMeta = (data.results && data.results.month) ? data.results.month : {};
+  const monthFound = !!monthMeta && monthMeta.found===true && Number.isFinite(Number(monthMeta.rank));
   const rankText = monthFound ? String(monthMeta.rank) : '-';
-  ctx.fillStyle = '#fff'; ctx.font = `800 ${Math.floor(summaryH*0.28)}px Inter, Arial`;
-  const rankX = summaryX + summaryW - 20;
+  // measure & clamp font size
+  let desiredSize = Math.floor(summaryH * 0.28);
+  ctx.font = `800 ${desiredSize}px Inter, Arial`;
+  let measured = ctx.measureText(rankText).width;
+  const maxAllowed = Math.floor(summaryW * 0.95);
+  while(measured > maxAllowed && desiredSize > 28){
+    desiredSize = Math.max(28, Math.floor(desiredSize * 0.9));
+    ctx.font = `800 ${desiredSize}px Inter, Arial`;
+    measured = ctx.measureText(rankText).width;
+  }
+  ctx.fillStyle = '#ffffff';
   ctx.textAlign = 'right';
-  ctx.fillText(rankText, rankX, summaryY + Math.floor(summaryH*0.22));
+  ctx.fillText(rankText, summaryX + summaryW - 20, summaryY + Math.floor(summaryH * 0.22));
   ctx.textAlign = 'left';
 
-  // month label and mindshare
-  ctx.fillStyle = '#9fb0bf'; ctx.font = `600 ${Math.floor(summaryH*0.042)}px Inter, Arial`;
-  ctx.fillText('Mindshare', summaryX + 18, summaryY + Math.floor(summaryH*0.18));
-  ctx.fillStyle = '#ffd24b'; ctx.font = `700 ${Math.floor(summaryH*0.055)}px Inter, Arial`;
-  ctx.fillText(monthFound ? Number(monthMeta.mindshare).toFixed(6) : '-', summaryX + 18, summaryY + Math.floor(summaryH*0.3));
+  // month mindshare label & value
+  ctx.fillStyle = '#9fb0bf';
+  ctx.font = '600 14px Inter, Arial';
+  ctx.fillText('Mindshare', summaryX + 12, summaryY + 28);
+  ctx.font = '700 28px Inter, Arial';
+  ctx.fillStyle = '#ffd24b';
+  const monthMsText = monthFound ? Number(monthMeta.mindshare).toFixed(6) : '-';
+  // draw mindshare in smaller controlled font to avoid overlap
+  ctx.fillText(monthMsText, summaryX + 12, summaryY + 62);
 
-  // eligibility and payout lines
-  let badgeText = 'Not eligible';
+  // month progress bar below
+  const barY = summaryY + 90;
+  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  ctx.fillRect(summaryX + 12, barY, summaryW - 24, 12);
+  const progMonth = monthFound ? Math.round(progressToTop100(Number(monthMeta.rank))*100) : 0;
   if(monthFound){
-    const r=Number(monthMeta.rank);
-    if(r<=SHARE_TOP) badgeText = 'Eligible: OG NFT + Revenue Share';
-    else if(r<=OG_NFT_TOP) badgeText = 'Eligible: OG NFT';
+    ctx.fillStyle = '#ffd24b';
+    ctx.fillRect(summaryX + 12, barY, Math.max(8, (summaryW - 24) * progMonth / 100), 12);
   }
-  ctx.fillStyle = monthFound && Number(monthMeta.rank) <= SHARE_TOP ? '#3ee6a8' : '#9fb0bf';
-  ctx.font = `700 ${Math.floor(summaryH*0.04)}px Inter, Arial`;
-  ctx.fillText(badgeText, summaryX + 18, summaryY + Math.floor(summaryH*0.46));
 
-  // assumed payout (if eligible)
-  ctx.fillStyle = '#fff';
-  ctx.font = `600 ${Math.floor(summaryH*0.035)}px Inter, Arial`;
-  let payoutLine = '-';
-  if(monthFound && Number(monthMeta.rank) <= SHARE_TOP){
+  // eligibility badge + payout text
+  const badgeY = barY + 32;
+  if(monthFound){
     const r = Number(monthMeta.rank);
-    const topMin = 1500, topMax=2000, min100=150, max100=260;
-    const t = (Math.min(100, Math.max(1, r)) - 1)/99;
-    const min = Math.round(topMin + (min100 - topMin)*t);
-    const max = Math.round(topMax + (max100 - topMax)*t);
-    payoutLine = `${money(min)} - ${money(max)}`;
+    ctx.fillStyle = (r <= SHARE_TOP) ? '#3ee6a8' : '#9fb0bf';
+    ctx.font = '700 18px Inter, Arial';
+    const badgeText = (r <= SHARE_TOP) ? 'Eligible: OG NFT + Revenue Share' : ((r <= OG_NFT_TOP) ? 'Eligible: OG NFT' : 'Not eligible');
+    ctx.fillText(badgeText, summaryX + 12, badgeY);
+    if(r <= SHARE_TOP){
+      // assumed payout
+      ctx.font = '600 16px Inter, Arial';
+      const t = (Math.min(100, Math.max(1, r)) - 1)/99;
+      const topMin = 1500, topMax=2000, min100=150, max100=260;
+      const mn = Math.round(topMin + (min100 - topMin)*t), mx = Math.round(topMax + (max100 - topMax)*t);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(`Assumed payout: ${money(mn)} - ${money(mx)}`, summaryX + 12, badgeY + 34);
+    }
+  } else {
+    ctx.font = '600 16px Inter, Arial';
+    ctx.fillStyle = '#9fb0bf';
+    ctx.fillText('No month data', summaryX + 12, badgeY);
   }
-  ctx.fillText(`Assumed payout (if eligible): ${payoutLine}`, summaryX + 18, summaryY + Math.floor(summaryH*0.58));
 
-  // footer small line inside card
-  ctx.fillStyle = 'rgba(255,255,255,0.6)';
-  ctx.font = `400 ${Math.floor(cardH*0.028)}px Inter, Arial`;
-  ctx.fillText('Powered by madara — zama-rank.vercel.app', pad + 18, pad + cardH - 26);
+  // footer label inside canvas
+  ctx.font = '500 14px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
+  ctx.fillText('Powered by madara — zama-rank.vercel.app', pad + 18, H - 40);
 
-  // restore clip
-  ctx.restore();
+  // restore from clip
+  ctx.restore(); // <<-- restore after clip (fix 1)
 
+  // return PNG data URL
   return canvas.toDataURL('image/png');
-
-  /* helpers for drawCanvas */
-  function roundRect(ctx, x, y, w, h, r, fill=true, stroke=true){
-    if(typeof r === 'undefined') r = 5;
-    ctx.beginPath();
-    ctx.moveTo(x+r, y);
-    ctx.arcTo(x+w, y,   x+w, y+h, r);
-    ctx.arcTo(x+w, y+h, x,   y+h, r);
-    ctx.arcTo(x,   y+h, x,   y,   r);
-    ctx.arcTo(x,   y,   x+w, y,   r);
-    ctx.closePath();
-    if(fill){ ctx.fill(); }
-    if(stroke){ ctx.stroke(); }
-  }
-
-  function drawSmallBox(ctx, x, y, w, h, title, meta){
-    // background small rounded
-    ctx.save();
-    ctx.fillStyle = 'rgba(0,0,0,0.06)';
-    roundRect(ctx, x, y, w, h, 12, true, false);
-    // title
-    ctx.fillStyle = '#fff'; ctx.font = `700 ${Math.floor(h*0.34)}px Inter, Arial`;
-    ctx.fillText(title.toUpperCase(), x + 12, y + Math.floor(h*0.36));
-    // rank on top-right
-    const found = meta && meta.found===true && Number.isFinite(Number(meta.rank));
-    ctx.fillStyle = '#fff'; ctx.font = `700 ${Math.floor(h*0.38)}px Inter, Arial`;
-    ctx.textAlign='right';
-    ctx.fillText(found?String(meta.rank):'-', x + w - 12, y + Math.floor(h*0.36));
-    ctx.textAlign='left';
-    // Mindshare text below
-    ctx.fillStyle = '#9fb0bf'; ctx.font = `400 ${Math.floor(h*0.22)}px Inter, Arial`;
-    ctx.fillText('Mindshare: ' + (found?Number(meta.mindshare).toFixed(6):'-'), x + 12, y + Math.floor(h*0.36) + 28);
-    // small progress bar
-    const prog = found ? Math.round(progressToTop100(Number(meta.rank))*100) : 0;
-    const barW = Math.max(10, Math.floor(w - 24));
-    const barY = y + h - 22;
-    ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fillRect(x + 12, barY, barW, 8);
-    if(found){ ctx.fillStyle = '#ffd24b'; ctx.fillRect(x + 12, barY, Math.max(8, (barW * prog / 100)), 8); }
-    ctx.restore();
-  }
 }
 
-/* share helper: user gesture required */
+/* export dataURL -> file and share (runs inside user gesture) */
 function shareImageFromDataURL(dataUrl, handle, data){
   try{
     const byteString = atob(dataUrl.split(',')[1]);
@@ -382,16 +422,18 @@ function shareImageFromDataURL(dataUrl, handle, data){
     if(navigator.canShare && navigator.canShare({files:[file]})){
       navigator.share({
         files: [file],
-        text: `${handle} — Zama Rank (month): ${data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`
-      }).catch(()=>{});
+        text: `${handle} — Zama Rank (30d): ${data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`
+      }).catch(e=>{
+        // user cancelled or error — silently ignore
+      });
       return;
     }
 
-    // fallback: download + open tweet compose
+    // fallback: download then open tweet intent
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url; a.download = `${handle}-zama-rank.png`; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),2000);
-    const text = `${handle} — Zama Rank (month): ${data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`;
+    const text = `${handle} — Zama Rank (30d): ${data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`;
     window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
 
   }catch(err){
@@ -399,15 +441,16 @@ function shareImageFromDataURL(dataUrl, handle, data){
   }
 }
 
-/* UI behaviour */
+/* UI flow: search, render cards */
 let lastSearch = null;
 async function performSearch(){
   const raw = ($('username').value||'').trim();
   if(!raw){ $('username').focus(); return; }
   const handle = raw.replace(/^@/,'');
+  // show results area
   showResults();
+  // simple loading cards
   const container = $('resultArea'); container.innerHTML = '';
-  // loading placeholders
   for(let i=0;i<3;i++){ const s=document.createElement('div'); s.className='card'; s.innerHTML=`<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`; container.appendChild(s); }
 
   // preload avatar
@@ -417,18 +460,13 @@ async function performSearch(){
     const res = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
     if(!res.ok) throw new Error('Network ' + res.status);
     const data = await res.json();
-
-    // render small cards
+    // render cards
     container.innerHTML = '';
     const order = ['24h','7d','month'];
     for(let i=0;i<order.length;i++){
       const k = order[i]; const neighbor = (i<order.length-1) ? data.results[order[i+1]] || null : null;
       container.appendChild( mkCard(k, data.results[k]||{}, neighbor) );
     }
-
-    // update footer link to user's profile
-    $('poweredLink').href = `https://x.com/${encodeURIComponent(handle)}`;
-
     lastSearch = { handle, data };
   }catch(err){
     const el = document.createElement('div'); el.className='card';
@@ -438,24 +476,30 @@ async function performSearch(){
   }
 }
 
-/* share click must be direct user gesture to use navigator.share() */
+/* Share handler - requires a previous successful search, must be called directly by user gesture */
 $('shareCardBtn').addEventListener('click', async (e) => {
   if(!lastSearch){ alert('Run Search first, then press Share Card.'); return; }
   const { handle, data } = lastSearch;
-  // draw the canvas with avatar if available
+  // draw canvas and produce dataURL
   const dataUrl = drawCanvas(handle, data);
+  // share
   shareImageFromDataURL(dataUrl, handle, data);
 });
 
-/* bindings */
+/* Search + Enter key */
 $('searchBtn').addEventListener('click', performSearch);
-$('username').addEventListener('keydown', (e)=>{ if(e.key === 'Enter') performSearch(); });
+$('username').addEventListener('keydown', (e)=>{ if(e.key==='Enter') performSearch(); });
+
+/* Clear */
 $('clearBtn').addEventListener('click', ()=>{
   $('username').value = '';
   lastSearch = null;
   hideResults();
-  $('poweredLink').href = 'https://x.com/0x_madara_';
 });
+
+/* show only search area on initial load */
+hideResults();
+
 </script>
 </body>
 </html>
