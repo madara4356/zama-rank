@@ -3,111 +3,149 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ZAMA RANK — Share Card (Premium)</title>
+<title>ZAMA SZN 5 RANK</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg1:#020613; --bg2:#061026;
+  --bg-top:#000409;
+  --bg-bottom:#071025;
   --muted:#9fb0bf;
-  --accent1:#ffd24b; --accent2:#ff6b6b;
-  --card: rgba(255,255,255,0.03);
-  --ok: #3ee6a8; --danger:#ff7b7b;
+  --accent1:#ffd24b;
+  --accent2:#ff6b6b;
+  --card:#06101a;
   --glass: rgba(255,255,255,0.03);
+  --green:#3ee6a8;
+  --red:#ff7b7b;
 }
+
+/* Reset + layout */
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#eaf3fb}
-#app{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:18px}
-.container{max-width:940px;width:100%}
-.top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-.logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;overflow:hidden}
-.logo img{width:100%;height:100%;object-fit:cover}
-.title{font-weight:800;font-size:18px}
-.subtitle{color:var(--muted);font-size:13px;margin-top:2px}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#eaf3fb;-webkit-font-smoothing:antialiased}
+body{
+  background: linear-gradient(180deg,var(--bg-top) 0%, var(--bg-bottom) 100%);
+  min-height:100vh; display:flex; flex-direction:column;
+}
 
-.search-shell{background:var(--card);padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 30px rgba(0,0,0,0.45);display:flex;gap:12px;align-items:center;margin-bottom:16px}
-.search-shell input{flex:1;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px;height:44px}
-.btn{padding:10px 14px;border-radius:12px;border:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020;font-weight:800;cursor:pointer}
-.btn.gray{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);min-width:80px}
+/* App container */
+.app{width:100%;max-width:940px;margin:18px auto;padding:16px;flex:1;display:flex;flex-direction:column}
 
-.results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start;width:100%}
-.card{background:var(--card);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 28px rgba(0,0,0,0.45)}
-.card h3{margin:0 0 8px}
-.footer{display:flex;justify-content:space-between;align-items:center;width:100%;color:var(--muted);margin-top:18px;font-size:13px}
-.powered{display:flex;gap:10px;align-items:center}
-.powered img{width:44px;height:44px;border-radius:8px;object-fit:cover}
+/* top brand */
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.brand .logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 8px 26px rgba(0,0,0,0.6)}
+.brand .logo img{width:100%;height:100%;object-fit:cover}
+.brand h1{margin:0;font-size:18px;font-weight:800}
+.brand p{margin:0;color:var(--muted);font-size:13px}
 
+/* search shell - old design: big search btn first (full width on mobile) */
+.search-shell{
+  background: linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.008));
+  border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,0.035);
+  box-shadow:0 20px 50px rgba(0,0,0,0.6);
+  display:flex;flex-direction:column;gap:12px;
+}
+.search-row{display:flex;gap:12px;align-items:center}
+.search-input{
+  width:100%;padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);
+  background:transparent;color:inherit;font-size:16px;outline:none;box-shadow:0 6px 26px rgba(0,0,0,0.6);
+}
+.btn{
+  padding:12px 18px;border-radius:12px;font-weight:800;border:0;cursor:pointer;font-size:16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  display:inline-flex;align-items:center;gap:10px;justify-content:center;
+}
+.btn:active{transform:translateY(1px)}
+.btn-search{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020;min-width:140px}
+.btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);min-width:90px}
+.btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020;min-width:140px}
+
+/* results grid */
+.results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.008));padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 28px rgba(0,0,0,0.45)}
+.card h3{margin:0 0 8px 0;font-size:16px}
+.row{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
+.label{color:var(--muted);font-size:13px}
+.value{font-size:20px;font-weight:800}
+
+/* badges */
+.badge{display:inline-block;padding:8px 12px;border-radius:999px;font-weight:700;background:rgba(62,230,168,0.12);color:var(--green)}
+
+/* footer - fix bottom spacing and alignment */
+.footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:13px;margin-top:18px;padding-bottom:28px}
+.footer .powered{display:flex;gap:8px;align-items:center}
+.footer img{width:44px;height:44px;border-radius:8px;object-fit:cover}
+
+/* hidden helper */
 .hidden{display:none}
 
+/* small screens */
 @media (max-width:560px){
-  .search-shell{flex-direction:column;align-items:stretch}
-  .search-shell input{width:100%}
+  .search-row{flex-direction:column;align-items:stretch}
+  .btn{width:100%}
+  .btn-clear{order:2}
+  .btn-share{order:3}
 }
+/* keep page footer always having background by forcing body and app to fill */
 </style>
 </head>
 <body>
-  <div id="app">
-    <div class="container">
-      <div class="top">
-        <div class="logo"><img id="siteLogo" src="zama-logo.png" alt="Zama"></div>
-        <div>
-          <div class="title">ZAMA SZN 5 RANK</div>
-          <div class="subtitle">Search X handle (e.g. @0x_madara_)</div>
-        </div>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo"><img src="zama-logo.png" alt="Zama logo"></div>
       </div>
-
-      <div class="search-shell" role="search" aria-label="Search X handle">
-        <input id="username" type="text" placeholder="@your_handle" />
-        <button id="searchBtn" class="btn">🔎 Search</button>
-        <button id="clearBtn" class="btn gray">Clear</button>
-        <button id="shareBtn" class="btn">Share Card</button>
+      <div style="flex:1">
+        <h1 class="brand-title">ZAMA SZN 5 RANK</h1>
+        <p class="brand-subtitle">Search X handle (e.g. @0x_madara_)</p>
       </div>
+    </div>
 
-      <div id="resultArea" class="hidden"></div>
-
-      <div class="footer">
-        <div>Made with ❤️ for Zama — love & powered by madara</div>
-        <a href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer" class="powered">
-          <img id="poweredImg" src="madara.png" alt="madara"><div style="font-weight:700">madara</div>
-        </a>
+    <div class="search-shell" role="search" aria-label="Search X handle">
+      <input id="username" class="search-input" type="text" placeholder="@your_handle" />
+      <div class="search-row">
+        <!-- Big Search button first (old design) -->
+        <button id="searchBtn" class="btn btn-search">🔎 Search</button>
+        <button id="clearBtn" class="btn btn-clear">Clear</button>
+        <button id="shareBtn" class="btn btn-share">Share Card</button>
       </div>
+    </div>
+
+    <!-- results initially hidden until user searches -->
+    <div id="resultArea" class="hidden"></div>
+
+    <div class="footer">
+      <div>Made with ❤️ for Zama — love & powered by madara</div>
+      <a id="poweredLink" class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer">
+        <img id="poweredAvatar" src="madara.png" alt="madara">
+        <div style="display:flex;flex-direction:column"><span style="font-weight:700">madara</span></div>
+      </a>
     </div>
   </div>
 
-  <!-- canvas used to draw the premium slim share card -->
+  <!-- canvas used to generate share PNG -->
   <canvas id="shareCanvas" width="1200" height="640" style="display:none"></canvas>
 
 <script>
-/* =========================
-   CONFIG & HELPERS
-   ========================= */
+/* ---------- Config ---------- */
 const API_BASE = '/api/check';
 const TOTAL_FETCHED = 1500;
 const OG_NFT_TOP = 1006;
 const SHARE_TOP = 100;
 
+/* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
-function fmt(n,d=6){ if(n==null||!isFinite(Number(n))) return '-'; return Number(n).toFixed(d); }
-function money(n){ if(n==null||!isFinite(Number(n))) return '-'; return '$' + Number(n).toLocaleString(); }
+function fmt(n, d = 6){ if(n==null || !isFinite(Number(n))) return '-'; return Number(n).toFixed(d); }
+function money(n){ if(n==null || !isFinite(Number(n))) return '-'; return '$' + Number(n).toLocaleString(); }
 
-/* preloaded images */
+/* preload images */
 const IMGS = {logo:null, powered:null, avatar:null};
 function preload(){
-  const l = new Image(); l.src='zama-logo.png'; l.onload=()=>IMGS.logo=l; l.onerror=()=>IMGS.logo=null;
-  const p = new Image(); p.src='madara.png'; p.onload=()=>IMGS.powered=p; p.onerror=()=>IMGS.powered=null;
+  const l = new Image(); l.src = 'zama-logo.png'; l.onload = ()=>IMGS.logo = l;
+  const p = new Image(); p.src = 'madara.png'; p.onload = ()=>IMGS.powered = p;
 }
+preload();
 
-/* fetch avatar (unavatar) */
-async function loadAvatar(handle){
-  return new Promise(resolve=>{
-    const img = new Image(); img.crossOrigin='anonymous';
-    img.onload = ()=>{ IMGS.avatar = img; resolve(true); };
-    img.onerror = ()=>{ IMGS.avatar = null; resolve(false); };
-    img.src = `https://unavatar.io/x/${encodeURIComponent(handle)}?fallback=true`;
-  });
-}
-
-/* progress helper (0..100) */
-function progress(rank){
+/* progress percentage computed from rank */
+function progressPct(rank){
   if(!isFinite(rank)) return 0;
   rank = Number(rank);
   if(rank <= 100) return Math.round((100 - rank) / 99 * 100);
@@ -115,178 +153,175 @@ function progress(rank){
   return Math.round((TOTAL_FETCHED - rank) / (TOTAL_FETCHED - 100) * 100);
 }
 
-/* compute simple payout assumption for share winners
-   top1 ~ 1500-2000; top100 ~ 150-260; interpolate */
-function assumedPayout(rank){
+/* assumed payout interpolation for rank 1..100 */
+function assumedPayoutRange(rank){
   if(!isFinite(rank)) return null;
   rank = Math.max(1, Math.min(100, rank));
   const topMin = 1500, topMax = 2000, min100 = 150, max100 = 260;
-  const t = (rank - 1)/99;
-  const mn = Math.round(topMin + (min100 - topMin)*t);
-  const mx = Math.round(topMax + (max100 - topMax)*t);
-  return {min:mn, max:mx};
+  const t = (rank - 1) / 99;
+  const mn = Math.round(topMin + (min100 - topMin) * t);
+  const mx = Math.round(topMax + (max100 - topMax) * t);
+  return {min: mn, max: mx};
 }
 
-/* =========================
-   RENDER RESULTS (cards on page)
-   ========================= */
-function mkCard(title, meta, nextMeta){
-  const wrapper = document.createElement('div'); wrapper.className='card';
-  const found = meta && meta.found===true && isFinite(Number(meta.rank));
-  const rank = found ? Number(meta.rank) : null;
-  const ms = found ? meta.mindshare : null;
-  const prog = found ? progress(rank) : 0;
+/* ---------- UI / rendering ---------- */
+let lastData = null;
+function renderResults(data){
+  const out = $('resultArea');
+  out.innerHTML = '';
+  out.classList.remove('hidden');
 
-  const change = (() => {
-    if(!found || !nextMeta || !nextMeta.found) return '-';
-    const a = Number(meta.mindshare), b = Number(nextMeta.mindshare);
-    if(!isFinite(a) || !isFinite(b)) return '-';
-    const diff = a - b; const pct = b===0?0:Math.round((Math.abs(diff)/Math.abs(b))*1000)/10;
-    const sign = diff>0 ? '▲' : (diff<0 ? '▼' : '-');
-    const cls = diff>0 ? 'up' : (diff<0 ? 'down':'');
-    return `<span class="ms-change ${cls}" style="font-weight:800;color:${diff>0? '#3ee6a8' : (diff<0? '#ff7b7b':'#9fb0bf')}">${sign} ${pct}% ${diff!==0? '(' + (diff>0?'+':'') + diff.toFixed(6) + ')' : ''}</span>`;
+  const order = ['24h','7d','month'];
+  for(let i=0;i<order.length;i++){
+    const key = order[i];
+    const meta = (data.results && data.results[key]) ? data.results[key] : {};
+    const nextMeta = (i < order.length - 1) ? ((data.results && data.results[order[i+1]]) ? data.results[order[i+1]] : {}) : null;
+    out.appendChild( makeCard(key, meta, nextMeta) );
+  }
+  // scroll to results on mobile
+  setTimeout(()=>{ window.scrollTo({top: out.getBoundingClientRect().top + window.scrollY - 80, behavior:'smooth'}); }, 50);
+}
+
+function makeCard(title, meta, nextMeta){
+  const found = meta && meta.found === true && isFinite(Number(meta.rank));
+  const rank = found ? Number(meta.rank) : null;
+  const mindshare = found ? Number(meta.mindshare) : null;
+  const prog = found ? progressPct(rank) : 0;
+
+  const card = document.createElement('div'); card.className = 'card';
+  const changeHtml = (() => {
+    if(!found || !nextMeta || !nextMeta.found) return '<span style="color:var(--muted)">-</span>';
+    const a = Number(meta.mindshare); const b = Number(nextMeta.mindshare);
+    if(!isFinite(a) || !isFinite(b)) return '<span style="color:var(--muted)">-</span>';
+    const diff = a - b; const pct = b===0 ? 0 : Math.round((Math.abs(diff) / Math.abs(b)) * 1000) / 10;
+    const sign = diff > 0 ? '▲' : (diff < 0 ? '▼' : '-');
+    const color = diff > 0 ? 'var(--green)' : (diff < 0 ? 'var(--red)' : 'var(--muted)');
+    return `<span style="color:${color};font-weight:800">${sign} ${pct}% ${diff !== 0 ? '(' + (diff>0?'+':'') + diff.toFixed(6) + ')' : ''}</span>`;
   })();
 
-  wrapper.innerHTML = `
+  card.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <h3 style="margin:0">${title}</h3>
-      <div style="font-weight:800;font-size:22px">${found?rank:'-'}</div>
+      <h3>${title}</h3>
+      <div style="font-weight:800;font-size:22px">${found ? rank : '-'}</div>
     </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-      <div style="color:var(--muted)">Mindshare</div>
-      <div style="font-weight:800;font-size:20px">${found?fmt(ms,6):'-'}</div>
-    </div>
-    <div style="margin-top:10px;color:var(--muted)">Change vs next</div>
-    <div style="margin-top:6px">${change}</div>
-    <div style="margin-top:10px">
+    <div style="margin-top:8px;color:var(--muted)">Mindshare</div>
+    <div style="font-weight:800;font-size:20px;margin-top:6px">${found? fmt(mindshare,6) : '-'}</div>
+
+    <div style="margin-top:12px;color:var(--muted)">Change vs next</div>
+    <div style="margin-top:6px">${changeHtml}</div>
+
+    <div style="margin-top:12px">
       <div style="height:10px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden">
         <div style="width:${prog}%;height:100%;background:linear-gradient(90deg,var(--accent1),var(--accent2));"></div>
       </div>
-      <div style="font-size:12px;color:var(--muted);margin-top:8px">${found ? `Progress to Top 100: ${prog}% • Total fetched: ${TOTAL_FETCHED}` : 'Search to show data'}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">${found? `Progress to Top 100: ${prog}% • Total fetched: ${TOTAL_FETCHED}` : 'Search to show data'}</div>
     </div>
-    ${ (title==='month' && found && (rank <= SHARE_TOP)) ? `<div style="margin-top:10px"><span style="display:inline-block;padding:8px 12px;border-radius:999px;background:rgba(62,230,168,0.12);color:#3ee6a8;font-weight:700">Eligible: OG NFT + Revenue Share</span></div>` : ((title==='month' && found && rank <= OG_NFT_TOP) ? `<div style="margin-top:10px"><span style="display:inline-block;padding:8px 12px;border-radius:999px;background:rgba(62,230,168,0.06);color:#3ee6a8;font-weight:700">Eligible: OG NFT</span></div>` : '')}
-    <div style="margin-top:12px;font-size:14px;color:var(--muted)">Assumed payout (if eligible): <span style="font-weight:800">${(title==='month' && found && rank<=SHARE_TOP)? (money(assumedPayout(rank).min) + ' — ' + money(assumedPayout(rank).max)) : '-'}</span></div>
+
+    ${ (title === 'month' && found && isFinite(rank) ? eligibilityHtml(rank) : '') }
+
+    <div style="margin-top:12px;color:var(--muted)">Assumed payout (if eligible): <span style="font-weight:800">${(title==='month' && found && rank <= SHARE_TOP) ? (money(assumedPayoutRange(rank).min) + ' — ' + money(assumedPayoutRange(rank).max)) : '-'}</span></div>
   `;
-  return wrapper;
+  return card;
 }
 
-function renderResults(data){
-  const container = $('resultArea');
-  container.innerHTML = '';
-  const order = ['24h','7d','month'];
-  for(let i=0;i<order.length;i++){
-    const item = data.results && data.results[order[i]] ? data.results[order[i]] : {};
-    const nextItem = (i<order.length-1) ? (data.results && data.results[order[i+1]] ? data.results[order[i+1]] : {}) : null;
-    container.appendChild( mkCard(order[i], item, nextItem) );
+function eligibilityHtml(rank){
+  if(!isFinite(rank)) return '';
+  if(rank <= SHARE_TOP){
+    return `<div style="margin-top:10px"><span class="badge">Eligible: OG NFT + Revenue Share</span></div>`;
+  } else if(rank <= OG_NFT_TOP){
+    return `<div style="margin-top:10px"><span class="badge" style="background:rgba(62,230,168,0.06) ; color:var(--green)">Eligible: OG NFT</span></div>`;
   }
-  container.classList.remove('hidden');
+  return '';
 }
 
-/* =========================
-   SLIM PREMIUM SHARE CARD (canvas)
-   ========================= */
-function drawPremiumCard(handle, data){
-  // canvas is 1200x640 (slim)
+/* ---------- avatar loader (unavatar) ---------- */
+async function loadAvatar(handle){
+  return new Promise(resolve => {
+    const img = new Image(); img.crossOrigin='anonymous';
+    img.onload = ()=>{ IMGS.avatar = img; resolve(true); };
+    img.onerror = ()=>{ IMGS.avatar = null; resolve(false); };
+    img.src = `https://unavatar.io/x/${encodeURIComponent(handle)}?fallback=true`;
+  });
+}
+
+/* ---------- share card rendering (canvas) ---------- */
+function drawShareCanvas(handle, data){
   const canvas = $('shareCanvas'); const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
 
-  // background gradient (soft premium)
-  const g = ctx.createLinearGradient(0,0, W, H);
-  g.addColorStop(0, '#071025');
-  g.addColorStop(1, '#041428');
+  // background
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#081025'); g.addColorStop(1,'#041428');
   ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
 
-  // soft vignette
-  ctx.fillStyle = 'rgba(0,0,0,0.18)';
-  ctx.beginPath(); ctx.ellipse(W/2, H/2, W*0.55, H*0.55, 0, 0, Math.PI*2); ctx.fill();
-
-  // subtle glass panel for content
+  // panel
   const pad = 36;
-  const panelW = W - pad*2, panelH = H - pad*2;
-  ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.roundRect = function(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); };
-  ctx.roundRect(pad, pad, panelW, panelH, 18); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.02)'; roundRect(ctx, pad, pad, W - pad*2, H - pad*2, 18); ctx.fill();
 
-  // left section: avatar + handle + small meta
-  const avatarSize = 128;
-  const avatarX = pad + 28;
-  const avatarY = pad + 26;
-
-  if(IMGS.avatar){
-    // avatar clipped circle
+  // avatar area left
+  const avatarSize = 120; const avatarX = pad + 28; const avatarY = pad + 28;
+  if(IMGS.avatar) { // draw avatar circle
     ctx.save(); ctx.beginPath(); ctx.arc(avatarX + avatarSize/2, avatarY + avatarSize/2, avatarSize/2, 0, Math.PI*2); ctx.closePath(); ctx.clip();
     ctx.drawImage(IMGS.avatar, avatarX, avatarY, avatarSize, avatarSize); ctx.restore();
-  } else {
-    // fallback circle with logo
+  } else if(IMGS.logo) {
     ctx.fillStyle = '#ffd24b'; ctx.beginPath(); ctx.arc(avatarX + avatarSize/2, avatarY + avatarSize/2, avatarSize/2, 0, Math.PI*2); ctx.fill();
-    if(IMGS.logo) ctx.drawImage(IMGS.logo, avatarX+16, avatarY+16, avatarSize-32, avatarSize-32);
+    ctx.drawImage(IMGS.logo, avatarX + 18, avatarY + 18, avatarSize - 36, avatarSize - 36);
   }
 
-  // handle large
-  ctx.fillStyle = '#eaf3fb'; ctx.font = '700 40px Inter, Arial';
+  // handle text
   const handleText = handle.startsWith('@') ? handle : '@' + handle;
+  ctx.fillStyle = '#eaf3fb'; ctx.font = '700 36px Inter, Arial'; ctx.textAlign = 'left';
   ctx.fillText(handleText, avatarX + avatarSize + 28, avatarY + 44);
 
-  // sub small meta
-  ctx.font = '500 18px Inter, Arial'; ctx.fillStyle = 'rgba(234,243,251,0.8)';
-  ctx.fillText('Zama rank card', avatarX + avatarSize + 28, avatarY + 74);
+  // right side rank/mindshare (month)
+  const month = data.results && data.results.month ? data.results.month : null;
+  const rankVal = (month && month.found) ? Number(month.rank) : '-';
+  const msVal = (month && month.found) ? Number(month.mindshare).toFixed(6) : '-';
+  ctx.fillStyle = '#fff'; ctx.font = '800 84px Inter, Arial'; ctx.textAlign = 'right';
+  ctx.fillText(rankVal, W - pad - 40, avatarY + 88);
 
-  // right large rank & mindshare
-  const rightX = W - pad - 260;
-  // rank big
-  const rankVal = (data.results && data.results['month'] && data.results.month.found) ? Number(data.results.month.rank) : '-';
-  ctx.fillStyle = '#ffffff'; ctx.font = '800 80px Inter, Arial'; ctx.textAlign = 'right';
-  ctx.fillText(rankVal, rightX + 220, avatarY + 100);
-
-  // mindshare label & value
-  const msVal = (data.results && data.results['month'] && data.results.month.found) ? Number(data.results.month.mindshare).toFixed(6) : '-';
   ctx.font = '600 18px Inter, Arial'; ctx.fillStyle = '#9fb0bf'; ctx.textAlign = 'right';
-  ctx.fillText('Mindshare', rightX + 220, avatarY + 150);
-  ctx.font = '800 28px Inter, Arial'; ctx.fillStyle = '#ffd24b'; ctx.fillText(msVal, rightX + 220, avatarY + 186);
+  ctx.fillText('Mindshare', W - pad - 40, avatarY + 122);
+  ctx.font = '800 28px Inter, Arial'; ctx.fillStyle = '#ffd24b'; ctx.fillText(msVal, W - pad - 40, avatarY + 154);
 
-  // small progress bar under handle (overall month progress)
-  const pBarX = avatarX + avatarSize + 28;
-  const pBarY = avatarY + avatarSize - 6;
-  const pBarW = W - pBarX - 40 - 260;
-  // compute progress using month rank
-  const monthMeta = data.results && data.results.month ? data.results.month : null;
+  // progress bar under handle
+  const pX = avatarX + avatarSize + 28; const pY = avatarY + avatarSize - 12; const pW = W - pX - 200;
+  ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fillRect(pX, pY, pW, 12);
   let prog = 0;
-  if(monthMeta && monthMeta.found && isFinite(Number(monthMeta.rank))){
-    const r = Number(monthMeta.rank);
-    prog = (r<=100) ? Math.round((100-r)/99*100) : Math.round((TOTAL_FETCHED - r) / (TOTAL_FETCHED-100) * 100);
-    prog = Math.max(0, Math.min(100, prog));
+  if(month && month.found && isFinite(Number(month.rank))){
+    prog = progressPct(Number(month.rank));
   }
-  ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fillRect(pBarX, pBarY, pBarW, 12);
-  ctx.fillStyle = 'linear-gradient(90deg,#ffd24b,#ff6b6b)';
-  // draw gradient manually
-  const g2 = ctx.createLinearGradient(pBarX,0,pBarX+pBarW,0); g2.addColorStop(0,'#ffd24b'); g2.addColorStop(1,'#ff6b6b');
-  ctx.fillStyle = g2; ctx.fillRect(pBarX, pBarY, Math.max(10, pBarW * prog / 100), 12);
+  // gradient fill
+  const g2 = ctx.createLinearGradient(pX,0,pX+pW,0); g2.addColorStop(0,'#ffd24b'); g2.addColorStop(1,'#ff6b6b');
+  ctx.fillStyle = g2; ctx.fillRect(pX, pY, Math.max(10, pW * prog / 100), 12);
 
-  // eligibility badge (month only)
-  if(monthMeta && monthMeta.found){
-    const r = Number(monthMeta.rank);
-    let badgeText = null;
-    if(r <= SHARE_TOP) badgeText = 'Eligible: OG NFT + Revenue Share';
-    else if(r <= OG_NFT_TOP) badgeText = 'Eligible: OG NFT';
-    if(badgeText){
-      ctx.fillStyle = 'rgba(62,230,168,0.12)'; ctx.roundRect(pBarX, pBarY + 24, 360, 36, 999); ctx.fill();
+  // eligibility badge
+  if(month && month.found){
+    const r = Number(month.rank);
+    let badge = null;
+    if(r <= SHARE_TOP) badge = 'Eligible: OG NFT + Revenue Share';
+    else if(r <= OG_NFT_TOP) badge = 'Eligible: OG NFT';
+    if(badge){
+      ctx.fillStyle = 'rgba(62,230,168,0.12)'; roundRectFill(ctx, pX, pY + 28, 420, 36, 999);
       ctx.fillStyle = '#3ee6a8'; ctx.font = '700 18px Inter, Arial'; ctx.textAlign = 'left';
-      ctx.fillText(badgeText, pBarX + 16, pBarY + 48);
+      ctx.fillText(badge, pX + 16, pY + 28 + 24);
     }
   }
 
-  // smaller footer line
-  ctx.font = '500 14px Inter, Arial'; ctx.fillStyle = '#9fb0bf'; ctx.textAlign='left';
+  // footer small
+  ctx.fillStyle = '#9fb0bf'; ctx.font = '500 14px Inter, Arial'; ctx.textAlign = 'left';
   ctx.fillText('Powered by madara — zama-rank.vercel.app', pad + 18, H - 28);
 
-  // return dataURL
   return canvas.toDataURL('image/png');
+
+  // helper: rounded rect path
+  function roundRect(ctx, x, y, w, h, r){ ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+  function roundRectFill(ctx, x,y,w,h,r){ ctx.beginPath(); roundRect(ctx,x,y,w,h,r); ctx.fill(); }
 }
 
-/* share / download logic */
-function downloadDataUrl(dataUrl, filename){
-  const a = document.createElement('a'); a.href = dataUrl; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
-}
-async function shareDataUrl(dataUrl, filename, shareText){
+/* ---------- share/download ---------- */
+function downloadDataUrl(dataUrl, filename){ const a = document.createElement('a'); a.href = dataUrl; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); }
+async function shareDataUrl(dataUrl, filename, text){
   try{
     const byteString = atob(dataUrl.split(',')[1]);
     const ab = new ArrayBuffer(byteString.length);
@@ -295,11 +330,12 @@ async function shareDataUrl(dataUrl, filename, shareText){
     const blob = new Blob([ab], {type:'image/png'});
     const file = new File([blob], filename, {type:'image/png'});
     if(navigator.canShare && navigator.canShare({files:[file]})){
-      await navigator.share({files:[file], text: shareText});
+      await navigator.share({files:[file], text});
       return true;
     } else {
+      // fallback: download + open tweet
       downloadDataUrl(dataUrl, filename);
-      window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}`, '_blank');
+      window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
       return false;
     }
   }catch(err){
@@ -308,52 +344,61 @@ async function shareDataUrl(dataUrl, filename, shareText){
   }
 }
 
-/* =========================
-   UI interactions
-   ========================= */
-let lastSearchData = null;
-preload();
+/* ---------- interactions ---------- */
+$('searchBtn').addEventListener('click', doSearch);
+$('username').addEventListener('keydown', (e)=>{ if(e.key === 'Enter') doSearch(); });
+$('clearBtn').addEventListener('click', ()=>{ $('username').value=''; $('resultArea').innerHTML=''; $('resultArea').classList.add('hidden'); lastData = null; });
+$('shareBtn').addEventListener('click', async ()=>{
+  if(!lastData){ alert('Run a search first (Share Card works after search).'); return; }
+  const handle = lastData.handle;
+  await loadAvatar(handle); // load avatar before drawing
+  const dataUrl = drawShareCanvas(handle, lastData.data);
+  const filename = `${handle}-zama-rank.png`;
+  const tx = `${handle} — Zama Rank (month): ${lastData.data.results?.month?.rank || '-'} • Mindshare: ${lastData.data.results?.month?.mindshare || '-'}\nCheck: https://zama-rank.vercel.app`;
+  await shareDataUrl(dataUrl, filename, tx);
+});
 
+/* load avatar helper */
+async function loadAvatar(handle){
+  return new Promise(resolve=>{
+    const img = new Image(); img.crossOrigin='anonymous';
+    img.onload = ()=>{ IMGS.avatar = img; $('poweredAvatar').src = `https://unavatar.io/x/${encodeURIComponent(handle)}?fallback=true`; resolve(true); };
+    img.onerror = ()=>{ IMGS.avatar = null; resolve(false); };
+    img.src = `https://unavatar.io/x/${encodeURIComponent(handle)}?fallback=true`;
+  });
+}
+
+/* ---------- fetch search ---------- */
+let lastData = null;
 async function doSearch(){
   const raw = ($('username').value || '').trim();
   if(!raw){ $('username').focus(); return; }
   const handle = raw.replace(/^@/,'');
-  // load avatar
-  await loadAvatar(handle);
-  // show loader while fetching
-  $('resultArea').classList.remove('hidden');
-  $('resultArea').innerHTML = '<div class="card"><h3>Loading…</h3><div style="color:var(--muted);margin-top:8px">Fetching leaderboards</div></div>';
+  // pre-load avatar for display in footer (optional)
+  loadAvatar(handle).then(()=>{ /* powered avatar updated by loadAvatar */ });
+
+  // show loading card
+  const container = $('resultArea');
+  container.classList.remove('hidden');
+  container.innerHTML = `<div class="card"><h3>Loading…</h3><div style="color:var(--muted);margin-top:8px">Fetching 24h / 7d / month</div></div>`;
 
   try{
     const res = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
     if(!res.ok) throw new Error('Network ' + res.status);
     const data = await res.json();
-    lastSearchData = { handle, data };
+    lastData = {handle, data};
     renderResults(data);
   }catch(err){
-    $('resultArea').innerHTML = `<div class="card"><h3>Error</h3><div style="color:var(--muted);margin-top:8px">${err.message}</div></div>`;
-    lastSearchData = null;
+    container.innerHTML = `<div class="card"><h3>Error</h3><div style="color:var(--muted);margin-top:8px">${err.message}</div></div>`;
+    lastData = null;
   }
 }
 
-$('searchBtn').addEventListener('click', doSearch);
-$('username').addEventListener('keydown', (e)=>{ if(e.key==='Enter') doSearch(); });
-$('clearBtn').addEventListener('click', ()=>{
-  $('username').value = ''; $('resultArea').classList.add('hidden'); lastSearchData = null;
-});
-
-$('shareBtn').addEventListener('click', async ()=>{
-  if(!lastSearchData){ alert('Run Search first; Share Card works after search.'); return; }
-  const handle = lastSearchData.handle;
-  const data = lastSearchData.data;
-  const dataUrl = drawPremiumCard(handle, data);
-  const filename = `${handle}-zama-rank.png`;
-  const tweetText = `${handle} — Zama Rank (month): ${data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-'}\nCheck: https://zama-rank.vercel.app`;
-  await shareDataUrl(dataUrl, filename, tweetText);
-});
-
-/* small fallback: hide results on load */
-$('resultArea').classList.add('hidden');
+/* ensure footer always shows on dark background (fix bottom color glitch) */
+(function fixBodyHeight() {
+  // Force html/body to have full dark gradient visible and avoid white flash
+  document.documentElement.style.background = 'linear-gradient(180deg,#000409 0%, #071025 100%)';
+})();
 </script>
 </body>
 </html>
