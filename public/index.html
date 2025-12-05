@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>ZAMA RANK</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -12,25 +12,25 @@
     --muted:#9fb0bf;
     --accent1:#ffd24b; --accent2:#ff6b6b;
     --text:#eaf3fb; --ok:#3ee6a8; --bad:#ff7b7b;
-    --footer-h:88px; /* keep this in sync with footer.height */
+    /* footer height that we reserve in CSS */
+    --footer-h:72px;
+    --footer-transition: 220ms cubic-bezier(.22,.9,.28,1);
   }
+
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));}
   body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;}
 
   /* page layout */
-  /* use dynamic viewport so mobile browsers behave better */
   #app{min-height:100dvh;display:flex;flex-direction:column;}
   .wrap{
     max-width:940px;
     margin:18px auto;
     padding:18px 18px 18px;
-    /* reserve space for footer in CSS so fixed footer doesn't overlap content */
-    padding-bottom: calc(var(--footer-h) + 18px);
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    transition:padding-bottom .12s ease;
+    /* Reserve footer space so it never visually overlaps content.
+       Add safe-area inset (for iPhone gesture bar) so content isn't hidden. */
+    padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom, 0px) + 12px);
+    flex:1;display:flex;flex-direction:column;transition:padding-bottom .12s ease;
   }
 
   .topbar{display:flex;align-items:center;justify-content:flex-start;gap:12px}
@@ -45,14 +45,12 @@
   .search-inner{flex:1;min-width:0}
   input[type="text"]{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px; height:56px; outline:none}
 
-  /* action buttons: inline single row */
   .actions{display:flex;gap:12px;align-items:center;flex:0 0 auto}
   .btn{padding:12px 18px;border-radius:12px;border:0;cursor:pointer;font-weight:800;display:inline-flex;align-items:center;justify-content:center;min-height:48px}
   .btn-search{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020;box-shadow:0 10px 30px rgba(0,0,0,0.5);min-width:120px}
   .btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);min-width:88px}
   .btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#061020; min-width:132px;}
 
-  /* results grid */
   .results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start}
   .card{background:var(--card);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 28px rgba(0,0,0,0.45)}
   .card h3{margin:0 0 10px;font-size:14px}
@@ -60,13 +58,7 @@
   .label{color:var(--muted);font-size:13px}
   .value{font-size:20px;font-weight:800; font-variant-numeric: tabular-nums;}
 
-  /* mindshare specific */
-  .value.mindshare{
-    font-size:20px;
-    color:var(--accent1);
-    text-align:right;
-    white-space:nowrap;
-  }
+  .value.mindshare{ font-size:20px; color:var(--accent1); text-align:right; white-space:nowrap; }
 
   .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;font-size:13px}
   .badge.ok{background:rgba(62,230,168,0.12);color:var(--ok);border:1px solid rgba(62,230,168,0.12)}
@@ -74,23 +66,38 @@
 
   .progress-shell{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
   .progress-bar{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .6s ease}
-  /* change block: keep percent and absolute on one line */
+
   .ms-change{display:inline-flex;gap:8px;align-items:center;font-weight:800;white-space:nowrap;font-variant-numeric: tabular-nums}
   .ms-change.up{color:var(--ok)} .ms-change.down{color:var(--bad)}
   .ms-change .abs{font-weight:700;color:rgba(255,255,255,0.85);font-size:0.95em;margin-left:6px}
 
   hr.sep{border:none;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0}
+  .results-empty{color:var(--muted);margin-top:16px}
 
-  /* fixed footer - explicit height (matches --footer-h) */
+  /* ------------------------
+     Bottom app-style footer
+     ------------------------ */
   footer.site-footer{
     position:fixed;
-    left:0;right:0;bottom:0;
-    height: var(--footer-h); /* explicit height, keep in sync with root var */
-    background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.6));
+    left:0; right:0; bottom:0;
+    height: var(--footer-h);
+    display:flex; align-items:center; justify-content:center;
+    padding:12px 18px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.6));
     border-top:1px solid rgba(255,255,255,0.02);
-    display:flex;align-items:center;justify-content:center;padding:12px 18px;z-index:20;
-    box-shadow: 0 -6px 30px rgba(0,0,0,0.35);
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.35);
+    z-index:40;
+    transform: translateY(0);
+    transition: transform var(--footer-transition);
+    will-change: transform;
+    backdrop-filter: blur(6px);
   }
+
+  /* hidden state (slides out of view) */
+  footer.site-footer.hidden{
+    transform: translateY(calc(100% + env(safe-area-inset-bottom, 0px)));
+  }
+
   .footer-inner{max-width:940px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:14px}
   .footer-text{flex:1; min-width:0}
   a.powered{ text-decoration:none;color:inherit;display:flex;gap:12px;align-items:center;flex:0 0 auto}
@@ -104,15 +111,18 @@
   @media (max-width:560px){
     .search-row{flex-direction:column;align-items:stretch}
     .search-inner{width:100%}
-    /* keep action buttons inline on one row with wrapping behavior */
     .actions{flex-wrap:nowrap;justify-content:space-between}
     .btn{flex:1 1 auto; min-width:0}
     .btn + .btn{margin-left:8px}
     .footer-inner{padding:0 6px; font-size:13px}
     a.powered img{width:48px;height:48px}
+    /* On mobile we slightly reduce footer height to maximize reading space */
+    :root{ --footer-h:64px; }
   }
 
-  .results-empty{color:var(--muted);margin-top:16px}
+  @media (max-height:520px){
+    .wrap{ padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom,0px) + 6px); }
+  }
 </style>
 </head>
 <body>
@@ -261,7 +271,7 @@ function mkCard(title, meta, neighbor){
   return el;
 }
 
-/* share canvas layout (same as provided earlier) */
+/* share canvas layout */
 function drawCanvasLayout(handle, data){
   const canvas = $('cardCanvas'); const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
@@ -351,6 +361,7 @@ function shareImageFromDataURL(dataUrl, handle, data){
     for(let i=0;i<byteString.length;i++) ia[i]=byteString.charCodeAt(i);
     const blob = new Blob([ab], {type:'image/png'});
     const file = new File([blob], `${handle}-zama-rank.png`, {type:'image/png'});
+
     if(navigator.canShare && navigator.canShare({files:[file]})){
       navigator.share({
         files: [file],
@@ -358,9 +369,16 @@ function shareImageFromDataURL(dataUrl, handle, data){
       }).catch(()=>{});
       return;
     }
+
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `${handle}-zama-rank.png`; document.body.appendChild(a); a.click(); a.remove();
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${handle}-zama-rank.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),2000);
+
     const text = `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`;
     window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
   }catch(err){
@@ -378,7 +396,7 @@ async function performSearch(){
   const container = $('resultArea'); container.innerHTML = '';
   for(let i=0;i<3;i++){
     const s=document.createElement('div'); s.className='card';
-    s.innerHTML=`<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`;
+    s.innerHTML = `<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`;
     container.appendChild(s);
   }
   await loadAvatar(handle);
@@ -397,8 +415,6 @@ async function performSearch(){
       container.appendChild( mkCard(k, results[k]||{}, neighbor) );
     }
     lastSearch = { handle, data };
-    // After rendering results, ensure footer padding still matches footer height
-    requestAnimationFrame(updateFooterPadding);
   }catch(err){
     const el = document.createElement('div'); el.className='card';
     el.innerHTML = `<h3>Error</h3><div style="color:var(--muted);margin-top:6px">${err.message}</div>`;
@@ -426,34 +442,34 @@ $('clearBtn').addEventListener('click', ()=>{
   hideResults();
 });
 
-/* FOOTER: compute and set padding-bottom for wrap so content never hides below footer
-   - CSS already reserves space using --footer-h; JS is a safety net to expand if footer grows */
-function updateFooterPadding(){
+/* ---------- footer hide/show on scroll (tiny JS, no measurements) ---------- */
+(function setupFooterVisibility(){
   const footer = $('siteFooter');
-  const wrap = $('wrap');
-  if(!footer || !wrap) return;
-  const rect = footer.getBoundingClientRect();
-  const height = Math.ceil(rect.height || 0);
-  // CSS-reserved height (root var)
-  const root = getComputedStyle(document.documentElement);
-  const reserved = parseInt(root.getPropertyValue('--footer-h')) || 88;
-  // ensure paddingBottom is at least reserved + 18 (matching CSS). If footer is taller, expand.
-  const pb = Math.max(reserved + 18, height + 18);
-  wrap.style.paddingBottom = pb + 'px';
-}
+  if(!footer) return;
 
-/* more reliable mobile viewport handling */
-window.addEventListener('load', ()=>{
-  updateFooterPadding();
-  // also recalc after a short delay (mobile UI may adjust)
-  setTimeout(updateFooterPadding, 350);
-});
-window.addEventListener('resize', updateFooterPadding);
-window.addEventListener('orientationchange', ()=>setTimeout(updateFooterPadding,220));
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', updateFooterPadding);
-  window.visualViewport.addEventListener('scroll', updateFooterPadding);
-}
+  let lastY = window.scrollY || 0;
+  let ticking = false;
+
+  function onScroll(){
+    const y = window.scrollY || 0;
+    if (y > lastY + 6) {
+      footer.classList.add('hidden');
+    } else if (y < lastY - 6) {
+      footer.classList.remove('hidden');
+    }
+    lastY = y;
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', function(){
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(onScroll);
+  }, { passive: true });
+
+  window.addEventListener('touchstart', ()=> footer.classList.remove('hidden'), {passive:true});
+  window.addEventListener('load', ()=> footer.classList.remove('hidden'));
+})();
 
 /* initial */
 hideResults();
