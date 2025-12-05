@@ -12,11 +12,11 @@
     --muted:#9fb0bf;
     --accent1:#ffd24b; --accent2:#ff6b6b;
     --text:#eaf3fb; --ok:#3ee6a8; --bad:#ff7b7b;
-    --footer-h:88px;
+    --footer-h:72px;
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));}
-  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;}
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.25;}
 
   /* page layout */
   #app{min-height:100vh;display:flex;flex-direction:column;}
@@ -26,17 +26,26 @@
   .brand{display:flex;gap:12px;align-items:center}
   .logo{width:48px;height:48px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(0,0,0,0.45)}
   .logo img{width:100%;height:100%;object-fit:cover}
-  h1{margin:0;font-size:20px}
+  h1{margin:0;font-size:20px;font-weight:800}
   .subtitle{color:var(--muted);font-size:13px;margin-top:2px}
 
-  .search-shell{margin-top:14px;background:var(--card);padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 36px rgba(0,0,0,0.45)}
+  .search-shell{margin-top:14px;background:var(--card);padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 36px rgba(0,0,0,0.45)}
   .search-row{display:flex;gap:12px;align-items:center}
   .search-inner{flex:1;min-width:0}
-  input[type="text"]{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px; height:56px; outline:none}
+  input[type="text"]{
+    width:100%;
+    padding:14px 16px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.06);
+    background:linear-gradient(180deg, rgba(255,255,255,0.015), transparent);
+    color:inherit;font-size:16px; height:56px; outline:none;
+    box-shadow:inset 0 -4px 18px rgba(0,0,0,0.35);
+  }
 
   /* action buttons: inline single row */
   .actions{display:flex;gap:12px;align-items:center;flex:0 0 auto}
   .btn{padding:12px 18px;border-radius:12px;border:0;cursor:pointer;font-weight:800;display:inline-flex;align-items:center;justify-content:center;min-height:48px}
+  .btn:focus{outline:3px solid rgba(255,210,75,0.14);outline-offset:2px}
   .btn-search{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020;box-shadow:0 10px 30px rgba(0,0,0,0.5);min-width:120px}
   .btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);min-width:88px}
   .btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#061020; min-width:132px;}
@@ -44,25 +53,32 @@
   /* results grid */
   .results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start}
   .card{background:var(--card);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 28px rgba(0,0,0,0.45)}
-  .card h3{margin:0 0 10px;font-size:14px}
+  .card h3{margin:0 0 8px;font-size:14px;font-weight:700;color:#dfeff9}
   .row{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
   .label{color:var(--muted);font-size:13px}
   .value{font-size:20px;font-weight:800; font-variant-numeric: tabular-nums;}
 
   /* mindshare specific */
   .value.mindshare{
-    font-size:20px;
+    font-size:22px;
     color:var(--accent1);
     text-align:right;
     white-space:nowrap;
+    letter-spacing:0.2px;
   }
 
   .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;font-size:13px}
-  .badge.ok{background:rgba(62,230,168,0.12);color:var(--ok);border:1px solid rgba(62,230,168,0.12)}
+  .badge.ok{background:rgba(62,230,168,0.10);color:var(--ok);border:1px solid rgba(62,230,168,0.08)}
   .badge.neutral{background:rgba(255,255,255,0.03);color:var(--muted);border:1px solid rgba(255,255,255,0.03)}
 
   .progress-shell{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
-  .progress-bar{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .6s ease}
+  .progress-bar{height:100%;width:0;border-radius:999px;transition:width .6s ease}
+  /* default gradient if not overridden */
+  .progress-bar.default{background:linear-gradient(90deg,var(--accent1),var(--accent2));}
+  .progress-bar.h24{background:linear-gradient(90deg,#ffd24b,#ffb347);} /* 24h - warm */
+  .progress-bar.w7{background:linear-gradient(90deg,#3ee6a8,#1fb5a6);} /* 7d - teal/green */
+  .progress-bar.m30{background:linear-gradient(90deg,#7aa2ff,#6a7aff);} /* 30d - blue */
+
   /* change block: keep percent and absolute on one line */
   .ms-change{display:inline-flex;gap:8px;align-items:center;font-weight:800;white-space:nowrap;font-variant-numeric: tabular-nums}
   .ms-change.up{color:var(--ok)} .ms-change.down{color:var(--bad)}
@@ -74,15 +90,16 @@
   footer.site-footer{
     position:fixed;
     left:0;right:0;bottom:0;
-    height:auto; /* allow content to set height; we will measure it in JS */
-    background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.6));
+    height:auto;
+    background:linear-gradient(180deg, rgba(0,0,0,0.22), rgba(0,0,0,0.6));
     border-top:1px solid rgba(255,255,255,0.02);
     display:flex;align-items:center;justify-content:center;padding:12px 18px;z-index:20;
     box-shadow: 0 -6px 30px rgba(0,0,0,0.35);
+    backdrop-filter: blur(4px);
   }
   .footer-inner{max-width:940px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:14px}
-  .footer-text{flex:1; min-width:0}
-  a.powered{ text-decoration:none;color:inherit;display:flex;gap:12px;align-items:center;flex:0 0 auto}
+  .footer-text{flex:1; min-width:0;opacity:0.7}
+  a.powered{ text-decoration:none;color:inherit;display:flex;gap:12px;align-items:center;flex:0 0 auto;opacity:0.9}
   a.powered img{ width:56px; height:56px; border-radius:8px; object-fit:cover; box-shadow:0 8px 22px rgba(0,0,0,0.45) }
 
   /* smaller screens */
@@ -93,7 +110,6 @@
   @media (max-width:560px){
     .search-row{flex-direction:column;align-items:stretch}
     .search-inner{width:100%}
-    /* keep action buttons inline on one row with wrapping behavior */
     .actions{flex-wrap:nowrap;justify-content:space-between}
     .btn{flex:1 1 auto; min-width:0}
     .btn + .btn{margin-left:8px}
@@ -122,10 +138,10 @@
           <div class="search-inner">
             <input id="username" type="text" placeholder="@your_handle" aria-label="Search handle" />
           </div>
-          <div class="actions">
-            <button id="searchBtn" class="btn btn-search">🔎 Search</button>
-            <button id="clearBtn" class="btn btn-clear">Clear</button>
-            <button id="shareCardBtn" class="btn btn-share">Share Card</button>
+          <div class="actions" role="group" aria-label="Search actions">
+            <button id="searchBtn" class="btn btn-search" aria-label="Search">🔎 Search</button>
+            <button id="clearBtn" class="btn btn-clear" aria-label="Clear input">Clear</button>
+            <button id="shareCardBtn" class="btn btn-share" aria-label="Share card">Share Card</button>
           </div>
         </div>
       </div>
@@ -137,10 +153,9 @@
 
     <footer class="site-footer" id="siteFooter" aria-hidden="false">
       <div class="footer-inner">
-        <div class="footer-text" id="footerText">Made with ❤️ for Zama by Madara </div>
+        <div class="footer-text" id="footerText">Made with ❤️ for Zama by Madara</div>
         <a class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer" id="poweredLink">
           <img id="poweredAvatar" src="madara.png" alt="madara">
-          <div style="font-size:13px; color:var(--muted)"><div style="font-weight:700;color:var(--text)"></div></div>
         </a>
       </div>
     </footer>
@@ -175,7 +190,7 @@ function computeChange(curr, next) {
   const pctRounded = Math.round(pct * 10) / 10;
   const absRounded = Math.round(diff * 1000000) / 1000000;
   const dir = (diff > 0 ? 'up' : (diff < 0 ? 'down' : 'same'));
-  const pctText = (dir === 'same') ? '0.0%' : `${Math.abs(pctRounded)}%`;
+  const pctText = (dir === 'same') ? '0.0%' : `${(pctRounded>0?'+':'')}${Math.abs(pctRounded)}%`;
   const absText = (absRounded === 0 ? '' : `(${absRounded>0?'+':''}${absRounded})`);
   return { dir, pctText, absText, pct: pctRounded, abs: absRounded };
 }
@@ -224,28 +239,38 @@ function mkCard(title, meta, neighbor){
     if(rank <= SHARE_TOP) badgeHtml = `<div style="margin-top:8px"><span class="badge ok">Eligible for OG NFT + Revenue Share</span></div>`;
     else if(rank <= OG_NFT_TOP) badgeHtml = `<div style="margin-top:8px"><span class="badge ok">Eligible for OG NFT</span></div>`;
   }
+  // compute payout only if eligible
   let payoutHtml = '-';
+  let payoutVisible = false;
   if((title==='30d' || title==='month') && found && rank <= SHARE_TOP){
-    const topMin = 1500, topMax=2000, min100=150, max100=260;
-    const t = (Math.min(100, Math.max(1, rank)) - 1)/99;
-    const min = Math.round(topMin + (min100 - topMin)*t);
-    const max = Math.round(topMax + (max100 - topMax)*t);
+    // example payout calc (kept simple)
+    const t = Math.min(1, Math.max(0, (SHARE_TOP - rank) / (SHARE_TOP - 1)));
+    const min = Math.round(1500 + (150 - 1500) * t);
+    const max = Math.round(2000 + (260 - 2000) * t);
     payoutHtml = `${money(min)} - ${money(max)}`;
+    payoutVisible = true;
   }
+
+  // pick progress bar style based on title
+  let progClass = 'progress-bar default';
+  if(title==='24h') progClass = 'progress-bar h24';
+  if(title==='7d') progClass = 'progress-bar w7';
+  if(title==='30d' || title==='month') progClass = 'progress-bar m30';
+
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <h3>${title}</h3>
+      <h3>${title.toUpperCase()}</h3>
       <div style="text-align:right;font-weight:800;font-size:20px">${found?rank:'-'}</div>
     </div>
     <div class="row"><div class="label">Mindshare</div>${mindshareHtml}</div>
     <div class="row"><div class="label">Change vs next</div><div style="text-align:right">${found? changeHtml : '-'}</div></div>
     <div style="margin-top:8px">
-      <div class="progress-shell" aria-hidden="true"><div class="progress-bar" style="width:${found?prog+'%':'0%'}"></div></div>
+      <div class="progress-shell" aria-hidden="true"><div class="${progClass}" style="width:${found?Math.max(3, prog)+'%':'0%'}"></div></div>
       <div style="font-size:12px;color:var(--muted);margin-top:6px">${found ? `Progress to Top 100: ${prog}% • Total fetched: ${TOTAL_FETCHED}` : `Search to show data • Total fetched: ${TOTAL_FETCHED}`}</div>
     </div>
     ${badgeHtml}
     <hr class="sep" />
-    <div class="row"><div class="label">Assumed payout (if eligible)</div><div class="value">${payoutHtml}</div></div>
+    ${payoutVisible ? `<div class="row"><div class="label">Assumed payout (if eligible)</div><div class="value">${payoutHtml}</div></div>` : ''}
   `;
   return el;
 }
@@ -255,7 +280,7 @@ function drawCanvasLayout(handle, data){
   const canvas = $('cardCanvas'); const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0,0,W,H);
-  ctx.fillStyle = '#0f3b39'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = '#071025'; ctx.fillRect(0,0,W,H);
   ctx.fillStyle = 'rgba(0,0,0,0.06)'; roundRect(ctx, 20, 20, W-40, H-40, 20, true, false);
   const avatar = _pre.avatar;
   const aSize = 120, margin = 48;
@@ -386,7 +411,6 @@ async function performSearch(){
       container.appendChild( mkCard(k, results[k]||{}, neighbor) );
     }
     lastSearch = { handle, data };
-    // After rendering results, ensure footer padding still matches footer height
     requestAnimationFrame(updateFooterPadding);
   }catch(err){
     const el = document.createElement('div'); el.className='card';
@@ -420,16 +444,12 @@ function updateFooterPadding(){
   const footer = $('siteFooter');
   const wrap = $('wrap');
   if(!footer || !wrap) return;
-  // measure height (including margins)
   const rect = footer.getBoundingClientRect();
-  const computed = window.getComputedStyle(footer);
-  const marginBottom = parseInt(computed.marginBottom || '0',10);
-  const height = Math.ceil(rect.height + (isNaN(marginBottom)?0:marginBottom));
-  wrap.style.paddingBottom = (height + 18) + 'px'; // leave some breathing room
+  const height = Math.ceil(rect.height);
+  wrap.style.paddingBottom = (height + 18) + 'px';
 }
 window.addEventListener('load', ()=>{
   updateFooterPadding();
-  // also recalc after a short delay (mobile UI may adjust)
   setTimeout(updateFooterPadding, 350);
 });
 window.addEventListener('resize', updateFooterPadding);
