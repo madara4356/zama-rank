@@ -7,40 +7,58 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#02070b; --card:rgba(255,255,255,0.03); --muted:#9fb0bf;
-      --accent1:#ffd24b; --accent2:#ff6b6b; --text:#eaf3fb;
+      --bg1:#000409;
+      --bg2:#071025;
+      --card:rgba(255,255,255,0.03);
+      --muted:#9fb0bf;
+      --accent1:#ffd24b; --accent2:#ff6b6b;
+      --text:#eaf3fb;
       --ok:#3ee6a8; --bad:#ff7b7b;
     }
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#071025 100%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
-    #app{min-height:100vh;display:flex;flex-direction:column}
-    .wrap{max-width:880px;margin:18px auto;padding:16px}
+    html,body,#app{height:100%}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,var(--bg1) 0%, var(--bg2) 100%);
+      color:var(--text);
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      background-attachment: fixed;
+    }
+
+    /* layout */
+    #app{display:flex;flex-direction:column;min-height:100%}
+    .wrap{max-width:940px;margin:20px auto;padding:18px;flex:1;display:flex;flex-direction:column}
+
+    /* top */
     .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
     .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:44px;height:44px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center}
+    .logo{width:44px;height:44px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(0,0,0,0.45)}
     .logo img{width:100%;height:100%;object-fit:cover}
     h1{margin:0;font-size:16px}
     .subtitle{color:var(--muted);font-size:13px;margin-top:2px}
 
-    .search-shell{margin-top:14px;background:var(--card);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    /* search */
+    .search-shell{margin-top:14px;background:var(--card);padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 12px 40px rgba(0,0,0,0.5)}
     .search-row{display:flex;gap:10px;align-items:center}
     .search-inner{flex:1}
-    input[type="text"]{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px}
-    .actions{display:flex;gap:8px;min-width:260px;justify-content:flex-end}
+    input[type="text"]{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px}
+    .actions{display:flex;gap:10px;align-items:center}
     .btn{padding:10px 14px;border-radius:12px;border:0;cursor:pointer;font-weight:700}
-    .btn-search{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020}
+    .btn-search{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020;box-shadow:0 8px 30px rgba(0,0,0,0.5)}
     .btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
 
-    .results{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
-    .card{background:var(--card);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
-    .card h3{margin:0 0 8px;font-size:14px}
+    /* results */
+    .results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start}
+    .card{background:var(--card);padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 30px rgba(0,0,0,0.45)}
+    .card h3{margin:0 0 12px;font-size:14px}
     .row{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
     .label{color:var(--muted);font-size:13px}
     .value{font-size:20px;font-weight:800}
 
     .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;font-size:13px}
     .badge.ok{background:rgba(62,230,168,0.12);color:var(--ok);border:1px solid rgba(62,230,168,0.12)}
-    .badge.no{background:rgba(255,123,123,0.06);color:var(--bad);border:1px solid rgba(255,123,123,0.06)}
     .badge.neutral{background:rgba(255,255,255,0.03);color:var(--muted);border:1px solid rgba(255,255,255,0.03)}
 
     .progress-shell{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
@@ -49,12 +67,21 @@
     .ms-change{display:inline-flex;gap:6px;align-items:center;font-weight:700}
     .ms-change.up{color:var(--ok)} .ms-change.down{color:var(--bad)}
 
-    footer{margin-top:auto;display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px;padding:20px 0 28px}
+    hr.sep{border:none;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0}
+
+    /* footer */
+    footer{margin-top:18px;color:var(--muted);font-size:13px;padding:18px 0 34px;display:flex;justify-content:space-between;align-items:center}
     .powered{display:flex;gap:8px;align-items:center}
-    a.powered { text-decoration: none; color: inherit; display:flex; gap:8px; align-items:center }
-    a.powered img { transition: transform .18s ease, box-shadow .18s ease; }
-    a.powered:hover img { transform: rotate(-6deg) scale(1.03); box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
-    @media (max-width:520px){ .topbar{flex-direction:column;align-items:flex-start;gap:8px} .search-row{flex-direction:column;align-items:stretch} .actions{justify-content:space-between} }
+    a.powered { text-decoration:none;color:inherit;display:flex;gap:8px;align-items:center }
+    a.powered img { width:44px; height:44px; border-radius:8px; object-fit:cover; transition: transform .18s ease, box-shadow .18s ease; box-shadow: 0 8px 22px rgba(0,0,0,0.45) }
+    a.powered:hover img { transform: rotate(-6deg) scale(1.03); box-shadow: 0 14px 40px rgba(0,0,0,0.45); }
+
+    /* responsive */
+    @media (max-width:560px){
+      .search-row{flex-direction:column;align-items:stretch}
+      .actions{justify-content:space-between}
+      a.powered img { width:40px; height:40px }
+    }
   </style>
 </head>
 <body>
@@ -62,7 +89,7 @@
     <div class="wrap">
       <div class="topbar">
         <div class="brand">
-          <div class="logo"><img src="zama-logo.png" alt="Zama"></div>
+          <div class="logo"><img id="logoImg" src="zama-logo.png" alt="Zama"></div>
           <div>
             <h1>ZAMA SZN 5 RANK</h1>
             <div class="subtitle">Search X handle (e.g. @0x_madara_)</div>
@@ -86,11 +113,9 @@
       <div id="resultArea" class="results" aria-live="polite"></div>
 
       <footer>
-        <div>Made with ❤️ </div>
-
-        <!-- clickable powered by madara (opens X profile) -->
+        <div>Made with ❤️ for Zama — love & powered by madara</div>
         <a class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer">
-          <img id="poweredAvatar" src="madara.png" alt="madara" style="width:40px;height:40px;border-radius:8px;object-fit:cover">
+          <img id="poweredAvatar" src="madara.png" alt="madara">
           <div style="font-size:13px">
             <div style="color:var(--muted);font-size:12px">Powered by</div>
             <div style="font-weight:700">madara</div>
@@ -100,88 +125,90 @@
     </div>
   </div>
 
-  <!-- canvas for generating share image -->
+  <!-- hidden canvas used for share image -->
   <canvas id="cardCanvas" width="1200" height="630" style="display:none"></canvas>
 
   <script>
-    // minimal config
+    // ------------- config -------------
     const API_BASE = '/api/check';
     const TOTAL_FETCHED = 1500;
     const OG_NFT_TOP = 1006;
     const SHARE_TOP = 100;
 
-    // Assumed payout curve for display: linear range between TOP and R100
     const ASSUMED_TOP_MIN = 1500; // rank1 lower bound
     const ASSUMED_TOP_MAX = 2000; // rank1 upper bound
     const ASSUMED_100_MIN = 200;  // rank100 lower bound
     const ASSUMED_100_MAX = 200;  // rank100 upper bound
 
-    // helpers
+    // ------------ utils --------------
+    const $ = (id)=>document.getElementById(id);
     function fmtNum(n, dec = 8) { if (n == null || !isFinite(Number(n))) return '-'; return Number(n).toFixed(dec); }
-    function money(n) { if (n == null || !isFinite(Number(n))) return '-'; return '$' + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function money(n) { if (n == null || !isFinite(Number(n))) return '-'; return '$' + Number(n).toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0}); }
 
-    // progress: if rank <= 100 use (100 - rank)/99; else use (1500 - rank)/(1500 - 100)
-    function progressToTop100(rank) {
-      if (!isFinite(rank)) return 0;
+    function lerp(a,b,t){ return a + (b-a)*t; }
+    function assumedPayoutRange(rank){
+      if(!isFinite(rank) || rank<1) return {min:null,max:null};
+      rank = Math.min(100, Math.max(1, Math.round(rank)));
+      const t = (rank - 1) / 99;
+      const min = lerp(ASSUMED_TOP_MIN, ASSUMED_100_MIN, t);
+      const max = lerp(ASSUMED_TOP_MAX, ASSUMED_100_MAX, t);
+      return { min: Math.round(min), max: Math.round(max) };
+    }
+
+    function progressToTop100(rank){
+      if(!isFinite(rank)) return 0;
       rank = Number(rank);
-      if (rank <= 100) {
-        return Math.max(0, Math.min(1, (100 - rank) / 99 ));
-      }
+      if(rank <= 100) return Math.max(0, Math.min(1, (100 - rank) / 99));
       return Math.max(0, Math.min(1, (1500 - rank) / (1500 - 100)));
     }
 
-    function computeChange(curr, next) {
+    function computeChange(curr, next){
       const a = Number(curr?.mindshare); const b = Number(next?.mindshare);
-      if (!isFinite(a) || !isFinite(b)) return { dir: 'same', pct: 0, abs: 0 };
-      const diff = a - b;
-      const pct = b === 0 ? (a === 0 ? 0 : 100) : (diff / Math.abs(b) * 100);
-      return { dir: diff > 0 ? 'up' : (diff < 0 ? 'down' : 'same'), pct: Math.round(Math.abs(pct) * 10) / 10, abs: Math.round(diff * 1000000) / 1000000 };
+      if(!isFinite(a) || !isFinite(b)) return {dir:'same', pct:0, abs:0};
+      const diff = a - b; const pct = b===0 ? (a===0?0:100) : (diff/Math.abs(b)*100);
+      return {dir: diff>0 ? 'up' : (diff<0 ? 'down' : 'same'), pct: Math.round(Math.abs(pct)*10)/10, abs: Math.round(diff*1000000)/1000000};
     }
 
-    function lerp(a, b, t) { return a + (b - a) * t; }
-
-    function assumedPayoutRange(rank) {
-      if (!isFinite(rank) || rank < 1) return { min: null, max: null };
-      rank = Math.min(100, Math.max(1, Math.round(rank)));
-      const t = (rank - 1) / 99; // 0..1
-      const min = lerp(ASSUMED_TOP_MIN, ASSUMED_100_MIN, t);
-      const max = lerp(ASSUMED_TOP_MAX, ASSUMED_100_MAX, t);
-      return { min: Math.round(min * 100) / 100, max: Math.round(max * 100) / 100 };
+    // ------------ preload images (important for share gesture) ------------
+    let _preloaded = {};
+    async function preloadImages(){
+      const toLoad = ['zama-logo.png','madara.png'];
+      await Promise.all(toLoad.map(src => new Promise((resolve)=> {
+        const im = new Image(); im.crossOrigin = 'anonymous';
+        im.onload = ()=>{ _preloaded[src]=im; resolve(); };
+        im.onerror = ()=>{ _preloaded[src]=null; resolve(); };
+        im.src = src;
+      })));
     }
+    preloadImages();
 
-    // UI pieces
-    function skeletonCard() {
-      const c = document.createElement('div'); c.className = 'card';
-      c.innerHTML = '<h3 style="background:rgba(255,255,255,0.02;width:120px;height:18px;border-radius:6px"></h3><div class="row"><div class="label" style="background:rgba(255,255,255,0.02;width:80px;height:12px"></div><div class="value" style="background:rgba(255,255,255,0.02;width:80px;height:20px"></div></div>';
-      return c;
-    }
+    // ------------ UI builders ------------
+    function skeletonCard(){ const c=document.createElement('div'); c.className='card'; c.innerHTML='<h3 style="background:rgba(255,255,255,0.02;width:110px;height:18px;border-radius:6px"></h3><div class="row"><div class="label" style="background:rgba(255,255,255,0.02;width:80px;height:12px"></div><div class="value" style="background:rgba(255,255,255,0.02;width:80px;height:20px"></div></div>'; return c; }
 
-    function mkCard(title, meta, neighbor) {
-      const c = document.createElement('div'); c.className = 'card';
+    // title = '24h'|'7d'|'month'
+    function mkCard(title, meta, neighbor){
+      const c=document.createElement('div'); c.className='card';
       const rank = meta?.rank ?? null;
       const ms = meta?.mindshare ?? null;
-      const progressPct = Math.round(progressToTop100(rank) * 100);
-      const change = computeChange(meta || {}, neighbor || {});
-      const changeHtml = change.dir === 'same' ? '-' : `<span class="ms-change ${change.dir}">${change.dir === 'up' ? '▲' : '▼'} ${change.pct}%</span>`;
+      const change = computeChange(meta||{}, neighbor||{});
+      const changeHtml = change.dir==='same' ? '-' : `<span class="ms-change ${change.dir}">${change.dir==='up'?'▲':'▼'} ${change.pct}%</span>`;
       const absHtml = change.abs ? ` (${change.abs>0?'+':''}${change.abs})` : '';
+      const prog = Math.round(progressToTop100(rank)*100);
 
-      // badges
+      // eligibility badge: ONLY show when title === 'month' (30d) because selection uses 30d
       let badgeHtml = '';
-      if (isFinite(rank)) {
-        if (rank <= SHARE_TOP) {
-          badgeHtml = `<span class="badge ok">Eligible for OG NFT + Revenue Share</span>`;
-        } else if (rank <= OG_NFT_TOP) {
-          badgeHtml = `<span class="badge ok">Eligible for OG NFT</span>`;
-        } else {
-          badgeHtml = `<span class="badge neutral">Not Eligible</span>`;
-        }
+      if (title === 'month' && isFinite(rank)) {
+        if (rank <= SHARE_TOP) badgeHtml = `<span class="badge ok">Eligible for OG NFT + Revenue Share</span>`;
+        else if (rank <= OG_NFT_TOP) badgeHtml = `<span class="badge ok">Eligible for OG NFT</span>`;
+        else badgeHtml = `<span class="badge neutral">Not Eligible</span>`;
       }
 
-      // assumed payout
+      // assumed payout text (only if eligible - i.e., rank <= SHARE_TOP AND title === 'month')
       let payoutHtml = '-';
-      if (isFinite(rank) && rank <= SHARE_TOP) {
+      if(title === 'month' && isFinite(rank) && rank <= SHARE_TOP){
         const r = assumedPayoutRange(rank);
-        payoutHtml = `${money(r.min)} — ${money(r.max)} (assumption)`;
+        // use single short dash
+        payoutHtml = `${money(r.min)} - ${money(r.max)}`;
       }
 
       c.innerHTML = `
@@ -194,70 +221,64 @@
         <div class="row"><div class="label">Change vs next</div><div class="value">${changeHtml}${absHtml}</div></div>
 
         <div style="margin-top:8px">
-          <div class="progress-shell" aria-hidden="true"><div class="progress-bar" style="width:${progressPct}%"></div></div>
-          <div style="font-size:12px;color:var(--muted);margin-top:6px">Progress to Top 100: ${progressPct}% • Total fetched: ${TOTAL_FETCHED}</div>
+          <div class="progress-shell" aria-hidden="true"><div class="progress-bar" style="width:${prog}%"></div></div>
+          <div style="font-size:12px;color:var(--muted);margin-top:6px">Progress to Top 100: ${prog}% • Total fetched: ${TOTAL_FETCHED}</div>
         </div>
 
         <div style="margin-top:10px">${badgeHtml}</div>
 
-        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0" />
+        <hr class="sep" />
         <div class="row"><div class="label">Assumed payout (if eligible)</div><div class="value">${payoutHtml}</div></div>
       `;
       return c;
     }
 
-    // canvas share card
-    function loadImage(src) {
-      return new Promise((resolve, reject) => {
-        const img = new Image(); img.crossOrigin = 'anonymous';
-        img.onload = () => resolve(img); img.onerror = () => reject(new Error('failed to load image')); img.src = src;
-      });
-    }
-
-    async function generateShareCard(handle, data) {
-      const canvas = document.getElementById('cardCanvas');
-      const ctx = canvas.getContext('2d');
+    // ------------ share image generation (synchronous draw + toDataURL) ------------
+    // Draw synchronously (no async image loads) using preloaded images to keep the share call inside user gesture.
+    function drawShareCanvas(handle, data){
+      const canvas = $('cardCanvas'); const ctx = canvas.getContext('2d');
       ctx.clearRect(0,0,canvas.width,canvas.height);
-
       // background
       ctx.fillStyle = '#071025'; ctx.fillRect(0,0,canvas.width,canvas.height);
 
-      // logo
+      // logo box and image (use preloaded if available)
       ctx.fillStyle = '#ffd24b'; ctx.fillRect(48,40,110,110);
-      try { const lg = await loadImage('zama-logo.png'); ctx.drawImage(lg,56,48,94,94); } catch(e){}
+      const logo = _preloaded['zama-logo.png'];
+      if(logo) ctx.drawImage(logo,56,48,94,94);
 
       // header
       ctx.fillStyle = '#eaf3fb'; ctx.font = '700 40px Inter, Arial';
       ctx.fillText(handle.startsWith('@')?handle:`@${handle}`, 180, 90);
 
-      // 24h block
+      // 24h summary
       const tf = data.results && data.results['24h'] ? data.results['24h'] : {};
-      ctx.font = '700 52px Inter, Arial'; ctx.fillStyle = '#eaf3fb';
+      ctx.font = '700 48px Inter, Arial'; ctx.fillStyle = '#eaf3fb';
       ctx.fillText('Rank ' + (tf.rank || '-'), 180, 170);
       ctx.font = '600 24px Inter, Arial'; ctx.fillStyle = '#ffd24b';
       ctx.fillText('Mindshare: ' + (tf.mindshare ? Number(tf.mindshare).toFixed(6) : '-'), 180, 206);
 
-      // badges
-      const rank = Number(tf.rank) || 999999;
-      ctx.font = '700 20px Inter, Arial';
-      if (rank <= SHARE_TOP) {
-        ctx.fillStyle = '#3ee6a8'; ctx.fillRect(48,240,280,42); ctx.fillStyle = '#041017'; ctx.fillText('Eligible: OG NFT + Revenue Share', 60, 270);
-      } else if (rank <= OG_NFT_TOP) {
-        ctx.fillStyle = '#3ee6a8'; ctx.fillRect(48,240,200,42); ctx.fillStyle = '#041017'; ctx.fillText('Eligible: OG NFT', 60, 270);
+      // month-based eligibility badge (we reflect winners selection)
+      const monthMeta = data.results && data.results['month'] ? data.results['month'] : {};
+      const rankMonth = Number(monthMeta.rank) || 999999;
+      ctx.font = '700 18px Inter, Arial';
+      if(rankMonth <= SHARE_TOP){
+        ctx.fillStyle = '#3ee6a8'; ctx.fillRect(48,240,360,42); ctx.fillStyle = '#041017'; ctx.fillText('Eligible: OG NFT + Revenue Share', 60, 270);
+      } else if(rankMonth <= OG_NFT_TOP){
+        ctx.fillStyle = '#3ee6a8'; ctx.fillRect(48,240,220,42); ctx.fillStyle = '#041017'; ctx.fillText('Eligible: OG NFT', 60, 270);
       } else {
         ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fillRect(48,240,200,42); ctx.fillStyle = '#9fb0bf'; ctx.fillText('Not Eligible', 60, 270);
       }
 
-      // progress (draw simple bar)
-      const prog = Math.round(progressToTop100(rank) * 100);
+      // progress bar (month progress)
+      const p = Math.round(progressToTop100(rankMonth)*100);
       ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fillRect(48,312,1100,18);
-      ctx.fillStyle = '#ffd24b'; ctx.fillRect(48,312,Math.max(2, (1100 * prog / 100)),18);
+      ctx.fillStyle = '#ffd24b'; ctx.fillRect(48,312,Math.max(2,(1100*p/100)),18);
       ctx.font = '500 16px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
-      ctx.fillText(`Progress to Top 100: ${prog}%`, 48, 358);
+      ctx.fillText(`Progress to Top 100 (30d): ${p}%`, 48, 358);
 
-      // assumed payout
-      if (rank <= SHARE_TOP) {
-        const r = assumedPayoutRange(rank);
+      // assumed payout for month if eligible
+      if(rankMonth <= SHARE_TOP){
+        const r = assumedPayoutRange(rankMonth);
         ctx.font = '600 22px Inter, Arial'; ctx.fillStyle = '#fff';
         ctx.fillText(`Assumed payout: ${money(r.min)} - ${money(r.max)}`, 48, 404);
       }
@@ -267,92 +288,105 @@
       ctx.fillText('Powered by madara', 48, canvas.height - 60);
       ctx.fillText('zama-rank.vercel.app', canvas.width - 320, canvas.height - 60);
 
-      return new Promise(resolve => canvas.toBlob(blob => resolve(blob)));
+      // return dataURL synchronously
+      return canvas.toDataURL('image/png');
     }
 
-    async function shareFlow(handle, data) {
-      try {
-        const blob = await generateShareCard(handle, data);
-        if (!blob) throw new Error('image generation failed');
-        const file = new File([blob], `${handle}-zama-rank.png`, { type: blob.type });
-        const text = `${handle} — Zama Rank: ${data.results?.['24h']?.rank || '-'} • Mindshare: ${data.results?.['24h']?.mindshare || '-'}\nCheck your rank: https://zama-rank.vercel.app`;
+    // convert dataURL -> file (synchronously using atob / typed array)
+    function dataURLtoFile(dataurl, filename){
+      const arr = dataurl.split(',');
+      const mime = arr[0].match(/:(.*?);/)[1];
+      const bstr = atob(arr[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while(n--) u8arr[n] = bstr.charCodeAt(n);
+      return new File([u8arr], filename, { type: mime });
+    }
 
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    // share action (keeps share call inside user gesture by using sync methods)
+    async function doShare(handle, data){
+      try{
+        // draw and get dataUrl synchronously
+        const dataUrl = drawShareCanvas(handle, data);
+        const file = dataURLtoFile(dataUrl, `${handle}-zama-rank.png`);
+        const text = `${handle} — Zama Rank: ${data.results?.['24h']?.rank || '-'} • Mindshare: ${data.results?.['24h']?.mindshare || '-'}\nCheck: https://zama-rank.vercel.app`;
+
+        if(navigator.canShare && navigator.canShare({ files: [file] })){
+          // this is still an async call but we're invoking it immediately during click
           await navigator.share({ files: [file], text });
           return;
         }
 
-        // fallback: download image and open X compose with text
+        // fallback: force download & open X compose
+        const blob = file; // file is a Blob
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = `${handle}-zama-rank.png`;
-        document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+        const a = document.createElement('a'); a.href = url; a.download = `${handle}-zama-rank.png`; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url), 1500);
 
         const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
         window.open(xUrl, '_blank');
-      } catch (err) {
+      }catch(err){
         alert('Share failed: ' + (err.message || err));
       }
     }
 
-    // main logic
-    const resultArea = document.getElementById('resultArea');
-    const searchBtn = document.getElementById('searchBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const shareCardBtn = document.getElementById('shareCardBtn');
+    // ------------ main logic ------------
+    const resultArea = $('resultArea');
+    const searchBtn = $('searchBtn');
+    const clearBtn = $('clearBtn');
+    const shareCardBtn = $('shareCardBtn');
 
-    function showSkeletons() { resultArea.innerHTML = ''; for (let i = 0; i < 3; i++) resultArea.appendChild(skeletonCard()); }
+    function showSkeletons(){ resultArea.innerHTML=''; for(let i=0;i<3;i++) resultArea.appendChild(skeletonCard()); }
 
-    async function performSearch() {
-      const raw = (document.getElementById('username').value || '').trim();
-      if (!raw) { document.getElementById('username').focus(); return; }
-      const handle = raw.replace(/^@/, '');
+    async function performSearch(){
+      const raw = ($('username').value || '').trim(); if(!raw){ $('username').focus(); return; }
+      const handle = raw.replace(/^@/,'');
       showSkeletons();
       searchBtn.disabled = true;
-      try {
+      try{
         const r = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
-        if (!r.ok) throw new Error('Network ' + r.status);
+        if(!r.ok) throw new Error('Network ' + r.status);
         const data = await r.json();
         resultArea.innerHTML = '';
-        const order = ['24h', '7d', 'month'];
-        for (let i = 0; i < order.length; i++) {
+        const order = ['24h','7d','month'];
+        for(let i=0;i<order.length;i++){
           const key = order[i];
-          const neighbor = order[i + 1] ? data.results[order[i + 1]] : null;
-          resultArea.appendChild(mkCard(key, data.results[key], neighbor));
+          const neighbor = order[i+1] ? data.results[order[i+1]] : null;
+          resultArea.appendChild( mkCard(key, data.results[key], neighbor) );
         }
-        // set share button to use this data
-        shareCardBtn.onclick = () => shareFlow(handle, data);
-      } catch (err) {
+        // set share handler to use fresh data (and call sync share inside click)
+        // Important: keep navigator.share executed during user's click gesture. We'll call doShare immediately in click handler.
+        shareCardBtn.onclick = ()=>{ doShare(handle, data); };
+      }catch(err){
         resultArea.innerHTML = `<div class="card"><h3>Error</h3><div style="color:var(--muted);margin-top:6px">${err.message}</div></div>`;
-      } finally {
-        searchBtn.disabled = false;
-      }
+      }finally{ searchBtn.disabled = false; }
     }
 
     searchBtn.addEventListener('click', performSearch);
-    clearBtn.addEventListener('click', () => {
-      document.getElementById('username').value = '';
-      resultArea.innerHTML = '';
-    });
+    clearBtn.addEventListener('click', ()=>{ $('username').value=''; resultArea.innerHTML=''; });
 
-    // If user presses Share without prior search, fetch first
-    shareCardBtn.addEventListener('click', async () => {
-      const handleRaw = (document.getElementById('username').value || '').trim();
-      if (!handleRaw) return alert('Search a handle first to share');
-      const handle = handleRaw.replace(/^@/, '');
-      // call API to ensure fresh data then share
-      try {
+    // If user clicks Share without doing Search, fetch first but then call doShare synchronously in response to the click
+    shareCardBtn.addEventListener('click', async ()=>{
+      const raw = ($('username').value||'').trim(); if(!raw) return alert('Search a handle first');
+      const handle = raw.replace(/^@/,'');
+      // run fetch first (async) but then immediately do share inside user click callback below.
+      // To keep UX, we try fetching quickly then call doShare. If fetch is slow we still allow download fallback.
+      try{
         const r = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
-        if (!r.ok) throw new Error('Network ' + r.status);
+        if(!r.ok) throw new Error('Network ' + r.status);
         const data = await r.json();
-        await shareFlow(handle, data);
-      } catch (e) {
+        // call doShare immediately: still inside click event
+        await doShare(handle, data);
+      }catch(e){
         alert('Failed to prepare share card: ' + (e.message || e));
       }
     });
 
-    document.getElementById('username').addEventListener('keydown', (e) => { if (e.key === 'Enter') performSearch(); });
+    // enter key
+    $('username').addEventListener('keydown', (e)=>{ if(e.key==='Enter') performSearch(); });
 
-    // init: nothing else needed
+    // ensure background covers bottom on phones (tiny extra) - add a bit of bottom padding to wrap
+    document.querySelector('.wrap').style.paddingBottom = '36px';
   </script>
 </body>
 </html>
