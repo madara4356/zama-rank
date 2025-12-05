@@ -12,15 +12,15 @@
     --muted:#9fb0bf;
     --accent1:#ffd24b; --accent2:#ff6b6b;
     --text:#eaf3fb; --ok:#3ee6a8; --bad:#ff7b7b;
-    --max-width:940px;
-    --footer-height:78px;
+    --footer-h:88px;
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));}
   body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;}
 
+  /* page layout */
   #app{min-height:100vh;display:flex;flex-direction:column;}
-  .wrap{width:100%;max-width:var(--max-width);margin:18px auto;padding:18px 18px 16px;flex:1;display:flex;flex-direction:column}
+  .wrap{max-width:940px;margin:18px auto;padding:18px 18px 8px;flex:1;display:flex;flex-direction:column;padding-bottom: calc(var(--footer-h) + 18px);}
 
   .topbar{display:flex;align-items:center;justify-content:flex-start;gap:12px}
   .brand{display:flex;gap:12px;align-items:center}
@@ -30,23 +30,32 @@
   .subtitle{color:var(--muted);font-size:13px;margin-top:2px}
 
   .search-shell{margin-top:14px;background:var(--card);padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 36px rgba(0,0,0,0.45)}
-  .search-row{display:flex;gap:14px;align-items:center}
+  .search-row{display:flex;gap:12px;align-items:center}
   .search-inner{flex:1;min-width:0}
-  input[type="text"]{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px; height:48px; outline:none}
+  input[type="text"]{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px; height:56px; outline:none}
 
-  /* actions: force single line, shrink buttons evenly */
-  .actions{display:flex;gap:10px;align-items:center;flex-wrap:nowrap; justify-content:flex-end}
-  .btn{padding:10px 14px;border-radius:12px;border:0;cursor:pointer;font-weight:800;display:inline-flex;align-items:center;justify-content:center;min-height:44px;box-sizing:border-box;flex:1 1 0; min-width:0}
-  .btn-search{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020;box-shadow:0 10px 30px rgba(0,0,0,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:10px 12px}
-  .btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#061020; white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* action buttons: inline single row */
+  .actions{display:flex;gap:12px;align-items:center;flex:0 0 auto}
+  .btn{padding:12px 18px;border-radius:12px;border:0;cursor:pointer;font-weight:800;display:inline-flex;align-items:center;justify-content:center;min-height:48px}
+  .btn-search{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020;box-shadow:0 10px 30px rgba(0,0,0,0.5);min-width:120px}
+  .btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);min-width:88px}
+  .btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#061020; min-width:132px;}
 
-  .results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;align-items:start}
-  .card{background:var(--card);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 28px rgba(0,0,0,0.45)}
+  /* results grid */
+  .results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start}
+  .card{background:var(--card);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 28px rgba(0,0,0,0.45)}
   .card h3{margin:0 0 10px;font-size:14px}
   .row{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
   .label{color:var(--muted);font-size:13px}
-  .value{font-size:20px;font-weight:800}
+  .value{font-size:20px;font-weight:800; font-variant-numeric: tabular-nums;}
+
+  /* mindshare specific */
+  .value.mindshare{
+    font-size:20px;
+    color:var(--accent1);
+    text-align:right;
+    white-space:nowrap;
+  }
 
   .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;font-size:13px}
   .badge.ok{background:rgba(62,230,168,0.12);color:var(--ok);border:1px solid rgba(62,230,168,0.12)}
@@ -54,39 +63,44 @@
 
   .progress-shell{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
   .progress-bar{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .6s ease}
-  .ms-change{display:inline-flex;gap:6px;align-items:center;font-weight:700}
+  /* change block: keep percent and absolute on one line */
+  .ms-change{display:inline-flex;gap:8px;align-items:center;font-weight:800;white-space:nowrap;font-variant-numeric: tabular-nums}
   .ms-change.up{color:var(--ok)} .ms-change.down{color:var(--bad)}
+  .ms-change .abs{font-weight:700;color:rgba(255,255,255,0.85);font-size:0.95em;margin-left:6px}
+
   hr.sep{border:none;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0}
 
-  /* reserve space for footer so content isn't covered */
-  .wrap { padding-bottom: calc(var(--footer-height) + 32px); }
-
-  footer.footer-fixed{
+  /* fixed footer */
+  footer.site-footer{
     position:fixed;
-    left:0; right:0; bottom:0;
-    height:var(--footer-height);
-    display:flex; align-items:center; justify-content:center;
-    background: linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0.14));
+    left:0;right:0;bottom:0;
+    height:var(--footer-h);
+    background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.6));
     border-top:1px solid rgba(255,255,255,0.02);
-    z-index:9999; padding:0 12px; box-sizing:border-box;
+    display:flex;align-items:center;justify-content:center;padding:12px 18px;z-index:20;
   }
-  .footer-inner{ width:100%; max-width:var(--max-width); display:flex; align-items:center; justify-content:space-between; gap:12px; }
-  .footer-left{ color:var(--muted); font-size:14px; line-height:1.2; flex:1 1 auto; min-width:0; }
-  .footer-right{ display:flex; align-items:center; gap:12px; flex:0 0 auto; }
-  .footer-right .avatar{ width:56px; height:56px; border-radius:8px; overflow:hidden; background: #fff; box-shadow:0 8px 22px rgba(0,0,0,0.45); display:block; }
+  .footer-inner{max-width:940px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:14px}
+  a.powered{ text-decoration:none;color:inherit;display:flex;gap:12px;align-items:center}
+  a.powered img{ width:56px; height:56px; border-radius:8px; object-fit:cover; box-shadow:0 8px 22px rgba(0,0,0,0.45) }
+
+  /* smaller screens */
+  @media (max-width:760px){
+    h1{font-size:18px}
+  }
 
   @media (max-width:560px){
-    h1{font-size:18px}
     .search-row{flex-direction:column;align-items:stretch}
-    .actions{ /* keep one-line even on narrow screens by allowing buttons to shrink */
-      flex-direction:row;
-      gap:8px;
-    }
-    .btn{font-size:14px; padding:10px 8px}
-    .footer-left{ font-size:13px }
-    .footer-right .avatar{ width:48px; height:48px }
-    :root{ --footer-height:96px; }
+    .search-inner{width:100%}
+    /* keep action buttons inline on one row with wrapping behavior */
+    .actions{flex-wrap:nowrap;justify-content:space-between}
+    .btn{flex:1 1 auto; min-width:0}
+    .btn + .btn{margin-left:8px}
+    .footer-inner{padding:0 6px; font-size:13px}
+    a.powered img{width:48px;height:48px}
   }
+
+  /* small visual helper when results hidden */
+  .results-empty{color:var(--muted);margin-top:16px}
 </style>
 </head>
 <body>
@@ -107,62 +121,77 @@
           <div class="search-inner">
             <input id="username" type="text" placeholder="@your_handle" aria-label="Search handle" />
           </div>
-
-          <!-- ACTIONS: single-line, evenly shrinking -->
-          <div class="actions" role="group" aria-label="Search actions">
-            <button id="searchBtn" class="btn btn-search" title="Search">🔎 Search</button>
-            <button id="clearBtn" class="btn btn-clear" title="Clear">Clear</button>
-            <button id="shareCardBtn" class="btn btn-share" title="Share card">Share Card</button>
+          <div class="actions">
+            <button id="searchBtn" class="btn btn-search">🔎 Search</button>
+            <button id="clearBtn" class="btn btn-clear">Clear</button>
+            <button id="shareCardBtn" class="btn btn-share">Share Card</button>
           </div>
         </div>
       </div>
 
+      <!-- results area -->
       <div id="resultArea" class="results" aria-live="polite" style="display:none"></div>
+      <div id="emptyHint" class="results-empty">Search to show data</div>
+    </div>
 
-    </div> <!-- wrap -->
-  </div> <!-- app -->
-
-  <!-- footer: avatar links to X account. REPLACE handle below with your X handle -->
-  <footer class="footer-fixed" aria-hidden="false">
-    <div class="footer-inner">
-      <div class="footer-left">Made with ❤️ for Zama Powered by madara</div>
-      <div class="footer-right">
-        <!-- change this href to your X handle (example uses 0x_madara_) -->
-        <a href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:10px;text-decoration:none">
-          <img class="avatar" src="madara.png" alt="madara" />
+    <footer class="site-footer" aria-hidden="false">
+      <div class="footer-inner">
+        <div>Made with ❤️ for Zama — Powered by madara</div>
+        <a class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer" id="poweredLink">
+          <img id="poweredAvatar" src="madara.png" alt="madara">
+          <div style="font-size:13px; color:var(--muted)"><div style="font-weight:700;color:var(--text)">madara</div></div>
         </a>
       </div>
-    </div>
-  </footer>
+    </footer>
+  </div>
 
-  <canvas id="cardCanvas" width="1200" height="760" style="display:none"></canvas>
+  <!-- canvas for share card (hidden) -->
+  <canvas id="cardCanvas" width="1200" height="720" style="display:none"></canvas>
 
 <script>
-/* ---------- Minimal JS: same logic as before (API, render, share) ---------- */
-const API_BASE = '/api/check';
+/* -------- CONFIG -------- */
+const API_BASE = '/api/check';           // server endpoint (unchanged)
 const TOTAL_FETCHED = 1500;
 const OG_NFT_TOP = 1006;
 const SHARE_TOP = 100;
 
+/* helpers */
 const $ = id => document.getElementById(id);
-function fmtNum(n, d=8){ if(n==null || !isFinite(Number(n))) return '-'; return Number(n).toFixed(d); }
 function money(n){ if(n==null || !isFinite(Number(n))) return '-'; return '$' + Number(n).toLocaleString(); }
+function fmtNum(n, d=6){ if(n==null || !isFinite(Number(n))) return '-'; return Number(n).toFixed(d); }
 function progressToTop100(rank){
   if(!isFinite(rank)) return 0;
   rank = Number(rank);
   if(rank <= 100) return Math.max(0, Math.min(1, (100-rank)/99));
   return Math.max(0, Math.min(1, (1500-rank)/(1500-100)));
 }
-function computeChange(curr,next){
-  const a = Number(curr?.mindshare), b = Number(next?.mindshare);
-  if(!isFinite(a) || !isFinite(b)) return {dir:'same',pct:0,abs:0};
-  const diff = a - b; const pct = b===0 ? (a===0?0:100) : (diff/Math.abs(b)*100);
-  return {dir: diff>0 ? 'up' : (diff<0 ? 'down' : 'same'), pct: Math.round(Math.abs(pct)*10)/10, abs: Math.round(diff*1000000)/1000000};
+
+/* compute change between current and neighbor for display */
+function computeChange(curr, next) {
+  const a = Number(curr?.mindshare);
+  const b = Number(next?.mindshare);
+  if (!isFinite(a) || !isFinite(b)) return { dir: 'same', pctText: '-', absText: '', pct: 0, abs: 0 };
+
+  const diff = a - b;
+  const pct = (b === 0) ? ((a === 0) ? 0 : 100) : (diff / Math.abs(b) * 100);
+  const pctRounded = Math.round(pct * 10) / 10;
+  const absRounded = Math.round(diff * 1000000) / 1000000;
+  const dir = (diff > 0 ? 'up' : (diff < 0 ? 'down' : 'same'));
+  const pctText = (dir === 'same') ? '0.0%' : `${Math.abs(pctRounded)}%`;
+  const absText = (absRounded === 0 ? '' : `(${absRounded>0?'+':''}${absRounded})`);
+  return { dir, pctText, absText, pct: pctRounded, abs: absRounded };
 }
 
-/* preload */
-const _pre = {avatar:null};
-function loadAvatar(handle){
+/* preload images */
+const _pre = {logo:null, powered:null, avatar:null};
+function preloadStatic(){
+  const l = new Image(); l.src='zama-logo.png'; l.onload=()=>_pre.logo=l; l.onerror=()=>_pre.logo=null;
+  const p = new Image(); p.src='madara.png'; p.onload=()=>{ _pre.powered=p; $('poweredAvatar').src='madara.png'; } ; p.onerror=()=>_pre.powered=null;
+}
+preloadStatic();
+
+/* avatar from unavatar */
+async function loadAvatar(handle){
   return new Promise(resolve=>{
     const img = new Image(); img.crossOrigin='anonymous';
     img.onload = ()=>{ _pre.avatar = img; resolve(true); };
@@ -171,28 +200,39 @@ function loadAvatar(handle){
   });
 }
 
-function hideResults(){ $('resultArea').style.display = 'none'; }
-function showResults(){ $('resultArea').style.display = 'grid'; }
-hideResults();
+/* UI show/hide */
+function hideResults(){ $('resultArea').style.display = 'none'; $('emptyHint').style.display='block'; }
+function showResults(){ $('resultArea').style.display = 'grid'; $('emptyHint').style.display='none'; }
 
+/* build a single card (title: '24h'|'7d'|'30d') */
 function mkCard(title, meta, neighbor){
   const el = document.createElement('div'); el.className='card';
+
   const found = !!meta && meta.found === true && Number.isFinite(Number(meta.rank));
   const rank = found ? Number(meta.rank) : null;
   const ms = found ? meta.mindshare : null;
   const prog = found ? Math.round(progressToTop100(rank)*100) : 0;
   const ch = computeChange(found ? meta : {}, (neighbor && neighbor.found===true)?neighbor:{});
-  const changeHtml = ch.dir==='same' ? '-' : `<span class="ms-change ${ch.dir}">${ch.dir==='up'?'▲':'▼'} ${ch.pct}%</span>`;
-  const absHtml = (ch.abs && ch.abs !== 0) ? ` (${ch.abs>0?'+':''}${ch.abs})` : '';
+
+  let changeHtml = '-';
+  if(found){
+    if(ch.dir === 'same') changeHtml = `<span class="ms-change">${ch.pctText}</span>`;
+    else {
+      const arrow = ch.dir === 'up' ? '▲' : '▼';
+      changeHtml = `<span class="ms-change ${ch.dir}">${arrow} ${ch.pctText}<span class="abs">${ch.absText}</span></span>`;
+    }
+  }
+
+  const mindshareHtml = found ? `<div class="value mindshare">${fmtNum(ms,6)}</div>` : `<div class="value mindshare">-</div>`;
 
   let badgeHtml = '';
-  if((title === 'month' || title === '30d') && found){
+  if((title==='30d' || title==='month') && found){
     if(rank <= SHARE_TOP) badgeHtml = `<div style="margin-top:8px"><span class="badge ok">Eligible for OG NFT + Revenue Share</span></div>`;
     else if(rank <= OG_NFT_TOP) badgeHtml = `<div style="margin-top:8px"><span class="badge ok">Eligible for OG NFT</span></div>`;
   }
 
   let payoutHtml = '-';
-  if((title === 'month' || title === '30d') && found && rank <= SHARE_TOP){
+  if((title==='30d' || title==='month') && found && rank <= SHARE_TOP){
     const topMin = 1500, topMax=2000, min100=150, max100=260;
     const t = (Math.min(100, Math.max(1, rank)) - 1)/99;
     const min = Math.round(topMin + (min100 - topMin)*t);
@@ -205,8 +245,8 @@ function mkCard(title, meta, neighbor){
       <h3>${title}</h3>
       <div style="text-align:right;font-weight:800;font-size:20px">${found?rank:'-'}</div>
     </div>
-    <div class="row"><div class="label">Mindshare</div><div class="value">${found?fmtNum(ms):'-'}</div></div>
-    <div class="row"><div class="label">Change vs next</div><div class="value">${found? (changeHtml + absHtml) : '-'}</div></div>
+    <div class="row"><div class="label">Mindshare</div>${mindshareHtml}</div>
+    <div class="row"><div class="label">Change vs next</div><div style="text-align:right">${found? changeHtml : '-'}</div></div>
     <div style="margin-top:8px">
       <div class="progress-shell" aria-hidden="true"><div class="progress-bar" style="width:${found?prog+'%':'0%'}"></div></div>
       <div style="font-size:12px;color:var(--muted);margin-top:6px">${found ? `Progress to Top 100: ${prog}% • Total fetched: ${TOTAL_FETCHED}` : `Search to show data • Total fetched: ${TOTAL_FETCHED}`}</div>
@@ -218,56 +258,157 @@ function mkCard(title, meta, neighbor){
   return el;
 }
 
-let lastSearch = null;
-async function performSearch(){
-  const raw = ($('username').value||'').trim();
-  if(!raw){ $('username').focus(); return; }
-  const handle = raw.replace(/^@/,'');
-  showResults();
-  const container = $('resultArea'); container.innerHTML = '';
-  for(let i=0;i<3;i++){ const s=document.createElement('div'); s.className='card'; s.innerHTML=`<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`; container.appendChild(s); }
+/* draw share canvas in the layout requested:
+   two small boxes (24h, 7d) on top, a middle-wide 'month/30d' box below, avatar and username on left and large rank on right.
+*/
+function drawCanvasLayout(handle, data){
+  const canvas = $('cardCanvas'); const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
 
-  await loadAvatar(handle);
+  // background: dark green teal with subtle rounded overlay
+  ctx.fillStyle = '#0f3b39'; ctx.fillRect(0,0,W,H);
+  // rounded card area
+  ctx.fillStyle = 'rgba(0,0,0,0.06)'; roundRect(ctx, 20, 20, W-40, H-40, 20, true, false);
 
-  try{
-    const res = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
-    if(!res.ok) throw new Error('Network ' + res.status);
-    const data = await res.json();
+  // draw avatar circle left
+  const avatar = _pre.avatar;
+  const aSize = 120, margin = 48;
+  if(avatar){
+    ctx.save(); ctx.beginPath(); ctx.arc(margin + aSize/2, margin + aSize/2, aSize/2, 0, Math.PI*2); ctx.closePath(); ctx.clip();
+    ctx.drawImage(avatar, margin, margin, aSize, aSize); ctx.restore();
+  } else {
+    ctx.fillStyle = '#ffd24b'; ctx.fillRect(margin, margin, aSize, aSize);
+  }
 
-    if(data.results && data.results.month && !data.results['30d']) data.results['30d'] = data.results.month;
+  // handle text
+  ctx.fillStyle = '#ffffff'; ctx.font = '700 36px Inter, Arial';
+  const handleText = handle.startsWith('@') ? handle : '@' + handle;
+  ctx.fillText(handleText, margin + aSize + 28, margin + 42);
 
-    container.innerHTML = '';
-    const order = ['24h','7d','30d'];
-    for(let i=0;i<order.length;i++){
-      const k = order[i]; const neighbor = (i<order.length-1) ? data.results[order[i+1]] || null : null;
-      container.appendChild( mkCard(k, data.results[k]||{}, neighbor) );
+  // subtitle
+  ctx.fillStyle = '#9fb0bf'; ctx.font = '400 16px Inter, Arial';
+  ctx.fillText('Zama rank card', margin + aSize + 28, margin + 70);
+
+  // fetch timeframe data (allow keys both '24h','7d','30d' or 'month')
+  const r24 = data.results?.['24h'] || data.results?.['24'] || {};
+  const r7 = data.results?.['7d'] || data.results?.['7'] || {};
+  const r30 = data.results?.['30d'] || data.results?.['month'] || data.results?.['30'] || {};
+  const found24 = r24 && r24.found===true;
+  const found7 = r7 && r7.found===true;
+  const found30 = r30 && r30.found===true;
+
+  // small box sizes
+  const boxW = Math.floor((W - margin*3 - 400) / 2); // two small boxes width (leave space for big rank to the right)
+  const boxH = 96;
+  // positions
+  const topY = margin + aSize + 32;
+  const leftX = margin + 10;
+  const midX = leftX + boxW + 16;
+  const rightBoxX = W - margin - 320; // area reserved for large rank
+
+  // draw first two small boxes
+  drawSmallBox(ctx, leftX, topY, boxW, boxH, '24H', r24);
+  drawSmallBox(ctx, midX, topY, boxW, boxH, '7D', r7);
+
+  // draw middle big box below them (centered between them)
+  const bigW = (midX + boxW/2) - leftX + 8; // span width of first two boxes
+  const bigX = leftX;
+  const bigY = topY + boxH + 18;
+  drawBigBox(ctx, rightBoxX, topY, 300, 300, 'MONTH', r30); // draw big box on right top for month
+  // also a central medium month box under the small ones (optional) - we'll draw a center small one below
+  // draw central medium box under small boxes
+  drawMediumBox(ctx, bigX + Math.max(0,(bigW/2 - 160)), bigY, Math.min(520, bigW), 110, '30D', r30);
+
+  // draw big rank (large number) at top-right
+  ctx.fillStyle = '#ffffff'; ctx.font = '900 110px Inter, Arial';
+  const rankText = (found30 && Number.isFinite(Number(r30.rank))) ? String(r30.rank) : '-';
+  ctx.textAlign = 'right';
+  ctx.fillText(rankText, W - margin - 20, margin + 100);
+  ctx.textAlign = 'left';
+
+  // footer credit
+  ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = '500 14px Inter, Arial';
+  ctx.fillText('Powered by madara — zama-rank.vercel.app', 36, H - 36);
+
+  return canvas.toDataURL('image/png');
+
+  /* helpers used above */
+  function roundRect(ctx, x, y, w, h, r, fill, stroke) {
+    if (typeof r === 'undefined') r = 5;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+    if (fill) ctx.fill();
+    if (stroke) ctx.stroke();
+  }
+  function drawSmallBox(ctx, x, y, w, h, title, meta) {
+    ctx.fillStyle = 'rgba(255,255,255,0.02)'; roundRect(ctx, x, y, w, h, 12, true, false);
+    ctx.fillStyle = '#9fb0bf'; ctx.font = '700 14px Inter, Arial';
+    ctx.fillText(title, x + 14, y + 24);
+    // rank top-right
+    const rank = (meta && meta.found && isFinite(Number(meta.rank))) ? String(meta.rank) : '-';
+    ctx.font = '800 22px Inter, Arial'; ctx.fillStyle = '#ffffff';
+    ctx.fillText(rank, x + w - 18 - ctx.measureText(rank).width, y + 26);
+    // mindshare
+    ctx.font = '400 13px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
+    const msText = (meta && meta.found) ? Number(meta.mindshare).toFixed(6) : '-';
+    ctx.fillText('Mindshare: ' + msText, x + 14, y + 52);
+    // progress bar
+    const prog = (meta && meta.found && Number.isFinite(Number(meta.rank))) ? Math.round(progressToTop100(Number(meta.rank))*100) : 0;
+    const barX = x + 14, barY = y + 62, barW = w - 28, barH = 12;
+    ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fillRect(barX, barY, barW, barH);
+    ctx.fillStyle = '#ffd24b'; ctx.fillRect(barX, barY, Math.max(6, (barW * prog / 100)), barH);
+  }
+  function drawMediumBox(ctx, x, y, w, h, title, meta) {
+    ctx.fillStyle = 'rgba(255,255,255,0.02)'; roundRect(ctx, x, y, w, h, 12, true, false);
+    ctx.fillStyle = '#9fb0bf'; ctx.font = '700 14px Inter, Arial';
+    ctx.fillText(title, x + 14, y + 24);
+    const rank = (meta && meta.found && isFinite(Number(meta.rank))) ? String(meta.rank) : '-';
+    ctx.font = '800 20px Inter, Arial'; ctx.fillStyle = '#ffffff';
+    ctx.fillText(rank, x + w - 18 - ctx.measureText(rank).width, y + 26);
+    ctx.font = '400 13px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
+    const msText = (meta && meta.found) ? Number(meta.mindshare).toFixed(6) : '-';
+    ctx.fillText('Mindshare: ' + msText, x + 14, y + 52);
+    const prog = (meta && meta.found && Number.isFinite(Number(meta.rank))) ? Math.round(progressToTop100(Number(meta.rank))*100) : 0;
+    ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fillRect(x + 14, y + 62, w - 28, 12);
+    ctx.fillStyle = '#ffd24b'; ctx.fillRect(x + 14, y + 62, Math.max(6, ((w - 28) * prog / 100)), 12);
+  }
+  function drawBigBox(ctx, x, y, w, h, title, meta) {
+    ctx.fillStyle = 'rgba(255,255,255,0.03)'; roundRect(ctx, x, y, w, h, 14, true, false);
+    ctx.fillStyle = '#9fb0bf'; ctx.font = '700 14px Inter, Arial';
+    ctx.fillText(title, x + 16, y + 28);
+    const rank = (meta && meta.found && isFinite(Number(meta.rank))) ? String(meta.rank) : '-';
+    ctx.font = '800 34px Inter, Arial'; ctx.fillStyle = '#ffffff';
+    ctx.fillText(rank, x + w - 16 - ctx.measureText(rank).width, y + 36);
+    ctx.font = '400 16px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
+    const msText = (meta && meta.found) ? Number(meta.mindshare).toFixed(6) : '-';
+    ctx.fillText(msText, x + 16, y + 70);
+    const prog = (meta && meta.found && Number.isFinite(Number(meta.rank))) ? Math.round(progressToTop100(Number(meta.rank))*100) : 0;
+    ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fillRect(x + 16, y + 90, w - 32, 14);
+    ctx.fillStyle = '#ffd24b'; ctx.fillRect(x + 16, y + 90, Math.max(6, ((w - 32) * prog / 100)), 14);
+
+    // eligible badge
+    if(meta && meta.found && Number.isFinite(Number(meta.rank))){
+      const r = Number(meta.rank);
+      if(r <= SHARE_TOP){
+        ctx.fillStyle = '#3ee6a8';
+        ctx.font = '700 14px Inter, Arial';
+        ctx.fillText('Eligible: OG NFT + Revenue Share', x + 16, y + 120);
+      } else if(r <= OG_NFT_TOP){
+        ctx.fillStyle = '#3ee6a8';
+        ctx.font = '700 14px Inter, Arial';
+        ctx.fillText('Eligible: OG NFT', x + 16, y + 120);
+      }
     }
-    lastSearch = { handle, data };
-  }catch(err){
-    const el = document.createElement('div'); el.className='card';
-    el.innerHTML = `<h3>Error</h3><div style="color:var(--muted);margin-top:6px">${err.message}</div>`;
-    $('resultArea').innerHTML = ''; $('resultArea').appendChild(el);
-    lastSearch = null;
   }
 }
 
-$('searchBtn').addEventListener('click', performSearch);
-$('username').addEventListener('keydown', (e)=>{ if(e.key==='Enter') performSearch(); });
-
-$('clearBtn').addEventListener('click', ()=>{
-  $('username').value = '';
-  lastSearch = null;
-  hideResults();
-});
-
-/* share: simple canvas export (keeps previous canvas logic), must be invoked from user gesture */
-function drawCanvasPlaceholder(handle, data){
-  const c = $('cardCanvas'); const ctx = c.getContext('2d');
-  ctx.fillStyle='#163238'; ctx.fillRect(0,0,c.width,c.height);
-  ctx.fillStyle='#fff'; ctx.font='700 40px Inter, Arial'; ctx.fillText(handle, 40, 80);
-  return c.toDataURL('image/png');
-}
-
+/* export dataURL -> file and share (runs inside user gesture) */
 function shareImageFromDataURL(dataUrl, handle, data){
   try{
     const byteString = atob(dataUrl.split(',')[1]);
@@ -280,27 +421,95 @@ function shareImageFromDataURL(dataUrl, handle, data){
     if(navigator.canShare && navigator.canShare({files:[file]})){
       navigator.share({
         files: [file],
-        text: `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.['30d']?.mindshare || data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`
-      }).catch(()=>{});
+        text: `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`
+      }).catch(e=>{
+        // ignore
+      });
       return;
     }
 
+    // fallback: download then open tweet intent
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url; a.download = `${handle}-zama-rank.png`; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),2000);
-    const text = `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.['30d']?.mindshare || data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`;
+    const text = `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`;
     window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
 
-  }catch(err){ alert('Share failed: '+(err.message||err)); }
+  }catch(err){
+    alert('Share failed: '+(err.message||err));
+  }
 }
 
-$('shareCardBtn').addEventListener('click', async ()=>{
+/* UI flow: search, render cards */
+let lastSearch = null;
+async function performSearch(){
+  const raw = ($('username').value||'').trim();
+  if(!raw){ $('username').focus(); return; }
+  const handle = raw.replace(/^@/,'');
+  showResults();
+  const container = $('resultArea'); container.innerHTML = '';
+  // loading placeholders
+  for(let i=0;i<3;i++){
+    const s=document.createElement('div'); s.className='card';
+    s.innerHTML=`<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`;
+    container.appendChild(s);
+  }
+
+  // preload avatar for share
+  await loadAvatar(handle);
+
+  try{
+    const res = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
+    if(!res.ok) throw new Error('Network ' + res.status);
+    const data = await res.json();
+
+    // ensure results object exists
+    const results = data.results || {};
+    // normalize keys: allow '30d' or 'month'
+    if(!results['30d'] && results['month']) results['30d'] = results['month'];
+    if(!results['month'] && results['30d']) results['month'] = results['30d'];
+
+    container.innerHTML = '';
+    const order = ['24h','7d','30d'];
+    for(let i=0;i<order.length;i++){
+      const k = order[i];
+      const neighbor = (i<order.length-1) ? (results[order[i+1]] || null) : null;
+      container.appendChild( mkCard(k, results[k]||{}, neighbor) );
+    }
+    lastSearch = { handle, data };
+  }catch(err){
+    const el = document.createElement('div'); el.className='card';
+    el.innerHTML = `<h3>Error</h3><div style="color:var(--muted);margin-top:6px">${err.message}</div>`;
+    $('resultArea').innerHTML = ''; $('resultArea').appendChild(el);
+    lastSearch = null;
+  }
+}
+
+/* Share handler - requires a previous successful search, must be called directly by user gesture */
+$('shareCardBtn').addEventListener('click', async (e) => {
   if(!lastSearch){ alert('Run Search first, then press Share Card.'); return; }
   const { handle, data } = lastSearch;
-  // simple canvas draw (replace with improved draw function if you want)
-  const dataUrl = drawCanvasPlaceholder(handle, data);
+
+  // draw canvas layout
+  const dataUrl = drawCanvasLayout(handle, data);
+  // share or download
   shareImageFromDataURL(dataUrl, handle, data);
 });
+
+/* Search + Enter key */
+$('searchBtn').addEventListener('click', performSearch);
+$('username').addEventListener('keydown', (e)=>{ if(e.key==='Enter') performSearch(); });
+
+/* Clear */
+$('clearBtn').addEventListener('click', ()=>{
+  $('username').value = '';
+  lastSearch = null;
+  hideResults();
+});
+
+/* initial */
+hideResults();
+
 </script>
 </body>
 </html>
