@@ -1,290 +1,443 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ZAMA RANK</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg: #02070b;
-      --card: rgba(255,255,255,0.03);
-      --muted: #9fb0bf;
-      --accent1: #ffd24b;
-      --accent2: #ff6b6b;
-      --glass: rgba(255,255,255,0.03);
-      --text: #eaf3fb;
-      --success: #3ee6a8;
-      --danger: #ff7b7b;
-    }
-    [data-theme="light"]{
-      --bg: #f7fafc; --card:#fff; --muted:#5b6b76; --text:#061020; --glass: rgba(0,0,0,0.04);
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ZAMA RANK</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#000409; --bg2:#071025;
+    --card:rgba(255,255,255,0.03);
+    --muted:#9fb0bf;
+    --accent1:#ffd24b; --accent2:#ff6b6b;
+    --text:#eaf3fb; --ok:#3ee6a8; --bad:#ff7b7b;
+    --footer-h:88px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));}
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;}
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; min-height:100vh; background: linear-gradient(180deg,var(--bg),#071025 100%);
-      color:var(--text); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial; -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-    }
+  /* page layout */
+  #app{min-height:100vh;display:flex;flex-direction:column;}
+  .wrap{max-width:940px;margin:18px auto;padding:18px 18px 18px;flex:1;display:flex;flex-direction:column;transition:padding-bottom .12s ease;}
 
-    .wrap{max-width:980px;margin:18px auto;padding:16px;}
-    .toprow{display:flex;gap:12px;align-items:center;justify-content:space-between}
-    .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:48px;height:48px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center}
-    .logo img{width:100%;height:100%;object-fit:cover}
-    h1{margin:0;font-size:18px}
-    .subtitle{color:var(--muted);font-size:13px;margin-top:2px}
+  .topbar{display:flex;align-items:center;justify-content:flex-start;gap:12px}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:48px;height:48px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(0,0,0,0.45)}
+  .logo img{width:100%;height:100%;object-fit:cover}
+  h1{margin:0;font-size:20px}
+  .subtitle{color:var(--muted);font-size:13px;margin-top:2px}
 
-    .controls{display:flex;gap:12px;align-items:center}
-    .theme-toggle{padding:8px 12px;border-radius:10px;border:0;background:transparent;color:var(--muted);cursor:pointer}
+  .search-shell{margin-top:14px;background:var(--card);padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 36px rgba(0,0,0,0.45)}
+  .search-row{display:flex;gap:12px;align-items:center}
+  .search-inner{flex:1;min-width:0}
+  input[type="text"]{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px; height:56px; outline:none}
 
-    .search-shell{margin-top:14px;background:var(--card);padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,0.03)}
-    .search-row{display:flex;gap:10px;align-items:center}
-    .search-inner{flex:1;position:relative;min-width:0}
-    .search-row input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px}
-    .actions{display:flex;gap:10px}
-    .btn{padding:10px 14px;border-radius:12px;border:0;cursor:pointer;font-weight:700}
-    .btn-search{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020}
-    .btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
-    .btn[disabled]{opacity:0.6;cursor:not-allowed}
+  /* action buttons: inline single row */
+  .actions{display:flex;gap:12px;align-items:center;flex:0 0 auto}
+  .btn{padding:12px 18px;border-radius:12px;border:0;cursor:pointer;font-weight:800;display:inline-flex;align-items:center;justify-content:center;min-height:48px}
+  .btn-search{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020;box-shadow:0 10px 30px rgba(0,0,0,0.5);min-width:120px}
+  .btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);min-width:88px}
+  .btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#061020; min-width:132px;}
 
-    .results{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
-    .card{background:var(--card);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
-    .card h3{margin:0 0 8px;font-size:14px}
-    .row{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
-    .label{color:var(--muted);font-size:13px}
-    .value{font-size:20px;font-weight:800}
+  /* results grid */
+  .results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start}
+  .card{background:var(--card);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 28px rgba(0,0,0,0.45)}
+  .card h3{margin:0 0 10px;font-size:14px}
+  .row{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
+  .label{color:var(--muted);font-size:13px}
+  .value{font-size:20px;font-weight:800; font-variant-numeric: tabular-nums;}
 
-    /* progress bar */
-    .progress-shell{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
-    .progress-bar{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .6s ease}
+  /* mindshare specific */
+  .value.mindshare{
+    font-size:20px;
+    color:var(--accent1);
+    text-align:right;
+    white-space:nowrap;
+  }
 
-    .ms-change{display:inline-flex;gap:6px;align-items:center;font-weight:700}
-    .ms-change.up{color:var(--success)} .ms-change.down{color:var(--danger)}
+  .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;font-size:13px}
+  .badge.ok{background:rgba(62,230,168,0.12);color:var(--ok);border:1px solid rgba(62,230,168,0.12)}
+  .badge.neutral{background:rgba(255,255,255,0.03);color:var(--muted);border:1px solid rgba(255,255,255,0.03)}
 
-    .bottom-actions{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
-    .share-btn{padding:8px 12px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));cursor:pointer;font-weight:700;color:#061020}
+  .progress-shell{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
+  .progress-bar{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .6s ease}
+  /* change block: keep percent and absolute on one line */
+  .ms-change{display:inline-flex;gap:8px;align-items:center;font-weight:800;white-space:nowrap;font-variant-numeric: tabular-nums}
+  .ms-change.up{color:var(--ok)} .ms-change.down{color:var(--bad)}
+  .ms-change .abs{font-weight:700;color:rgba(255,255,255,0.85);font-size:0.95em;margin-left:6px}
 
-    .skeleton{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.04), rgba(255,255,255,0.02));height:14px;border-radius:6px}
+  hr.sep{border:none;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0}
 
-    footer{margin-top:18px;display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px}
-    .powered{display:flex;gap:8px;align-items:center}
-    .powered img{width:40px;height:40px;border-radius:8px;object-fit:cover;box-shadow:0 8px 22px rgba(0,0,0,0.5)}
+  /* fixed footer */
+  footer.site-footer{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    height:auto; /* allow content to set height; we will measure it in JS */
+    background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.6));
+    border-top:1px solid rgba(255,255,255,0.02);
+    display:flex;align-items:center;justify-content:center;padding:12px 18px;z-index:20;
+    box-shadow: 0 -6px 30px rgba(0,0,0,0.35);
+  }
+  .footer-inner{max-width:940px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:14px}
+  .footer-text{flex:1; min-width:0}
+  a.powered{ text-decoration:none;color:inherit;display:flex;gap:12px;align-items:center;flex:0 0 auto}
+  a.powered img{ width:56px; height:56px; border-radius:8px; object-fit:cover; box-shadow:0 8px 22px rgba(0,0,0,0.45) }
 
-    @media (max-width:520px){
-      .toprow{flex-direction:column;align-items:flex-start;gap:8px}
-      .search-row{flex-direction:column;align-items:stretch}
-    }
-  </style>
+  /* smaller screens */
+  @media (max-width:760px){
+    h1{font-size:18px}
+  }
+
+  @media (max-width:560px){
+    .search-row{flex-direction:column;align-items:stretch}
+    .search-inner{width:100%}
+    /* keep action buttons inline on one row with wrapping behavior */
+    .actions{flex-wrap:nowrap;justify-content:space-between}
+    .btn{flex:1 1 auto; min-width:0}
+    .btn + .btn{margin-left:8px}
+    .footer-inner{padding:0 6px; font-size:13px}
+    a.powered img{width:48px;height:48px}
+  }
+
+  .results-empty{color:var(--muted);margin-top:16px}
+</style>
 </head>
 <body>
-  <div class="wrap" id="app">
-    <div class="toprow">
-      <div class="brand">
-        <div class="logo"><img src="zama-logo.png" alt="logo" /></div>
-        <div>
-          <h1>ZAMA RANK</h1>
-          <div class="subtitle">Search X handle (e.g. @0x_madara_)</div>
+  <div id="app">
+    <div class="wrap" id="wrap">
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo"><img id="logoImg" src="zama-logo.png" alt="Zama"></div>
+          <div>
+            <h1>ZAMA SZN 5 RANK</h1>
+            <div class="subtitle">Search X handle (e.g. @0x_madara_)</div>
+          </div>
         </div>
       </div>
 
-      <div class="controls">
-        <button id="themeToggle" class="theme-toggle">Toggle theme</button>
+      <div class="search-shell" role="search" aria-label="Search X handle">
+        <div class="search-row">
+          <div class="search-inner">
+            <input id="username" type="text" placeholder="@your_handle" aria-label="Search handle" />
+          </div>
+          <div class="actions">
+            <button id="searchBtn" class="btn btn-search">🔎 Search</button>
+            <button id="clearBtn" class="btn btn-clear">Clear</button>
+            <button id="shareCardBtn" class="btn btn-share">Share Card</button>
+          </div>
+        </div>
       </div>
+
+      <!-- results area -->
+      <div id="resultArea" class="results" aria-live="polite" style="display:none"></div>
+      <div id="emptyHint" class="results-empty">Search to show data</div>
     </div>
 
-    <div class="search-shell" role="search">
-      <div class="search-row">
-        <div class="search-inner">
-          <input id="username" type="text" placeholder="@your_handle" autocomplete="off" />
-        </div>
-
-        <div class="actions">
-          <button id="searchBtn" class="btn btn-search">🔎 Search</button>
-          <button id="clearBtn" class="btn btn-clear">Clear</button>
-        </div>
+    <footer class="site-footer" id="siteFooter" aria-hidden="false">
+      <div class="footer-inner">
+        <div class="footer-text" id="footerText">Made with ❤️ for Zama by Madara </div>
+        <a class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer" id="poweredLink">
+          <img id="poweredAvatar" src="madara.png" alt="madara">
+          <div style="font-size:13px; color:var(--muted)"><div style="font-weight:700;color:var(--text)"></div></div>
+        </a>
       </div>
-
-      <div class="bottom-actions">
-        <button id="shareBtn" class="share-btn" title="Generate share image">Share Card</button>
-      </div>
-    </div>
-
-    <div id="resultArea" class="results"></div>
-
-    <footer style="margin-top:20px">
-      <div>Made with ❤️ for Zama — love & powered by madara</div>
-      <a id="poweredLink" class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer">
-        <img id="poweredAvatar" src="madara.png" alt="madara avatar">
-        <div>
-          <div style="font-size:12px;color:var(--muted)">Powered by</div>
-          <div style="font-weight:700">madara</div>
-        </div>
-      </a>
     </footer>
   </div>
 
-  <canvas id="cardCanvas" width="1200" height="630" style="display:none"></canvas>
+  <!-- canvas for share card (hidden) -->
+  <canvas id="cardCanvas" width="1200" height="720" style="display:none"></canvas>
 
-  <script>
-    // ---- config
-    const apiBase = '/api/check';
-    const THEME_KEY = 'zama_theme_v1';
+<script>
+/* -------- CONFIG -------- */
+const API_BASE = '/api/check';
+const TOTAL_FETCHED = 1500;
+const OG_NFT_TOP = 1006;
+const SHARE_TOP = 100;
 
-    // ---- helpers
-    function fmtNum(n,dec=8){ if(n==null||!isFinite(Number(n))) return '-'; return Number(n).toFixed(dec) }
+/* helpers */
+const $ = id => document.getElementById(id);
+function money(n){ if(n==null || !isFinite(Number(n))) return '-'; return '$' + Number(n).toLocaleString(); }
+function fmtNum(n, d=6){ if(n==null || !isFinite(Number(n))) return '-'; return Number(n).toFixed(d); }
+function progressToTop100(rank){
+  if(!isFinite(rank)) return 0;
+  rank = Number(rank);
+  if(rank <= 100) return Math.max(0, Math.min(1, (100-rank)/99));
+  return Math.max(0, Math.min(1, (1500-rank)/(1500-100)));
+}
+function computeChange(curr, next) {
+  const a = Number(curr?.mindshare);
+  const b = Number(next?.mindshare);
+  if (!isFinite(a) || !isFinite(b)) return { dir: 'same', pctText: '-', absText: '', pct: 0, abs: 0 };
+  const diff = a - b;
+  const pct = (b === 0) ? ((a === 0) ? 0 : 100) : (diff / Math.abs(b) * 100);
+  const pctRounded = Math.round(pct * 10) / 10;
+  const absRounded = Math.round(diff * 1000000) / 1000000;
+  const dir = (diff > 0 ? 'up' : (diff < 0 ? 'down' : 'same'));
+  const pctText = (dir === 'same') ? '0.0%' : `${Math.abs(pctRounded)}%`;
+  const absText = (absRounded === 0 ? '' : `(${absRounded>0?'+':''}${absRounded})`);
+  return { dir, pctText, absText, pct: pctRounded, abs: absRounded };
+}
 
-    function setTheme(t){
-      if(t) document.documentElement.setAttribute('data-theme', t);
-      else document.documentElement.removeAttribute('data-theme');
-      localStorage.setItem(THEME_KEY, t || '');
+/* preload images */
+const _pre = {logo:null, powered:null, avatar:null};
+function preloadStatic(){
+  const l = new Image(); l.src='zama-logo.png'; l.onload=()=>_pre.logo=l; l.onerror=()=>_pre.logo=null;
+  const p = new Image(); p.src='madara.png'; p.onload=()=>{ _pre.powered=p; $('poweredAvatar').src='madara.png'; } ; p.onerror=()=>_pre.powered=null;
+}
+preloadStatic();
+
+/* avatar from unavatar */
+async function loadAvatar(handle){
+  return new Promise(resolve=>{
+    const img = new Image(); img.crossOrigin='anonymous';
+    img.onload = ()=>{ _pre.avatar = img; resolve(true); };
+    img.onerror = ()=>{ _pre.avatar = null; resolve(false); };
+    img.src = `https://unavatar.io/x/${encodeURIComponent(handle)}?fallback=true`;
+  });
+}
+
+/* UI show/hide */
+function hideResults(){ $('resultArea').style.display = 'none'; $('emptyHint').style.display='block'; }
+function showResults(){ $('resultArea').style.display = 'grid'; $('emptyHint').style.display='none'; }
+
+/* build a single card */
+function mkCard(title, meta, neighbor){
+  const el = document.createElement('div'); el.className='card';
+  const found = !!meta && meta.found === true && Number.isFinite(Number(meta.rank));
+  const rank = found ? Number(meta.rank) : null;
+  const ms = found ? meta.mindshare : null;
+  const prog = found ? Math.round(progressToTop100(rank)*100) : 0;
+  const ch = computeChange(found ? meta : {}, (neighbor && neighbor.found===true)?neighbor:{});
+  let changeHtml = '-';
+  if(found){
+    if(ch.dir === 'same') changeHtml = `<span class="ms-change">${ch.pctText}</span>`;
+    else {
+      const arrow = ch.dir === 'up' ? '▲' : '▼';
+      changeHtml = `<span class="ms-change ${ch.dir}">${arrow} ${ch.pctText}<span class="abs">${ch.absText}</span></span>`;
     }
-    function initTheme(){
-      const t = localStorage.getItem(THEME_KEY);
-      if(t) setTheme(t);
-      else setTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme:light)').matches ? 'light' : '');
+  }
+  const mindshareHtml = found ? `<div class="value mindshare">${fmtNum(ms,6)}</div>` : `<div class="value mindshare">-</div>`;
+  let badgeHtml = '';
+  if((title==='30d' || title==='month') && found){
+    if(rank <= SHARE_TOP) badgeHtml = `<div style="margin-top:8px"><span class="badge ok">Eligible for OG NFT + Revenue Share</span></div>`;
+    else if(rank <= OG_NFT_TOP) badgeHtml = `<div style="margin-top:8px"><span class="badge ok">Eligible for OG NFT</span></div>`;
+  }
+  let payoutHtml = '-';
+  if((title==='30d' || title==='month') && found && rank <= SHARE_TOP){
+    const topMin = 1500, topMax=2000, min100=150, max100=260;
+    const t = (Math.min(100, Math.max(1, rank)) - 1)/99;
+    const min = Math.round(topMin + (min100 - topMin)*t);
+    const max = Math.round(topMax + (max100 - topMax)*t);
+    payoutHtml = `${money(min)} - ${money(max)}`;
+  }
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3>${title}</h3>
+      <div style="text-align:right;font-weight:800;font-size:20px">${found?rank:'-'}</div>
+    </div>
+    <div class="row"><div class="label">Mindshare</div>${mindshareHtml}</div>
+    <div class="row"><div class="label">Change vs next</div><div style="text-align:right">${found? changeHtml : '-'}</div></div>
+    <div style="margin-top:8px">
+      <div class="progress-shell" aria-hidden="true"><div class="progress-bar" style="width:${found?prog+'%':'0%'}"></div></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px">${found ? `Progress to Top 100: ${prog}% • Total fetched: ${TOTAL_FETCHED}` : `Search to show data • Total fetched: ${TOTAL_FETCHED}`}</div>
+    </div>
+    ${badgeHtml}
+    <hr class="sep" />
+    <div class="row"><div class="label">Assumed payout (if eligible)</div><div class="value">${payoutHtml}</div></div>
+  `;
+  return el;
+}
+
+/* share canvas layout (same as provided earlier) */
+function drawCanvasLayout(handle, data){
+  const canvas = $('cardCanvas'); const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#0f3b39'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = 'rgba(0,0,0,0.06)'; roundRect(ctx, 20, 20, W-40, H-40, 20, true, false);
+  const avatar = _pre.avatar;
+  const aSize = 120, margin = 48;
+  if(avatar){
+    ctx.save(); ctx.beginPath(); ctx.arc(margin + aSize/2, margin + aSize/2, aSize/2, 0, Math.PI*2); ctx.closePath(); ctx.clip();
+    ctx.drawImage(avatar, margin, margin, aSize, aSize); ctx.restore();
+  } else {
+    ctx.fillStyle = '#ffd24b'; ctx.fillRect(margin, margin, aSize, aSize);
+  }
+  ctx.fillStyle = '#ffffff'; ctx.font = '700 36px Inter, Arial';
+  const handleText = handle.startsWith('@') ? handle : '@' + handle;
+  ctx.fillText(handleText, margin + aSize + 28, margin + 42);
+  ctx.fillStyle = '#9fb0bf'; ctx.font = '400 16px Inter, Arial';
+  ctx.fillText('Zama rank card', margin + aSize + 28, margin + 70);
+
+  const r24 = data.results?.['24h'] || {};
+  const r7 = data.results?.['7d'] || {};
+  const r30 = data.results?.['30d'] || data.results?.month || {};
+  // box positions & drawing helpers (kept simple)
+  drawSmallBox(ctx, margin + 8, margin + aSize + 32, 300, 96, '24H', r24);
+  drawSmallBox(ctx, margin + 8 + 300 + 16, margin + aSize + 32, 300, 96, '7D', r7);
+  drawMediumBox(ctx, margin + 8, margin + aSize + 32 + 96 + 16, Math.min(W - margin*3 - 300, 640), 120, '30D', r30);
+  ctx.fillStyle = '#ffffff'; ctx.font = '900 110px Inter, Arial';
+  const rankText = (r30 && r30.found && isFinite(Number(r30.rank))) ? String(r30.rank) : '-';
+  ctx.textAlign = 'right';
+  ctx.fillText(rankText, W - margin - 20, margin + 100);
+  ctx.textAlign = 'left';
+  ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = '500 14px Inter, Arial';
+  ctx.fillText('Powered by madara — zama-rank.vercel.app', 36, H - 36);
+
+  return canvas.toDataURL('image/png');
+
+  function roundRect(ctx, x, y, w, h, r, fill, stroke) {
+    if (typeof r === 'undefined') r = 5;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+    if (fill) ctx.fill();
+    if (stroke) ctx.stroke();
+  }
+  function drawSmallBox(ctx, x, y, w, h, title, meta) {
+    ctx.fillStyle = 'rgba(255,255,255,0.02)'; roundRect(ctx, x, y, w, h, 12, true, false);
+    ctx.fillStyle = '#9fb0bf'; ctx.font = '700 14px Inter, Arial';
+    ctx.fillText(title, x + 14, y + 24);
+    const rank = (meta && meta.found && isFinite(Number(meta.rank))) ? String(meta.rank) : '-';
+    ctx.font = '800 22px Inter, Arial'; ctx.fillStyle = '#ffffff';
+    ctx.fillText(rank, x + w - 18 - ctx.measureText(rank).width, y + 26);
+    ctx.font = '400 13px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
+    const msText = (meta && meta.found) ? Number(meta.mindshare).toFixed(6) : '-';
+    ctx.fillText('Mindshare: ' + msText, x + 14, y + 52);
+    const prog = (meta && meta.found && Number.isFinite(Number(meta.rank))) ? Math.round(progressToTop100(Number(meta.rank))*100) : 0;
+    const barX = x + 14, barY = y + 62, barW = w - 28, barH = 12;
+    ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fillRect(barX, barY, barW, barH);
+    ctx.fillStyle = '#ffd24b'; ctx.fillRect(barX, barY, Math.max(6, (barW * prog / 100)), barH);
+  }
+  function drawMediumBox(ctx, x, y, w, h, title, meta) {
+    ctx.fillStyle = 'rgba(255,255,255,0.02)'; roundRect(ctx, x, y, w, h, 12, true, false);
+    ctx.fillStyle = '#9fb0bf'; ctx.font = '700 14px Inter, Arial';
+    ctx.fillText(title, x + 14, y + 24);
+    const rank = (meta && meta.found && isFinite(Number(meta.rank))) ? String(meta.rank) : '-';
+    ctx.font = '800 20px Inter, Arial'; ctx.fillStyle = '#ffffff';
+    ctx.fillText(rank, x + w - 18 - ctx.measureText(rank).width, y + 26);
+    ctx.font = '400 13px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
+    const msText = (meta && meta.found) ? Number(meta.mindshare).toFixed(6) : '-';
+    ctx.fillText('Mindshare: ' + msText, x + 14, y + 52);
+    const prog = (meta && meta.found && Number.isFinite(Number(meta.rank))) ? Math.round(progressToTop100(Number(meta.rank))*100) : 0;
+    ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fillRect(x + 14, y + 62, w - 28, 12);
+    ctx.fillStyle = '#ffd24b'; ctx.fillRect(x + 14, y + 62, Math.max(6, ((w - 28) * prog / 100)), 12);
+  }
+}
+
+/* export dataURL -> file and share */
+function shareImageFromDataURL(dataUrl, handle, data){
+  try{
+    const byteString = atob(dataUrl.split(',')[1]);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for(let i=0;i<byteString.length;i++) ia[i]=byteString.charCodeAt(i);
+    const blob = new Blob([ab], {type:'image/png'});
+    const file = new File([blob], `${handle}-zama-rank.png`, {type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      navigator.share({
+        files: [file],
+        text: `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`
+      }).catch(()=>{});
+      return;
     }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `${handle}-zama-rank.png`; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),2000);
+    const text = `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`;
+    window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+  }catch(err){
+    alert('Share failed: '+(err.message||err));
+  }
+}
 
-    function computeProgress(meta){
-      if(!meta) return 0;
-      const ms = Number(meta.mindshare);
-      const rank100_ms = Number(meta.rank100_mindshare);
-      if(isFinite(ms) && isFinite(rank100_ms) && rank100_ms > 0){
-        return Math.max(0, Math.min(1, ms / rank100_ms));
-      }
-      if(isFinite(meta.rank)){
-        return Math.max(0, Math.min(1, (1500 - meta.rank) / 1500));
-      }
-      return 0;
+/* UI flow */
+let lastSearch = null;
+async function performSearch(){
+  const raw = ($('username').value||'').trim();
+  if(!raw){ $('username').focus(); return; }
+  const handle = raw.replace(/^@/,'');
+  showResults();
+  const container = $('resultArea'); container.innerHTML = '';
+  for(let i=0;i<3;i++){
+    const s=document.createElement('div'); s.className='card';
+    s.innerHTML=`<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`;
+    container.appendChild(s);
+  }
+  await loadAvatar(handle);
+  try{
+    const res = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
+    if(!res.ok) throw new Error('Network ' + res.status);
+    const data = await res.json();
+    const results = data.results || {};
+    if(!results['30d'] && results['month']) results['30d'] = results['month'];
+    if(!results['month'] && results['30d']) results['month'] = results['30d'];
+    container.innerHTML = '';
+    const order = ['24h','7d','30d'];
+    for(let i=0;i<order.length;i++){
+      const k = order[i];
+      const neighbor = (i<order.length-1) ? (results[order[i+1]] || null) : null;
+      container.appendChild( mkCard(k, results[k]||{}, neighbor) );
     }
+    lastSearch = { handle, data };
+    // After rendering results, ensure footer padding still matches footer height
+    requestAnimationFrame(updateFooterPadding);
+  }catch(err){
+    const el = document.createElement('div'); el.className='card';
+    el.innerHTML = `<h3>Error</h3><div style="color:var(--muted);margin-top:6px">${err.message}</div>`;
+    $('resultArea').innerHTML = ''; $('resultArea').appendChild(el);
+    lastSearch = null;
+  }
+}
 
-    function computeChange(curr, next){
-      const a = Number(curr?.mindshare); const b = Number(next?.mindshare);
-      if(!isFinite(a) || !isFinite(b)) return {dir:'same', pct:0};
-      if(b === 0) return {dir: a>0 ? 'up' : 'same', pct: 100};
-      const diff = a - b;
-      const pct = Math.abs(diff / (Math.abs(b) || 1)) * 100;
-      return {dir: diff > 0 ? 'up' : (diff < 0 ? 'down' : 'same'), pct: Math.round(pct*10)/10};
-    }
+/* Share button (needs prior search) */
+$('shareCardBtn').addEventListener('click', async (e) => {
+  if(!lastSearch){ alert('Run Search first, then press Share Card.'); return; }
+  const { handle, data } = lastSearch;
+  const dataUrl = drawCanvasLayout(handle, data);
+  shareImageFromDataURL(dataUrl, handle, data);
+});
 
-    function skeletonCard(){
-      const c = document.createElement('div'); c.className='card';
-      c.innerHTML = '<h3 class="skeleton" style="width:90px;height:18px"></h3>'
-        + '<div class="row"><div class="label skeleton" style="width:64px;height:12px"></div><div class="value skeleton" style="width:80px;height:20px"></div></div>'
-        + '<div class="row"><div class="label skeleton" style="width:90px;height:12px"></div><div class="value skeleton" style="width:120px;height:20px"></div></div>'
-        + '<div class="row"><div class="label skeleton" style="width:120px;height:12px"></div><div class="value skeleton" style="width:60px;height:20px"></div></div>';
-      return c;
-    }
+/* Search + Enter key */
+$('searchBtn').addEventListener('click', performSearch);
+$('username').addEventListener('keydown', (e)=>{ if(e.key==='Enter') performSearch(); });
 
-    function mkCard(title, meta, neighborMeta=null){
-      const c = document.createElement('div'); c.className='card';
-      const rank = meta?.rank ?? null;
-      const ms = meta?.mindshare ?? null;
-      const total = 1500;
-      const progressPct = Math.round(computeProgress(meta)*100);
-      const change = computeChange(meta, neighborMeta);
-      const changeHtml = change.dir === 'same' ? '-' : `<span class="ms-change ${change.dir}">${change.dir==='up' ? '▲' : '▼'} ${change.pct}%</span>`;
-      c.innerHTML = `
-        <h3>${title}</h3>
-        <div class="row"><div class="label">Rank</div><div class="value">${rank ?? '-'}</div></div>
-        <div class="row"><div class="label">Mindshare</div><div class="value">${fmtNum(ms)}</div></div>
-        <div class="row"><div class="label">Change vs next</div><div class="value">${changeHtml}</div></div>
-        <div style="margin-top:8px">
-          <div class="progress-shell" aria-hidden="true"><div class="progress-bar" style="width:${progressPct}%"></div></div>
-          <div style="font-size:12px;color:var(--muted);margin-top:6px">Progress to #100: ${progressPct}% • Total fetched: ${total}</div>
-        </div>
-      `;
-      return c;
-    }
+/* Clear */
+$('clearBtn').addEventListener('click', ()=>{
+  $('username').value = '';
+  lastSearch = null;
+  hideResults();
+});
 
-    // ---- share card generator
-    async function generateShareCard(handle, data){
-      const canvas = document.getElementById('cardCanvas');
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#071025';
-      ctx.fillRect(0,0,canvas.width,canvas.height);
-      ctx.fillStyle = '#ffd24b';
-      ctx.font = 'bold 48px Inter, Arial';
-      ctx.fillText(handle.startsWith('@')?handle:`@${handle}`, 60, 120);
-      const keys = ['24h','7d','month'];
-      ctx.font = 'bold 36px Inter, Arial';
-      for(let i=0;i<3;i++){
-        const x = 60 + i*360; const y = 190;
-        ctx.fillStyle = '#061020';
-        ctx.fillRect(x, y, 320, 240);
-        ctx.fillStyle = '#eaf3fb';
-        ctx.fillText(keys[i], x+18, y+44);
-        const meta = data.results[keys[i]] || {};
-        ctx.font = 'bold 32px Inter, Arial';
-        ctx.fillText('Rank: ' + (meta.rank || '-'), x+18, y+100);
-        ctx.fillText('MS: ' + (meta.mindshare ? Number(meta.mindshare).toFixed(6) : '-'), x+18, y+150);
-      }
-      return new Promise(resolve => canvas.toBlob(blob => resolve(blob)));
-    }
-    async function downloadShare(handle, data){
-      const blob = await generateShareCard(handle, data);
-      if(!blob) return alert('Failed to generate image');
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `${handle}-zama-rank.png`;
-      document.body.appendChild(a); a.click();
-      a.remove(); URL.revokeObjectURL(url);
-    }
+/* FOOTER: compute and set padding-bottom for wrap so content never hides below footer */
+function updateFooterPadding(){
+  const footer = $('siteFooter');
+  const wrap = $('wrap');
+  if(!footer || !wrap) return;
+  // measure height (including margins)
+  const rect = footer.getBoundingClientRect();
+  const computed = window.getComputedStyle(footer);
+  const marginBottom = parseInt(computed.marginBottom || '0',10);
+  const height = Math.ceil(rect.height + (isNaN(marginBottom)?0:marginBottom));
+  wrap.style.paddingBottom = (height + 18) + 'px'; // leave some breathing room
+}
+window.addEventListener('load', ()=>{
+  updateFooterPadding();
+  // also recalc after a short delay (mobile UI may adjust)
+  setTimeout(updateFooterPadding, 350);
+});
+window.addEventListener('resize', updateFooterPadding);
+window.addEventListener('orientationchange', ()=>setTimeout(updateFooterPadding,220));
 
-    // ---- main
-    const resultArea = document.getElementById('resultArea');
-    const searchBtn = document.getElementById('searchBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const shareBtn = document.getElementById('shareBtn');
+/* initial */
+hideResults();
 
-    async function performSearch(){
-      const raw = (document.getElementById('username').value||'').trim();
-      if(!raw) { document.getElementById('username').focus(); return; }
-      const handle = raw.replace(/^@/,'');
-      // skeleton UI
-      resultArea.innerHTML = '';
-      for(let i=0;i<3;i++) resultArea.appendChild(skeletonCard());
-
-      searchBtn.disabled = true;
-      try{
-        const r = await fetch(`${apiBase}?username=${encodeURIComponent(handle)}`);
-        if(!r.ok) throw new Error('Network '+r.status);
-        const data = await r.json();
-        resultArea.innerHTML = '';
-        const order = ['24h','7d','month'];
-        for(let i=0;i<order.length;i++){
-          const key = order[i];
-          const neighbor = order[i+1] ? data.results[order[i+1]] : null;
-          resultArea.appendChild(mkCard(key, data.results[key], neighbor));
-        }
-        shareBtn.onclick = () => downloadShare(handle, data);
-      } catch(err){
-        resultArea.innerHTML = `<div class="card"><h3>Error</h3><div style="color:var(--muted);margin-top:6px">${err.message}</div></div>`;
-      } finally { searchBtn.disabled = false }
-    }
-
-    // buttons
-    searchBtn.addEventListener('click', performSearch);
-    clearBtn.addEventListener('click', ()=>{ document.getElementById('username').value=''; resultArea.innerHTML=''; });
-    shareBtn.addEventListener('click', async () => {
-      const handle = (document.getElementById('username').value||'').trim();
-      if(!handle) return alert('Search for a handle first to generate card');
-      try{ const r = await fetch(`${apiBase}?username=${encodeURIComponent(handle.replace(/^@/,''))}`); const data = await r.json(); await downloadShare(handle.replace(/^@/,''), data); }
-      catch(e){ alert('Failed to generate card: '+e.message) }
-    });
-
-    // theme toggle
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme');
-      setTheme(current === 'light' ? '' : 'light');
-    });
-
-    // init theme
-    initTheme();
-    // enter key submits
-    document.getElementById('username').addEventListener('keydown', (e) => { if(e.key==='Enter') performSearch(); });
-  </script>
+</script>
 </body>
 </html>
