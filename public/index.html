@@ -24,8 +24,16 @@
 
   .topbar{display:flex;align-items:center;justify-content:flex-start;gap:12px}
   .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:48px;height:48px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(0,0,0,0.45)}
-  .logo img{width:100%;height:100%;object-fit:cover}
+  .logo{
+    width:56px;height:56px;border-radius:12px;overflow:hidden;
+    background:linear-gradient(135deg,var(--accent1),var(--accent2));
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 10px 28px rgba(0,0,0,0.45);
+    flex:0 0 auto;
+  }
+  /* image and fallback share the same space: image hidden by default, fallback visible */
+  .logo img{width:100%;height:100%;object-fit:cover;display:none}
+  .logo .fallback{width:72%;height:72%;display:flex;align-items:center;justify-content:center}
   h1{margin:0;font-size:20px;font-weight:800}
   .subtitle{color:var(--muted);font-size:13px;margin-top:2px}
 
@@ -101,6 +109,7 @@
   .footer-text{flex:1; min-width:0;opacity:0.7}
   a.powered{ text-decoration:none;color:inherit;display:flex;gap:12px;align-items:center;flex:0 0 auto;opacity:0.9}
   a.powered img{ width:56px; height:56px; border-radius:8px; object-fit:cover; box-shadow:0 8px 22px rgba(0,0,0,0.45) }
+  .powered-fallback{width:56px;height:56px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent1),var(--accent2));font-weight:800;color:#061020;box-shadow:0 8px 22px rgba(0,0,0,0.45)}
 
   /* smaller screens */
   @media (max-width:760px){
@@ -125,7 +134,25 @@
     <div class="wrap" id="wrap">
       <div class="topbar">
         <div class="brand">
-          <div class="logo"><img id="logoImg" src="zama-logo.png" alt="Zama"></div>
+          <!-- Logo: image + inline SVG fallback.
+               Fallback shown by default; JS will reveal image if it loads. -->
+          <div class="logo" aria-hidden="false" title="Zama">
+            <img id="logoImg" src="zama-logo.png" alt="Zama logo" crossorigin="anonymous">
+            <div id="logoFallback" class="fallback" aria-hidden="false">
+              <!-- inline diagonal mark SVG (simple, compact) -->
+              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" role="img" aria-label="Zama">
+                <defs>
+                  <linearGradient id="lg1" x1="0" x2="1" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#ffd24b"/>
+                    <stop offset="100%" stop-color="#ff6b6b"/>
+                  </linearGradient>
+                </defs>
+                <rect x="0" y="0" width="100" height="100" rx="12" fill="#08121a"/>
+                <path d="M0 0 L100 0 L0 100 Z" fill="url(#lg1)"/>
+              </svg>
+            </div>
+          </div>
+
           <div>
             <h1>ZAMA SZN 5 RANK</h1>
             <div class="subtitle">Search X handle (e.g. @0x_madara_)</div>
@@ -155,7 +182,8 @@
       <div class="footer-inner">
         <div class="footer-text" id="footerText">Made with ❤️ for Zama by Madara</div>
         <a class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer" id="poweredLink">
-          <img id="poweredAvatar" src="madara.png" alt="madara">
+          <img id="poweredAvatar" src="madara.png" alt="madara" crossorigin="anonymous" style="display:none" />
+          <div id="poweredFallback" class="powered-fallback" aria-hidden="false">ZM</div>
         </a>
       </div>
     </footer>
@@ -195,11 +223,41 @@ function computeChange(curr, next) {
   return { dir, pctText, absText, pct: pctRounded, abs: absRounded };
 }
 
-/* preload images */
-const _pre = {logo:null, powered:null, avatar:null};
+/* preload images: reveal raster logos if they load, keep fallback if not */
 function preloadStatic(){
-  const l = new Image(); l.src='zama-logo.png'; l.onload=()=>_pre.logo=l; l.onerror=()=>_pre.logo=null;
-  const p = new Image(); p.src='madara.png'; p.onload=()=>{ _pre.powered=p; $('poweredAvatar').src='madara.png'; } ; p.onerror=()=>_pre.powered=null;
+  // header logo
+  const logoImg = $('logoImg');
+  const logoFallback = $('logoFallback');
+  if(!logoImg) return;
+
+  // hide image initially; if it loads, show it and hide fallback
+  logoImg.style.display = 'none';
+  logoFallback.style.display = 'flex';
+
+  const l = new Image();
+  l.crossOrigin = 'anonymous';
+  l.onload = () => {
+    // show the raster if it was successfully loaded
+    try { logoImg.style.display = 'block'; logoFallback.style.display = 'none'; } catch(e){}
+  };
+  l.onerror = () => {
+    // keep fallback visible
+    logoImg.style.display = 'none'; logoFallback.style.display = 'flex';
+  };
+  l.src = logoImg.src;
+
+  // footer avatar: same pattern
+  const pImg = $('poweredAvatar');
+  const pFallback = $('poweredFallback');
+  if(pImg && pFallback){
+    pImg.style.display = 'none';
+    pFallback.style.display = 'flex';
+    const p = new Image();
+    p.crossOrigin = 'anonymous';
+    p.onload = () => { pImg.style.display = 'block'; pFallback.style.display = 'none'; };
+    p.onerror = () => { pImg.style.display = 'none'; pFallback.style.display = 'flex'; };
+    p.src = pImg.src;
+  }
 }
 preloadStatic();
 
@@ -207,8 +265,8 @@ preloadStatic();
 async function loadAvatar(handle){
   return new Promise(resolve=>{
     const img = new Image(); img.crossOrigin='anonymous';
-    img.onload = ()=>{ _pre.avatar = img; resolve(true); };
-    img.onerror = ()=>{ _pre.avatar = null; resolve(false); };
+    img.onload = ()=>{ resolve(true); };
+    img.onerror = ()=>{ resolve(false); };
     img.src = `https://unavatar.io/x/${encodeURIComponent(handle)}?fallback=true`;
   });
 }
@@ -222,8 +280,9 @@ function mkCard(title, meta, neighbor){
   const el = document.createElement('div'); el.className='card';
   const found = !!meta && meta.found === true && Number.isFinite(Number(meta.rank));
   const rank = found ? Number(meta.rank) : null;
+  let prog = found ? Math.round(progressToTop100(rank)*100) : 0;
+  if (prog >= 97) prog = 100; // snap near-100 to 100 to avoid rounded cap artifact
   const ms = found ? meta.mindshare : null;
-  const prog = found ? Math.round(progressToTop100(rank)*100) : 0;
   const ch = computeChange(found ? meta : {}, (neighbor && neighbor.found===true)?neighbor:{});
   let changeHtml = '-';
   if(found){
@@ -243,7 +302,6 @@ function mkCard(title, meta, neighbor){
   let payoutHtml = '-';
   let payoutVisible = false;
   if((title==='30d' || title==='month') && found && rank <= SHARE_TOP){
-    // example payout calc (kept simple)
     const t = Math.min(1, Math.max(0, (SHARE_TOP - rank) / (SHARE_TOP - 1)));
     const min = Math.round(1500 + (150 - 1500) * t);
     const max = Math.round(2000 + (260 - 2000) * t);
@@ -275,21 +333,16 @@ function mkCard(title, meta, neighbor){
   return el;
 }
 
-/* share canvas layout (same as provided earlier) */
+/* share canvas layout (unchanged) */
 function drawCanvasLayout(handle, data){
   const canvas = $('cardCanvas'); const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle = '#071025'; ctx.fillRect(0,0,W,H);
   ctx.fillStyle = 'rgba(0,0,0,0.06)'; roundRect(ctx, 20, 20, W-40, H-40, 20, true, false);
-  const avatar = _pre.avatar;
+  const avatar = null; // simplified: we rely on preloaded avatar in original version if needed
   const aSize = 120, margin = 48;
-  if(avatar){
-    ctx.save(); ctx.beginPath(); ctx.arc(margin + aSize/2, margin + aSize/2, aSize/2, 0, Math.PI*2); ctx.closePath(); ctx.clip();
-    ctx.drawImage(avatar, margin, margin, aSize, aSize); ctx.restore();
-  } else {
-    ctx.fillStyle = '#ffd24b'; ctx.fillRect(margin, margin, aSize, aSize);
-  }
+  ctx.fillStyle = '#ffd24b'; ctx.fillRect(margin, margin, aSize, aSize);
   ctx.fillStyle = '#ffffff'; ctx.font = '700 36px Inter, Arial';
   const handleText = handle.startsWith('@') ? handle : '@' + handle;
   ctx.fillText(handleText, margin + aSize + 28, margin + 42);
@@ -299,7 +352,6 @@ function drawCanvasLayout(handle, data){
   const r24 = data.results?.['24h'] || {};
   const r7 = data.results?.['7d'] || {};
   const r30 = data.results?.['30d'] || data.results?.month || {};
-  // box positions & drawing helpers (kept simple)
   drawSmallBox(ctx, margin + 8, margin + aSize + 32, 300, 96, '24H', r24);
   drawSmallBox(ctx, margin + 8 + 300 + 16, margin + aSize + 32, 300, 96, '7D', r7);
   drawMediumBox(ctx, margin + 8, margin + aSize + 32 + 96 + 16, Math.min(W - margin*3 - 300, 640), 120, '30D', r30);
