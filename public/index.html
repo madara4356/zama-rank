@@ -13,51 +13,166 @@
   --accent1:#ffd24b; --accent2:#ff6b6b;
   --text:#eaf3fb; --ok:#3ee6a8; --bad:#ff7b7b;
   --border: rgba(255,255,255,0.03);
+  --footer-height:84px;
 }
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,var(--bg-top),var(--bg-bottom));-webkit-font-smoothing:antialiased;}
-body{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;color:var(--text);display:flex;flex-direction:column;}
+html,body{
+  height:100%;
+  margin:0;
+  padding:0;
+  background:linear-gradient(180deg,var(--bg-top),var(--bg-bottom));
+  -webkit-font-smoothing:antialiased;
+}
+body{
+  font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  color:var(--text);
+  display:flex;
+  flex-direction:column;
+}
 
-/* app layout */
-#app{min-height:100vh;display:flex;flex-direction:column;}
-.container{max-width:980px;margin:18px auto;padding:18px;padding-bottom:120px; /* reserve footer space */ flex:1;display:flex;flex-direction:column}
+/* page container */
+.app{min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+.container{
+  width:100%;
+  max-width:980px;
+  padding:18px 18px 18px;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  padding-bottom:calc(var(--footer-height) + 24px); /* so footer never overlaps content */
+}
 
 /* header */
-.topbar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(0,0,0,0.45)}
+.header{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.logo{
+  width:56px;height:56px;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--accent1),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 10px 28px rgba(0,0,0,0.45)
+}
 .logo img{width:100%;height:100%;object-fit:cover}
 .brand-title{font-size:20px;font-weight:800;margin:0}
 .subtitle{color:var(--muted);font-size:13px;margin-top:3px}
 
-/* search */
-.search-shell{background:var(--card);padding:18px;border-radius:14px;border:1px solid var(--border);box-shadow:0 10px 36px rgba(0,0,0,0.45)}
+/* search area */
+.search-shell{
+  background:var(--card);
+  padding:18px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  box-shadow:0 10px 36px rgba(0,0,0,0.45)
+}
 .search-row{display:flex;gap:12px;align-items:center}
 .search-inner{flex:1;min-width:0}
-input[type="text"]{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px;height:48px}
+input[type="text"]{
+  width:100%;
+  padding:14px 16px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.04);
+  background:transparent;
+  color:inherit;
+  font-size:16px;
+  height:48px;
+}
 .actions{display:flex;gap:12px;align-items:center}
-.btn{padding:10px 16px;border-radius:12px;border:0;cursor:pointer;font-weight:800;display:inline-flex;align-items:center;justify-content:center;min-height:46px}
-.btn-search{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020;box-shadow:0 10px 30px rgba(0,0,0,0.5);min-width:140px}
-.btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);min-width:84px}
-.btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#061020; min-width:140px}
+.btn{
+  padding:10px 16px;
+  border-radius:12px;
+  border:0;
+  cursor:pointer;
+  font-weight:800;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:46px;
+}
+.btn-search{
+  background:linear-gradient(90deg,var(--accent1),var(--accent2));
+  color:#061020;
+  box-shadow:0 10px 30px rgba(0,0,0,0.5);
+  min-width:120px;
+}
+.btn-clear{
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.04);
+  color:var(--muted);
+  min-width:84px;
+}
+.btn-share{
+  background:linear-gradient(90deg,var(--accent1),var(--accent2));
+  color:#061020;
+  box-shadow:0 10px 30px rgba(0,0,0,0.5);
+  min-width:132px;
+}
 
-/* results */
-.results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start}
-.card{background:var(--card);padding:16px;border-radius:12px;border:1px solid var(--border);box-shadow:0 8px 28px rgba(0,0,0,0.45)}
+/* results grid */
+.results{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:14px;
+  align-items:start;
+}
+.card{
+  background:var(--card);
+  padding:16px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  box-shadow:0 8px 28px rgba(0,0,0,0.45);
+}
 .card h3{margin:0 0 10px;font-size:14px}
 .row{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
 .label{color:var(--muted);font-size:13px}
 .value{font-size:20px;font-weight:800}
 .progress-shell{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
-.progress-bar{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .6s ease}
+.progress-bar{
+  height:100%;
+  width:0;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--accent1),var(--accent2));
+  transition:width .6s ease;
+}
 .ms-change{display:inline-flex;gap:6px;align-items:center;font-weight:800}
-.ms-change.up{color:var(--ok)} .ms-change.down{color:var(--bad)}
+.ms-change.up{color:var(--ok)}
+.ms-change.down{color:var(--bad)}
 hr.sep{border:none;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0}
 
-/* footer is OUTSIDE container (see HTML) */
-.footer-wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-top:1px solid rgba(255,255,255,0.02);background:transparent}
+/* fixed footer */
+.footer-fixed{
+  position:fixed;
+  left:0;right:0;bottom:0;
+  height:var(--footer-height);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(180deg,rgba(0,0,0,0.06),rgba(0,0,0,0.18));
+  border-top:1px solid rgba(255,255,255,0.02);
+  z-index:80;
+}
+.footer-inner{
+  width:100%;
+  max-width:980px;
+  padding:12px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
 .footer-left{color:var(--muted);font-size:13px}
-.powered{display:flex;gap:12px;align-items:center;text-decoration:none;color:inherit}
-.powered img{width:56px;height:56px;border-radius:8px;object-fit:cover;box-shadow:0 8px 22px rgba(0,0,0,0.45)}
+.powered{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  text-decoration:none;
+  color:inherit;
+}
+.powered img{
+  width:56px;height:56px;
+  border-radius:8px;
+  object-fit:cover;
+  box-shadow:0 8px 22px rgba(0,0,0,0.45);
+}
 
 /* small screens */
 @media (max-width:640px){
@@ -66,20 +181,17 @@ hr.sep{border:none;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0}
   .results{grid-template-columns:1fr}
   .logo{width:48px;height:48px}
   .powered img{width:48px;height:48px}
-  .container{padding-bottom:130px}
 }
 </style>
 </head>
 <body>
-  <div id="app">
+  <div class="app">
     <div class="container">
-      <div class="topbar">
-        <div style="display:flex;gap:12px;align-items:center">
-          <div class="logo"><img id="zamaLogo" src="zama-logo.png" alt="Zama"></div>
-          <div>
-            <div class="brand-title">ZAMA SZN 5 RANK</div>
-            <div class="subtitle">Search X handle (e.g. @0x_madara_)</div>
-          </div>
+      <div class="header">
+        <div class="logo"><img src="zama-logo.png" alt="Zama"></div>
+        <div>
+          <div class="brand-title">ZAMA SZN 5 RANK</div>
+          <div class="subtitle">Search X handle (e.g. @0x_madara_)</div>
         </div>
       </div>
 
@@ -96,80 +208,137 @@ hr.sep{border:none;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0}
         </div>
       </div>
 
-      <!-- results area (hidden initially) -->
       <div id="resultArea" class="results" aria-live="polite" style="display:none"></div>
-
-      <!-- keep container flex so it grows; footer sits outside this container -->
     </div>
 
-    <!-- footer moved OUTSIDE the container so it always sits beneath content.
-         Because .container has padding-bottom equal to footer height we won't overlap content. -->
-    <div class="footer-wrap" role="contentinfo">
-      <div class="footer-left">Made with ❤️ for Zama — love &amp; powered by madara</div>
-      <a class="powered" id="poweredLink" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer">
-        <img id="poweredAvatar" src="madara.png" alt="madara">
-        <div style="font-size:13px;line-height:1">
-          <div style="color:var(--muted);font-size:12px">Powered by</div>
-          <div style="font-weight:700">madara</div>
-        </div>
-      </a>
+    <!-- fixed footer at bottom of viewport -->
+    <div class="footer-fixed">
+      <div class="footer-inner">
+        <div class="footer-left">Made with ❤️ </div>
+        <a class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer">
+          <img src="madara.png" alt="madara">
+          <div style="font-size:13px;line-height:1">
+            <div style="color:var(--muted);font-size:12px">Powered by</div>
+            <div style="font-weight:700">madara</div>
+          </div>
+        </a>
+      </div>
     </div>
   </div>
 
-  <!-- canvas used for PNG export (hidden) -->
-  <canvas id="cardCanvas" width="1200" height="600" style="display:none"></canvas>
+  <!-- hidden canvas for share card -->
+  <canvas id="shareCanvas" width="1200" height="630" style="display:none"></canvas>
 
 <script>
-/* --------- (unchanged app logic + canvas draw) ---------
-   For brevity I left the same JS logic used previously:
-   - fetch API at /api/check
-   - build cards into #resultArea
-   - drawShareCard(handle,data) -> canvas -> dataURL
-   - share / fallback download behavior
-   If you prefer, I can paste the full JS again. Right now only layout fixed:
-   footer moved outside container, container has bottom padding to avoid overlap.
----------------------------------------------------------*/
-
-/* Minimal working JS glue to keep UI functional (full logic from previous version) */
-const $ = id => document.getElementById(id);
-const TOTAL_FETCHED = 1500;
 const API_BASE = '/api/check';
-let lastSearch = null;
+const TOTAL_FETCHED = 1500;
+const OG_NFT_TOP = 1006;
+const SHARE_TOP = 100;
+const $ = id => document.getElementById(id);
 
 function fmtNum(n,d=8){ if(n==null || !isFinite(Number(n))) return '-'; return Number(n).toFixed(d); }
+
 function progressToTop100(rank){
-  if(!isFinite(rank)) return 0; rank=Number(rank);
+  if(!isFinite(rank)) return 0;
+  rank = Number(rank);
   if(rank<=100) return Math.max(0,Math.min(1,(100-rank)/99));
   return Math.max(0,Math.min(1,(1500-rank)/(1500-100)));
 }
 
-function mkCard(title, meta, neighbor){
+function computeChange(curr,next){
+  const a = Number(curr?.mindshare),
+        b = Number(next?.mindshare);
+  if(!isFinite(a) || !isFinite(b)) return {dir:'same',pct:0,abs:0};
+  const diff = a - b;
+  const pct = b===0 ? (a===0?0:100) : (diff/Math.abs(b)*100);
+  return {
+    dir: diff>0 ? 'up' : (diff<0 ? 'down' : 'same'),
+    pct: Math.round(Math.abs(pct)*10)/10,
+    abs: Math.round(diff*1000000)/1000000
+  };
+}
+
+function mkCard(label, meta, neighbor, isMonth){
   const el = document.createElement('div'); el.className='card';
+
   const found = !!meta && meta.found === true && Number.isFinite(Number(meta.rank));
-  const rank = found ? Number(meta.rank) : null;
-  const ms = found ? meta.mindshare : null;
-  const prog = found ? Math.round(progressToTop100(rank)*100) : 0;
-  const changeHtml = '-';
-  let badgeHtml = '';
-  if(title === 'month' && found){
-    if(rank <= 100) badgeHtml = `<div style="margin-top:10px"><span style="display:inline-block;padding:8px 12px;border-radius:999px;background:rgba(62,230,168,0.12);color:#3ee6a8;font-weight:700">Eligible for OG NFT + Revenue Share</span></div>`;
-    else if(rank <= 1006) badgeHtml = `<div style="margin-top:10px"><span style="display:inline-block;padding:8px 12px;border-radius:999px;background:rgba(62,230,168,0.08);color:#3ee6a8;font-weight:700">Eligible for OG NFT</span></div>`;
+  const rank  = found ? Number(meta.rank) : null;
+  const ms    = found ? meta.mindshare : null;
+  const prog  = found ? Math.round(progressToTop100(rank)*100) : 0;
+
+  let changeHtml = '-';
+  if(found && neighbor && neighbor.found === true && isFinite(Number(neighbor.mindshare))){
+    const ch = computeChange(meta, neighbor);
+    if(ch.dir !== 'same'){
+      const arrow = ch.dir==='up' ? '▲' : '▼';
+      changeHtml =
+        `<span class="ms-change ${ch.dir}">
+          ${arrow} ${ch.pct}% (${ch.abs>0?'+':''}${ch.abs})
+        </span>`;
+    }else{
+      changeHtml = '<span class="ms-change">-</span>';
+    }
   }
+
+  let badgeHtml = '';
+  if(isMonth && found){
+    if(rank <= SHARE_TOP){
+      badgeHtml =
+        `<div style="margin-top:10px">
+           <span style="display:inline-block;padding:8px 12px;border-radius:999px;background:rgba(62,230,168,0.12);color:#3ee6a8;font-weight:700">
+             Eligible for OG NFT + Revenue Share
+           </span>
+         </div>`;
+    } else if(rank <= OG_NFT_TOP){
+      badgeHtml =
+        `<div style="margin-top:10px">
+           <span style="display:inline-block;padding:8px 12px;border-radius:999px;background:rgba(62,230,168,0.08);color:#3ee6a8;font-weight:700">
+             Eligible for OG NFT
+           </span>
+         </div>`;
+    }
+  }
+
   let payoutHtml = '-';
+  if(isMonth && found && rank <= SHARE_TOP){
+    // keep as "-" for now (assumption range could be added if you want)
+    payoutHtml = '-';
+  }
+
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <h3>${title}</h3>
+      <h3>${label}</h3>
       <div style="text-align:right;font-weight:800;font-size:20px">${found?rank:'-'}</div>
     </div>
-    <div class="row"><div class="label">Mindshare</div><div class="value">${found?fmtNum(ms):'-'}</div></div>
-    <div class="row"><div class="label">Change vs next</div><div class="value">${found? (changeHtml) : '-'}</div></div>
-    <div style="margin-top:8px">
-      <div class="progress-shell" aria-hidden="true"><div class="progress-bar" style="width:${found?prog+'%':'0%'}"></div></div>
-      <div style="font-size:12px;color:var(--muted);margin-top:8px">${found ? `Progress to Top 100: ${prog}% • Total fetched: ${TOTAL_FETCHED}` : `Search to show data • Total fetched: ${TOTAL_FETCHED}`}</div>
+
+    <div class="row">
+      <div class="label">Mindshare</div>
+      <div class="value">${found?fmtNum(ms):'-'}</div>
     </div>
+
+    <div class="row">
+      <div class="label">Change vs next</div>
+      <div class="value">${found?changeHtml:'-'}</div>
+    </div>
+
+    <div style="margin-top:8px">
+      <div class="progress-shell" aria-hidden="true">
+        <div class="progress-bar" style="width:${found?prog+'%':'0%'}"></div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">
+        ${found ? `Progress to Top 100: ${prog}% • Total fetched: ${TOTAL_FETCHED}`
+                : `Search to show data • Total fetched: ${TOTAL_FETCHED}`}
+      </div>
+    </div>
+
     ${badgeHtml}
+
     <hr class="sep" />
-    <div class="row"><div class="label">Assumed payout (if eligible)</div><div class="value">${payoutHtml}</div></div>
+
+    <div class="row">
+      <div class="label">Assumed payout (if eligible)</div>
+      <div class="value">${payoutHtml}</div>
+    </div>
   `;
   return el;
 }
@@ -178,37 +347,304 @@ function hideResults(){ $('resultArea').style.display='none'; }
 function showResults(){ $('resultArea').style.display='grid'; }
 hideResults();
 
+/* Avatar preload (X pfp) */
+const preload = { avatar:null };
+function loadAvatar(handle){
+  return new Promise(resolve=>{
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = ()=>{ preload.avatar = img; resolve(true); };
+    img.onerror = ()=>{ preload.avatar = null; resolve(false); };
+    img.src = `https://unavatar.io/x/${encodeURIComponent(handle)}?fallback=true`;
+  });
+}
+
+/* draw share card canvas */
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+}
+
+function drawShareCard(handle,data){
+  const canvas = $('shareCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  // background
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#03252b';
+  ctx.fillRect(0,0,W,H);
+
+  // main rounded card
+  const margin = 40;
+  const cardX = margin;
+  const cardY = margin;
+  const cardW = W - margin*2;
+  const cardH = H - margin*2;
+  ctx.fillStyle = '#06363b';
+  roundRect(ctx, cardX, cardY, cardW, cardH, 26);
+  ctx.fill();
+
+  // avatar
+  const avatarSize = 140;
+  const avatarX = cardX + 40;
+  const avatarY = cardY + 40;
+  if(preload.avatar){
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(avatarX + avatarSize/2, avatarY + avatarSize/2, avatarSize/2, 0, Math.PI*2);
+    ctx.clip();
+    ctx.drawImage(preload.avatar, avatarX, avatarY, avatarSize, avatarSize);
+    ctx.restore();
+  }else{
+    ctx.fillStyle='#ffd24b';
+    ctx.beginPath();
+    ctx.arc(avatarX + avatarSize/2, avatarY + avatarSize/2, avatarSize/2, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  // handle
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 44px Inter, Arial';
+  const handleText = handle.startsWith('@') ? handle : '@' + handle;
+  ctx.fillText(handleText, avatarX + avatarSize + 28, avatarY + 58);
+
+  ctx.font = '500 22px Inter, Arial';
+  ctx.fillStyle = '#a6c3c8';
+  ctx.fillText('Zama rank card', avatarX + avatarSize + 28, avatarY + 90);
+
+  // data helpers
+  const r24  = data.results?.['24h']  && data.results['24h'].found  ? data.results['24h']  : null;
+  const r7   = data.results?.['7d']   && data.results['7d'].found   ? data.results['7d']   : null;
+  const r30  = data.results?.['month']&& data.results['month'].found? data.results['month']: null;
+
+  // small boxes (24h & 7d)
+  const boxW = 260;
+  const boxH = 90;
+  const boxGap = 18;
+  const boxY = avatarY + avatarSize + 30;
+  const box1X = avatarX + avatarSize + 28;
+  const box2X = box1X + boxW + boxGap;
+
+  function drawSmallBox(x,y,label,row){
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.16)';
+    roundRect(ctx,x,y,boxW,boxH,16);
+    ctx.fill();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '700 18px Inter, Arial';
+    ctx.fillText(label.toUpperCase(), x+16, y+26);
+
+    if(row){
+      ctx.textAlign = 'right';
+      ctx.font = '700 20px Inter, Arial';
+      ctx.fillText(String(row.rank), x+boxW-16, y+26);
+      ctx.textAlign = 'left';
+
+      ctx.font = '400 15px Inter, Arial';
+      ctx.fillStyle = '#a6c3c8';
+      ctx.fillText('Mindshare: ' + Number(row.mindshare).toFixed(6), x+16, y+48);
+
+      // progress
+      const prog = Math.round(progressToTop100(Number(row.rank))*100);
+      const barY = y + 60;
+      const barW = boxW - 32;
+      ctx.fillStyle = 'rgba(255,255,255,0.1)';
+      roundRect(ctx,x+16,barY,barW,10,5); ctx.fill();
+      ctx.fillStyle = '#ffd24b';
+      roundRect(ctx,x+16,barY,Math.max(10,barW*prog/100),10,5); ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  drawSmallBox(box1X, boxY, '24h', r24);
+  drawSmallBox(box2X, boxY, '7d',  r7);
+
+  // big 30d box below, centered under the two
+  const bigW = boxW*2 + boxGap;
+  const bigH = 170;
+  const bigX = box1X;
+  const bigY = boxY + boxH + 30;
+
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,0.24)';
+  roundRect(ctx,bigX,bigY,bigW,bigH,20);
+  ctx.fill();
+
+  ctx.fillStyle='#ffffff';
+  ctx.font = '700 18px Inter, Arial';
+  ctx.fillText('30D', bigX+20, bigY+28);
+
+  if(r30){
+    // rank big on right
+    ctx.textAlign='right';
+    ctx.font = '800 72px Inter, Arial';
+    ctx.fillText(String(r30.rank), bigX + bigW - 22, bigY + 70);
+
+    ctx.textAlign='left';
+    ctx.font = '500 16px Inter, Arial';
+    ctx.fillStyle = '#a6c3c8';
+    ctx.fillText('Mindshare', bigX+20, bigY+56);
+
+    ctx.font = '700 22px Inter, Arial';
+    ctx.fillStyle = '#ffd24b';
+    ctx.fillText(Number(r30.mindshare).toFixed(6), bigX+20, bigY+80);
+
+    // progress bar
+    const prog30 = Math.round(progressToTop100(Number(r30.rank))*100);
+    const barW2  = bigW - 40;
+    const barY2  = bigY + 96;
+    ctx.fillStyle='rgba(255,255,255,0.1)';
+    roundRect(ctx,bigX+20,barY2,barW2,12,6); ctx.fill();
+    ctx.fillStyle='#ffd24b';
+    roundRect(ctx,bigX+20,barY2,Math.max(10,barW2*prog30/100),12,6); ctx.fill();
+
+    // eligibility
+    let eligText = '';
+    if(r30.rank <= SHARE_TOP) eligText = 'Eligible: OG NFT + Revenue Share';
+    else if(r30.rank <= OG_NFT_TOP) eligText = 'Eligible: OG NFT';
+    else eligText = 'Not eligible';
+
+    ctx.font = '700 18px Inter, Arial';
+    ctx.fillStyle = (r30.rank <= OG_NFT_TOP) ? '#3ee6a8' : '#a6c3c8';
+    ctx.fillText(eligText, bigX+20, bigY+130);
+  }else{
+    ctx.font = '500 16px Inter, Arial';
+    ctx.fillStyle = '#a6c3c8';
+    ctx.fillText('No 30d data', bigX+20, bigY+60);
+  }
+
+  ctx.restore();
+
+  // footer text
+  ctx.font = '500 16px Inter, Arial';
+  ctx.fillStyle = '#9fb0bf';
+  ctx.fillText('Powered by madara — zama-rank.vercel.app', cardX+10, cardY+cardH-16);
+
+  return canvas.toDataURL('image/png');
+}
+
+/* convert dataURL -> File + share/download */
+function shareImageFromDataURL(dataUrl, handle, data){
+  try{
+    const byteString = atob(dataUrl.split(',')[1]);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for(let i=0;i<byteString.length;i++) ia[i] = byteString.charCodeAt(i);
+    const blob = new Blob([ab], {type:'image/png'});
+    const file = new File([blob], `${handle}-zama-rank.png`, {type:'image/png'});
+
+    const tweetText = `${handle.startsWith('@')?handle:'@'+handle} — Zama Rank 30d: ${data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-'}\nCheck: https://zama-rank.vercel.app`;
+
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      navigator.share({
+        files:[file],
+        text:tweetText
+      }).catch(()=>{ /* user cancelled; ignore */ });
+      return;
+    }
+
+    // fallback: download + open tweet intent
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${handle}-zama-rank.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 2000);
+
+    window.open(
+      `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}`,
+      '_blank'
+    );
+  }catch(err){
+    alert('Share failed: ' + (err.message||err));
+  }
+}
+
+let lastSearch = null;
+
 async function performSearch(){
   const raw = ($('username').value||'').trim();
   if(!raw){ $('username').focus(); return; }
   const handle = raw.replace(/^@/,'');
+
   showResults();
-  const container = $('resultArea'); container.innerHTML='';
-  for(let i=0;i<3;i++){ const s=document.createElement('div'); s.className='card'; s.innerHTML=`<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`; container.appendChild(s); }
+  const container = $('resultArea');
+  container.innerHTML = '';
+  for(let i=0;i<3;i++){
+    const skel = document.createElement('div');
+    skel.className='card';
+    skel.innerHTML = `<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`;
+    container.appendChild(skel);
+  }
+
+  // load avatar in parallel with API
+  const avatarPromise = loadAvatar(handle);
 
   try{
     const res = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
     if(!res.ok) throw new Error('Network ' + res.status);
     const data = await res.json();
+    await avatarPromise;
+
     container.innerHTML = '';
-    const order = ['24h','7d','month'];
-    for(let i=0;i<order.length;i++){
-      const k=order[i]; const neighbor = (i<order.length-1) ? (data.results[order[i+1]]||null) : null;
-      container.appendChild( mkCard(k, data.results[k]||{}, neighbor) );
+    const frames = [
+      {key:'24h',  label:'24h'},
+      {key:'7d',   label:'7d'},
+      {key:'month',label:'30d'}
+    ];
+
+    for(let i=0;i<frames.length;i++){
+      const frame = frames[i];
+      const meta = data.results[frame.key] || {};
+      const neighbor = (i<frames.length-1) ? data.results[frames[i+1].key] || null : null;
+      const isMonth = frame.key === 'month';
+      container.appendChild( mkCard(frame.label, meta, neighbor, isMonth) );
     }
+
     lastSearch = { handle, data };
   }catch(err){
-    container.innerHTML = ''; const el=document.createElement('div'); el.className='card'; el.innerHTML=`<h3>Error</h3><div style="color:var(--muted);margin-top:6px">${err.message}</div>`; container.appendChild(el); lastSearch=null;
+    container.innerHTML='';
+    const el = document.createElement('div');
+    el.className='card';
+    el.innerHTML = `<h3>Error</h3><div style="color:var(--muted);margin-top:6px">${err.message}</div>`;
+    container.appendChild(el);
+    lastSearch = null;
   }
 }
 
+/* event bindings */
 $('searchBtn').addEventListener('click', performSearch);
-$('username').addEventListener('keydown', (e)=>{ if(e.key==='Enter') performSearch(); });
-$('clearBtn').addEventListener('click', ()=>{ $('username').value=''; lastSearch=null; hideResults(); });
+$('username').addEventListener('keydown', e=>{ if(e.key==='Enter') performSearch(); });
+$('clearBtn').addEventListener('click', ()=>{
+  $('username').value='';
+  lastSearch=null;
+  hideResults();
+});
 
-/* share handler placeholder */
-$('shareCardBtn').addEventListener('click', ()=>{ if(!lastSearch){ alert('Run Search first, then press Share Card.'); return; } alert('Share logic: use previously provided share-canvas code (unchanged).'); });
-
+/* Share handler – must be directly from user gesture */
+$('shareCardBtn').addEventListener('click', () => {
+  if(!lastSearch){
+    alert('Search a handle first, then tap Share Card.');
+    return;
+  }
+  const {handle, data} = lastSearch;
+  const dataUrl = drawShareCard(handle, data);
+  shareImageFromDataURL(dataUrl, handle.startsWith('@')?handle:'@'+handle, data);
+});
 </script>
 </body>
 </html>
