@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ZAMA RANK — Share Card</title>
+<title>ZAMA RANK — fixed footer & share card fix</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -20,6 +20,7 @@
 
   /* layout */
   #app{min-height:100vh;display:flex;flex-direction:column;}
+  /* Use min-height calc accounting for footer variable (set by JS) */
   .wrap{max-width:980px;margin:18px auto;padding:18px;flex:1;display:flex;flex-direction:column;transition:padding-bottom .12s ease;min-height: calc(100vh - var(--footer-h));}
 
   .topbar{display:flex;align-items:center;gap:14px;margin-bottom:10px}
@@ -55,7 +56,18 @@
   .ms-change{display:inline-flex;gap:8px;align-items:center;font-weight:700;white-space:nowrap}
   .ms-change.up{color:var(--ok)} .ms-change.down{color:var(--bad)}
 
-  footer.site-footer{position:fixed;left:0;right:0;bottom:0;height:auto;background: linear-gradient(180deg, #071025 0%, #071025 100%);border-top:1px solid rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;padding:12px 18px calc(12px + env(safe-area-inset-bottom, 0px));z-index:20;box-shadow:none}
+  /* FOOTER: make background transparent so it blends with page gradient on mobile,
+     and keep only a subtle border so it doesn't produce a dark band */
+  footer.site-footer{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    height:auto;
+    background:transparent; /* transparent so page gradient shows through */
+    border-top:1px solid rgba(255,255,255,0.02);
+    display:flex;align-items:center;justify-content:center;padding:12px 18px calc(12px + env(safe-area-inset-bottom, 0px));z-index:20;
+    box-shadow:none;
+    pointer-events:auto;
+  }
   .footer-inner{max-width:980px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:14px}
   .footer-text{opacity:0.75}
   .powered{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
@@ -119,18 +131,17 @@
   <canvas id="cardCanvas" width="1400" height="900" style="display:none"></canvas>
 
 <script>
-/* CONFIG */
+/* -------- CONFIG -------- */
 const API_BASE = '/api/check';
 const TOTAL_FETCHED = 1500;
 const OG_NFT_TOP = 1006;
 const SHARE_TOP = 100;
 
-/* small image cache for canvas + footer avatar */
+/* image cache */
 const _pre = { avatar: null, powered: null };
 
-/* reveal raster logo + footer avatar if available, otherwise show fallback */
+/* reveal raster logo + footer avatar if available otherwise fallback */
 function revealAssets(){
-  // header logo
   const logoImg = document.getElementById('logoImg');
   const logoFallback = document.getElementById('logoFallback');
   if(logoImg){
@@ -141,7 +152,6 @@ function revealAssets(){
     if(logoImg.src) l.src = logoImg.src;
   }
 
-  // powered avatar (footer)
   const pImg = document.getElementById('poweredAvatar');
   const pFallback = document.getElementById('poweredFallback');
   if(pImg && pFallback){
@@ -154,7 +164,7 @@ function revealAssets(){
 }
 revealAssets();
 
-/* load avatar for the searched user for canvas */
+/* load avatar for canvas */
 async function loadAvatarForCanvas(handle){
   return new Promise(resolve=>{
     const img = new Image(); img.crossOrigin='anonymous';
@@ -166,7 +176,6 @@ async function loadAvatarForCanvas(handle){
 
 /* helpers */
 const $ = id => document.getElementById(id);
-function money(n){ if(n==null || !isFinite(Number(n))) return '-'; return '$' + Number(n).toLocaleString(); }
 function fmtNum(n,d=6){ if(n==null || !isFinite(Number(n))) return '-'; return Number(n).toFixed(d); }
 function progressToTop100(rank){
   if(!isFinite(rank)) return 0;
@@ -216,18 +225,17 @@ function mkCard(title, meta, neighbor){
   return el;
 }
 
-/* Draw professional card and include footer powered avatar in bottom-right */
+/* Draw share card, include powered avatar bottom-right */
 function drawProfessionalCard(handle, data){
   const canvas = $('cardCanvas'); const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0,0,W,H);
 
-  // subtle background gradient
+  // subtle background gradient matching page
   const g = ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#071026'); g.addColorStop(1,'#04121b');
   ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
 
   const pad = 56;
-  // header area
   ctx.fillStyle = '#ffffff'; ctx.font = '800 28px Inter, Arial';
   ctx.fillText('ZAMA RANK', pad + 110, pad - 8);
   ctx.font = '600 16px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
@@ -238,27 +246,21 @@ function drawProfessionalCard(handle, data){
   const handleText = handle.startsWith('@') ? handle : '@' + handle;
   ctx.fillText(handleText, pad + 110, pad + 56);
 
-  // draw header logo / avatar circle left
+  // draw header avatar-ish area (left)
   const logoX = pad, logoY = pad - 20, logoSize = 96;
-  // subtle rounded square background
   ctx.fillStyle = 'rgba(255,255,255,0.02)'; roundRect(ctx, logoX, logoY, logoSize, logoSize, 18, true, false);
-  // if user avatar loaded, draw it inside circle near header (user avatar)
   if(_pre.avatar){
     const ax = logoX + (logoSize - 72)/2, ay = logoY + (logoSize - 72)/2;
-    // draw circle clipped
     ctx.save(); ctx.beginPath(); ctx.arc(ax + 36, ay + 36, 36, 0, Math.PI*2); ctx.closePath(); ctx.clip();
     ctx.drawImage(_pre.avatar, ax, ay, 72, 72); ctx.restore();
   } else {
-    // fallback small circle
     ctx.beginPath(); ctx.arc(logoX + logoSize/2, logoY + logoSize/2, 34, 0, Math.PI*2); ctx.fillStyle='#ffd24b'; ctx.fill();
   }
 
-  // draw three uniform boxes (equal size)
-  const topY = pad + 120;
+  // 3 equal boxes
+  const topY = pad + 120; const gap = 22;
   const availableW = W - pad*2;
-  const gap = 22;
-  const cardW = Math.floor((availableW - gap*2) / 3);
-  const cardH = 190;
+  const cardW = Math.floor((availableW - gap*2) / 3); const cardH = 190;
 
   const r24 = data.results?.['24h'] || {};
   const r7  = data.results?.['7d'] || {};
@@ -269,22 +271,21 @@ function drawProfessionalCard(handle, data){
     ctx.fillStyle='#9fb0bf'; ctx.font='700 12px Inter, Arial'; ctx.fillText(title.toUpperCase(), x+18, y+28);
     const rankText = (meta && meta.found && isFinite(Number(meta.rank))) ? String(meta.rank) : '-';
     ctx.font='800 24px Inter, Arial'; ctx.fillStyle='#ffffff'; ctx.fillText(rankText, x + w - 18 - ctx.measureText(rankText).width, y+36);
-    // mindshare
-    ctx.font='400 12px Inter, Arial'; ctx.fillStyle='#9fb0bf'; const msText = (meta && meta.found) ? Number(meta.mindshare).toFixed(6) : '-';
+    ctx.font='400 12px Inter, Arial'; ctx.fillStyle='#9fb0bf';
+    const msText = (meta && meta.found) ? Number(meta.mindshare).toFixed(6) : '-';
     ctx.fillText('Mindshare: ' + msText, x + 18, y + 64);
-    // progress track
+
     const prog = (meta && meta.found && Number.isFinite(Number(meta.rank))) ? Math.round(progressToTop100(Number(meta.rank))*100) : 0;
     const barX = x + 18, barY = y + 78, barW = w - 36, barH = 14;
-    // track
     ctx.fillStyle = 'rgba(0,0,0,0.12)'; roundRect(ctx, barX, barY, barW, barH, 999, true, false);
-    // choose colors per timeframe
+
     let start='#ffd24b', end='#ffb347';
     if(title.toLowerCase()==='7d'){ start='#3ee6a8'; end='#1fb5a6'; }
     if(title.toLowerCase()==='30d'){ start='#7aa2ff'; end='#6a7aff'; }
     const g2 = ctx.createLinearGradient(barX,0,barX+barW,0); g2.addColorStop(0,start); g2.addColorStop(1,end);
     const fillW = Math.max(8, Math.round(barW * prog / 100));
     ctx.fillStyle = g2; roundRect(ctx, barX, barY, fillW, barH, 999, true, false);
-    // change vs next
+
     const ch = computeChange(meta||{}, (neighbor && neighbor.found)?neighbor:{} );
     if(meta && neighbor && neighbor.found){
       const up = ch.dir === 'up';
@@ -296,31 +297,28 @@ function drawProfessionalCard(handle, data){
       ctx.font = '600 12px Inter, Arial'; ctx.fillStyle = 'rgba(255,255,255,0.35)';
       ctx.fillText('-', x + 18, y + 116);
     }
-    // bottom meta
+
     ctx.font='500 11px Inter, Arial'; ctx.fillStyle='#9fb0bf';
     ctx.fillText(`Progress to Top 100: ${prog}% • Total fetched: ${TOTAL_FETCHED}`, x + 18, y + h - 18);
   }
 
-  const x1 = pad;
-  const x2 = pad + cardW + gap;
-  const x3 = pad + (cardW + gap)*2;
+  const x1 = pad; const x2 = pad + cardW + gap; const x3 = pad + (cardW + gap)*2;
   drawBox(x1, topY, cardW, cardH, '24H', r24, r7);
   drawBox(x2, topY, cardW, cardH, '7D', r7, r30);
   drawBox(x3, topY, cardW, cardH, '30D', r30, {});
 
-  // draw footer powered by text and powered avatar bottom-right
+  // powered text
   ctx.font = '500 13px Inter, Arial'; ctx.fillStyle = 'rgba(255,255,255,0.72)';
   ctx.fillText('Powered by madara — zama-rank.vercel.app', pad, H - 48);
 
-  // draw powered avatar if available (use _pre.powered), bottom-right
+  // powered avatar bottom-right (use _pre.powered if loaded)
   const avatarSize = 56;
   const avatarX = W - pad - avatarSize;
-  const avatarY = H - pad - avatarSize - 8; // leave bottom margin
+  const avatarY = H - pad - avatarSize - 8;
   if(_pre.powered){
     ctx.save(); ctx.beginPath(); ctx.arc(avatarX + avatarSize/2, avatarY + avatarSize/2, avatarSize/2, 0, Math.PI*2); ctx.closePath(); ctx.clip();
     ctx.drawImage(_pre.powered, avatarX, avatarY, avatarSize, avatarSize); ctx.restore();
   } else {
-    // fallback tile
     ctx.fillStyle = '#ffd24b'; roundRect(ctx, avatarX, avatarY, avatarSize, avatarSize, 10, true, false);
     ctx.fillStyle = '#061020'; ctx.font = '700 18px Inter, Arial'; ctx.fillText('MD', avatarX + 12, avatarY + 36);
   }
@@ -341,7 +339,7 @@ function drawProfessionalCard(handle, data){
   }
 }
 
-/* share -> file */
+/* share the PNG (native share or download) */
 function shareImageFromDataURL(dataUrl, handle){
   try{
     const byteString = atob(dataUrl.split(',')[1]);
@@ -374,7 +372,7 @@ async function performSearch(){
     container.appendChild(s);
   }
 
-  // prepare avatars for canvas (user avatar + footer powered avatar preload already attempted)
+  // prepare avatar for canvas and keep powered avatar if loaded
   await loadAvatarForCanvas(handle);
 
   try{
@@ -411,7 +409,10 @@ $('shareCardBtn').addEventListener('click', ()=>{
   shareImageFromDataURL(dataUrl, handle);
 });
 
-/* footer padding */
+/* Robust footer padding update:
+   - compute footer height
+   - update CSS var and wrap padding
+   - listen to visualViewport changes (mobile address bar), orientation, resize, and scroll */
 function updateFooterPadding(){
   const footer = $('siteFooter'); const wrap = $('wrap');
   if(!footer || !wrap) return;
@@ -422,11 +423,23 @@ function updateFooterPadding(){
   document.documentElement.style.setProperty('--footer-h', height + 'px');
   wrap.style.paddingBottom = (height + 18) + 'px';
 }
-window.addEventListener('load', ()=>{ updateFooterPadding(); setTimeout(updateFooterPadding,350); });
+
+/* call updateFooterPadding on many mobile/viewport events so padding always correct */
+window.addEventListener('load', ()=>{ updateFooterPadding(); setTimeout(updateFooterPadding, 350); });
 window.addEventListener('resize', updateFooterPadding);
 window.addEventListener('orientationchange', ()=>setTimeout(updateFooterPadding,220));
+window.addEventListener('scroll', ()=>{ /* slight debounce */ clearTimeout(window._pf_timeout); window._pf_timeout=setTimeout(updateFooterPadding,80); });
 
-/* init */
+/* use visualViewport when available for address-bar changes on mobile */
+if(window.visualViewport){
+  let vvTO = null;
+  window.visualViewport.addEventListener('resize', ()=>{
+    clearTimeout(vvTO);
+    vvTO = setTimeout(updateFooterPadding, 80);
+  });
+  window.visualViewport.addEventListener('scroll', ()=>{ clearTimeout(vvTO); vvTO = setTimeout(updateFooterPadding, 80); });
+}
+
 hideResults();
 </script>
 </body>
