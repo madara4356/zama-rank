@@ -3,420 +3,357 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ZAMA RANK</title>
+<title>ZAMA RANK — Share Card (Premium)</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg1:#000409; --bg2:#071025;
-    --card:rgba(255,255,255,0.03);
-    --muted:#9fb0bf;
-    --accent1:#ffd24b; --accent2:#ff6b6b;
-    --text:#eaf3fb; --ok:#3ee6a8; --bad:#ff7b7b;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));}
-  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;min-height:100vh;background-attachment:fixed;}
+:root{
+  --bg1:#020613; --bg2:#061026;
+  --muted:#9fb0bf;
+  --accent1:#ffd24b; --accent2:#ff6b6b;
+  --card: rgba(255,255,255,0.03);
+  --ok: #3ee6a8; --danger:#ff7b7b;
+  --glass: rgba(255,255,255,0.03);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#eaf3fb}
+#app{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:18px}
+.container{max-width:940px;width:100%}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;overflow:hidden}
+.logo img{width:100%;height:100%;object-fit:cover}
+.title{font-weight:800;font-size:18px}
+.subtitle{color:var(--muted);font-size:13px;margin-top:2px}
 
-  #app{min-height:100vh;display:flex;flex-direction:column;}
-  .wrap{max-width:940px;margin:18px auto;padding:20px 18px 36px;flex:1;display:flex;flex-direction:column}
+.search-shell{background:var(--card);padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 30px rgba(0,0,0,0.45);display:flex;gap:12px;align-items:center;margin-bottom:16px}
+.search-shell input{flex:1;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px;height:44px}
+.btn{padding:10px 14px;border-radius:12px;border:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020;font-weight:800;cursor:pointer}
+.btn.gray{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);min-width:80px}
 
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:48px;height:48px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(0,0,0,0.45)}
-  .logo img{width:100%;height:100%;object-fit:cover}
-  h1{margin:0;font-size:18px}
-  .subtitle{color:var(--muted);font-size:13px;margin-top:2px}
+.results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start;width:100%}
+.card{background:var(--card);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 28px rgba(0,0,0,0.45)}
+.card h3{margin:0 0 8px}
+.footer{display:flex;justify-content:space-between;align-items:center;width:100%;color:var(--muted);margin-top:18px;font-size:13px}
+.powered{display:flex;gap:10px;align-items:center}
+.powered img{width:44px;height:44px;border-radius:8px;object-fit:cover}
 
-  .search-shell{margin-top:14px;background:var(--card);padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 36px rgba(0,0,0,0.45)}
-  .search-row{display:flex;gap:12px;align-items:center}
-  .search-inner{flex:1;min-width:0}
-  input[type="text"]{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px; height:48px;}
+.hidden{display:none}
 
-  .actions{display:flex;gap:10px;align-items:center}
-  .btn{padding:10px 16px;border-radius:12px;border:0;cursor:pointer;font-weight:800;display:inline-flex;align-items:center;justify-content:center;min-height:44px}
-  .btn-search{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020;box-shadow:0 10px 30px rgba(0,0,0,0.5);min-width:120px}
-  .btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);min-width:84px}
-  .btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#061020; min-width:132px;}
-
-  .results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start;min-height:420px}
-  .card{background:var(--card);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 28px rgba(0,0,0,0.45)}
-  .card h3{margin:0 0 10px;font-size:14px}
-  .row{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
-  .label{color:var(--muted);font-size:13px}
-  .value{font-size:20px;font-weight:800}
-
-  .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;font-size:13px}
-  .badge.ok{background:rgba(62,230,168,0.12);color:var(--ok);border:1px solid rgba(62,230,168,0.12)}
-  .badge.neutral{background:rgba(255,255,255,0.03);color:var(--muted);border:1px solid rgba(255,255,255,0.03)}
-
-  .progress-shell{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
-  .progress-bar{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .6s ease}
-  .ms-change{display:inline-flex;gap:6px;align-items:center;font-weight:700}
-  .ms-change.up{color:var(--ok)} .ms-change.down{color:var(--bad)}
-  hr.sep{border:none;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0}
-
-  footer{margin-top:18px;color:var(--muted);font-size:13px;padding:12px 0 18px;display:flex;justify-content:space-between;align-items:center}
-  a.powered{ text-decoration:none;color:inherit;display:flex;gap:8px;align-items:center}
-  a.powered img{ width:44px; height:44px; border-radius:8px; object-fit:cover; box-shadow:0 8px 22px rgba(0,0,0,0.45) }
-
-  @media (max-width:560px){
-    .search-row{flex-direction:column;align-items:stretch}
-    .actions{justify-content:space-between}
-    .results{min-height:480px}
-  }
+@media (max-width:560px){
+  .search-shell{flex-direction:column;align-items:stretch}
+  .search-shell input{width:100%}
+}
 </style>
 </head>
 <body>
   <div id="app">
-    <div class="wrap">
-      <div class="topbar">
-        <div class="brand">
-          <div class="logo"><img id="logoImg" src="zama-logo.png" alt="Zama"></div>
-          <div>
-            <h1>ZAMA SZN 5 RANK</h1>
-            <div class="subtitle">Search X handle (e.g. @0x_madara_)</div>
-          </div>
+    <div class="container">
+      <div class="top">
+        <div class="logo"><img id="siteLogo" src="zama-logo.png" alt="Zama"></div>
+        <div>
+          <div class="title">ZAMA SZN 5 RANK</div>
+          <div class="subtitle">Search X handle (e.g. @0x_madara_)</div>
         </div>
       </div>
 
       <div class="search-shell" role="search" aria-label="Search X handle">
-        <div class="search-row">
-          <div class="search-inner">
-            <input id="username" type="text" placeholder="@your_handle" aria-label="Search handle" />
-          </div>
-          <div class="actions">
-            <button id="searchBtn" class="btn btn-search">🔎 Search</button>
-            <button id="clearBtn" class="btn btn-clear">Clear</button>
-            <button id="shareCardBtn" class="btn btn-share">Share Card</button>
-          </div>
-        </div>
+        <input id="username" type="text" placeholder="@your_handle" />
+        <button id="searchBtn" class="btn">🔎 Search</button>
+        <button id="clearBtn" class="btn gray">Clear</button>
+        <button id="shareBtn" class="btn">Share Card</button>
       </div>
 
-      <div id="resultArea" class="results" aria-live="polite">
-        <!-- placeholders -->
-      </div>
+      <div id="resultArea" class="hidden"></div>
 
-      <footer>
+      <div class="footer">
         <div>Made with ❤️ for Zama — love & powered by madara</div>
-        <a class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer">
-          <img id="poweredAvatar" src="madara.png" alt="madara">
-          <div style="font-size:13px">
-            <div style="color:var(--muted);font-size:12px">Powered by</div>
-            <div style="font-weight:700">madara</div>
-          </div>
+        <a href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer" class="powered">
+          <img id="poweredImg" src="madara.png" alt="madara"><div style="font-weight:700">madara</div>
         </a>
-      </footer>
+      </div>
     </div>
   </div>
 
-  <!-- canvas used for share card -->
-  <canvas id="cardCanvas" width="1200" height="760" style="display:none"></canvas>
+  <!-- canvas used to draw the premium slim share card -->
+  <canvas id="shareCanvas" width="1200" height="640" style="display:none"></canvas>
 
 <script>
-/* CONFIG */
+/* =========================
+   CONFIG & HELPERS
+   ========================= */
 const API_BASE = '/api/check';
 const TOTAL_FETCHED = 1500;
 const OG_NFT_TOP = 1006;
 const SHARE_TOP = 100;
 
-const ASSUMED_TOP_MIN = 1500;
-const ASSUMED_TOP_MAX = 2000;
-const ASSUMED_100_MIN = 150;
-const ASSUMED_100_MAX = 260;
-
 const $ = id => document.getElementById(id);
+function fmt(n,d=6){ if(n==null||!isFinite(Number(n))) return '-'; return Number(n).toFixed(d); }
+function money(n){ if(n==null||!isFinite(Number(n))) return '-'; return '$' + Number(n).toLocaleString(); }
 
-/* helpers */
-function fmtNum(n, dec = 8){ if(n==null || !isFinite(Number(n))) return '-'; return Number(n).toFixed(dec); }
-function money(n){ if(n==null || !isFinite(Number(n))) return '-'; return '$' + Number(n).toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0}); }
-function lerp(a,b,t){ return a + (b-a)*t; }
-function assumedPayoutRange(rank){
-  if(!isFinite(rank) || rank<1) return {min:null,max:null};
-  rank = Math.min(100, Math.max(1, Math.round(rank)));
-  const t = (rank-1)/99;
-  const min = lerp(ASSUMED_TOP_MIN, ASSUMED_100_MIN, t);
-  const max = lerp(ASSUMED_TOP_MAX, ASSUMED_100_MAX, t);
-  return { min: Math.round(min), max: Math.round(max) };
+/* preloaded images */
+const IMGS = {logo:null, powered:null, avatar:null};
+function preload(){
+  const l = new Image(); l.src='zama-logo.png'; l.onload=()=>IMGS.logo=l; l.onerror=()=>IMGS.logo=null;
+  const p = new Image(); p.src='madara.png'; p.onload=()=>IMGS.powered=p; p.onerror=()=>IMGS.powered=null;
 }
-function progressToTop100(rank){
+
+/* fetch avatar (unavatar) */
+async function loadAvatar(handle){
+  return new Promise(resolve=>{
+    const img = new Image(); img.crossOrigin='anonymous';
+    img.onload = ()=>{ IMGS.avatar = img; resolve(true); };
+    img.onerror = ()=>{ IMGS.avatar = null; resolve(false); };
+    img.src = `https://unavatar.io/x/${encodeURIComponent(handle)}?fallback=true`;
+  });
+}
+
+/* progress helper (0..100) */
+function progress(rank){
   if(!isFinite(rank)) return 0;
   rank = Number(rank);
-  if(rank <= 100) return Math.max(0, Math.min(1, (100-rank)/99));
-  return Math.max(0, Math.min(1, (1500-rank)/(1500-100)));
-}
-function computeChange(curr,next){
-  const a = Number(curr?.mindshare), b = Number(next?.mindshare);
-  if(!isFinite(a) || !isFinite(b)) return {dir:'same',pct:0,abs:0};
-  const diff = a - b; const pct = b===0 ? (a===0?0:100) : (diff/Math.abs(b)*100);
-  return {dir: diff>0 ? 'up' : (diff<0 ? 'down' : 'same'), pct: Math.round(Math.abs(pct)*10)/10, abs: Math.round(diff*1000000)/1000000};
+  if(rank <= 100) return Math.round((100 - rank) / 99 * 100);
+  if(rank >= TOTAL_FETCHED) return 0;
+  return Math.round((TOTAL_FETCHED - rank) / (TOTAL_FETCHED - 100) * 100);
 }
 
-/* preload static images */
-const _preloaded = { 'zama-logo.png': null, 'madara.png': null, avatar: null };
-function preloadStatic(){
-  ['zama-logo.png','madara.png'].forEach(src=>{
-    const im = new Image(); im.crossOrigin='anonymous';
-    im.onload = ()=>_preloaded[src]=im; im.onerror = ()=>_preloaded[src]=null;
-    im.src = src;
-  });
-}
-preloadStatic();
-
-/* avatar fetch */
-async function preloadAvatarForHandle(handle){
-  return new Promise(resolve=>{
-    const url = `https://unavatar.io/x/${encodeURIComponent(handle)}`;
-    const im = new Image(); im.crossOrigin='anonymous';
-    im.onload = ()=>{
-      if((im.naturalWidth||0) >= 32 && (im.naturalHeight||0) >= 32){
-        _preloaded.avatar = im; resolve(true);
-      } else { _preloaded.avatar = null; resolve(false); }
-    };
-    im.onerror = ()=>{ _preloaded.avatar = null; resolve(false); };
-    im.src = url + '?fallback=true';
-  });
+/* compute simple payout assumption for share winners
+   top1 ~ 1500-2000; top100 ~ 150-260; interpolate */
+function assumedPayout(rank){
+  if(!isFinite(rank)) return null;
+  rank = Math.max(1, Math.min(100, rank));
+  const topMin = 1500, topMax = 2000, min100 = 150, max100 = 260;
+  const t = (rank - 1)/99;
+  const mn = Math.round(topMin + (min100 - topMin)*t);
+  const mx = Math.round(topMax + (max100 - topMax)*t);
+  return {min:mn, max:mx};
 }
 
-/* placeholders */
-function showPlaceholders(){
-  const container = $('resultArea'); container.innerHTML='';
-  ['24h','7d','month'].forEach(t => {
-    const el = document.createElement('div'); el.className='card';
-    el.innerHTML = `<h3>${t}</h3><div style="color:var(--muted);margin-top:8px">Search to show data</div>`;
-    container.appendChild(el);
-  });
-}
-showPlaceholders();
+/* =========================
+   RENDER RESULTS (cards on page)
+   ========================= */
+function mkCard(title, meta, nextMeta){
+  const wrapper = document.createElement('div'); wrapper.className='card';
+  const found = meta && meta.found===true && isFinite(Number(meta.rank));
+  const rank = found ? Number(meta.rank) : null;
+  const ms = found ? meta.mindshare : null;
+  const prog = found ? progress(rank) : 0;
 
-/* UI card builder - only show eligibility/progress/payout when meta.found === true and rank is finite */
-function mkCard(title, meta, neighbor){
-  const c=document.createElement('div'); c.className='card';
+  const change = (() => {
+    if(!found || !nextMeta || !nextMeta.found) return '-';
+    const a = Number(meta.mindshare), b = Number(nextMeta.mindshare);
+    if(!isFinite(a) || !isFinite(b)) return '-';
+    const diff = a - b; const pct = b===0?0:Math.round((Math.abs(diff)/Math.abs(b))*1000)/10;
+    const sign = diff>0 ? '▲' : (diff<0 ? '▼' : '-');
+    const cls = diff>0 ? 'up' : (diff<0 ? 'down':'');
+    return `<span class="ms-change ${cls}" style="font-weight:800;color:${diff>0? '#3ee6a8' : (diff<0? '#ff7b7b':'#9fb0bf')}">${sign} ${pct}% ${diff!==0? '(' + (diff>0?'+':'') + diff.toFixed(6) + ')' : ''}</span>`;
+  })();
 
-  const hasData = !!meta && meta.found === true && Number.isFinite(Number(meta.rank));
-  const rank = hasData ? Number(meta.rank) : null;
-  const ms = hasData ? meta.mindshare : null;
-  const prog = hasData ? Math.round(progressToTop100(rank)*100) : 0;
-  const change = computeChange(hasData ? meta : {}, neighbor && neighbor.found===true ? neighbor : {});
-  const changeHtml = change.dir==='same' ? '-' : `<span class="ms-change ${change.dir}">${change.dir==='up'?'▲':'▼'} ${change.pct}%</span>`;
-  const absHtml = (change.abs && change.abs !== 0) ? ` (${change.abs>0?'+':''}${change.abs})` : '';
-
-  let badgeHtml = '';
-  if (title === 'month' && hasData) {
-    if (rank <= SHARE_TOP) badgeHtml = `<span class="badge ok">Eligible for OG NFT + Revenue Share</span>`;
-    else if (rank <= OG_NFT_TOP) badgeHtml = `<span class="badge ok">Eligible for OG NFT</span>`;
-    else badgeHtml = `<span class="badge neutral">Not Eligible</span>`;
-  }
-
-  let payoutHtml = '-';
-  if(title === 'month' && hasData && rank <= SHARE_TOP){
-    const r = assumedPayoutRange(rank);
-    payoutHtml = `${money(r.min)} - ${money(r.max)}`;
-  }
-
-  // When no data, show '-' placeholders
-  const rankDisplay = hasData ? rank : '-';
-  const msDisplay = hasData ? fmtNum(ms) : '-';
-  const changeDisplay = hasData ? (changeHtml + absHtml) : '-';
-  const progressText = hasData ? `Progress to Top 100: ${prog}% • Total fetched: ${TOTAL_FETCHED}` : 'No data • Total fetched: ' + TOTAL_FETCHED;
-
-  c.innerHTML = `
+  wrapper.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <h3>${title}</h3>
-      <div style="text-align:right;font-weight:800;font-size:20px">${rankDisplay}</div>
+      <h3 style="margin:0">${title}</h3>
+      <div style="font-weight:800;font-size:22px">${found?rank:'-'}</div>
     </div>
-
-    <div class="row"><div class="label">Mindshare</div><div class="value">${msDisplay}</div></div>
-    <div class="row"><div class="label">Change vs next</div><div class="value">${changeDisplay}</div></div>
-
-    <div style="margin-top:8px">
-      <div class="progress-shell" aria-hidden="true"><div class="progress-bar" style="width:${hasData ? prog + '%' : '0%'}"></div></div>
-      <div style="font-size:12px;color:var(--muted);margin-top:6px">${progressText}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+      <div style="color:var(--muted)">Mindshare</div>
+      <div style="font-weight:800;font-size:20px">${found?fmt(ms,6):'-'}</div>
     </div>
-
-    <div style="margin-top:10px">${badgeHtml}</div>
-    <hr class="sep" />
-    <div class="row"><div class="label">Assumed payout (if eligible)</div><div class="value">${payoutHtml}</div></div>
+    <div style="margin-top:10px;color:var(--muted)">Change vs next</div>
+    <div style="margin-top:6px">${change}</div>
+    <div style="margin-top:10px">
+      <div style="height:10px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden">
+        <div style="width:${prog}%;height:100%;background:linear-gradient(90deg,var(--accent1),var(--accent2));"></div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">${found ? `Progress to Top 100: ${prog}% • Total fetched: ${TOTAL_FETCHED}` : 'Search to show data'}</div>
+    </div>
+    ${ (title==='month' && found && (rank <= SHARE_TOP)) ? `<div style="margin-top:10px"><span style="display:inline-block;padding:8px 12px;border-radius:999px;background:rgba(62,230,168,0.12);color:#3ee6a8;font-weight:700">Eligible: OG NFT + Revenue Share</span></div>` : ((title==='month' && found && rank <= OG_NFT_TOP) ? `<div style="margin-top:10px"><span style="display:inline-block;padding:8px 12px;border-radius:999px;background:rgba(62,230,168,0.06);color:#3ee6a8;font-weight:700">Eligible: OG NFT</span></div>` : '')}
+    <div style="margin-top:12px;font-size:14px;color:var(--muted)">Assumed payout (if eligible): <span style="font-weight:800">${(title==='month' && found && rank<=SHARE_TOP)? (money(assumedPayout(rank).min) + ' — ' + money(assumedPayout(rank).max)) : '-'}</span></div>
   `;
-  return c;
+  return wrapper;
 }
 
-/* draw share canvas (only show eligibility when month meta found true) */
-function drawShareCanvasAll(handle, data){
-  const canvas = $('cardCanvas'); const ctx = canvas.getContext('2d');
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle = '#071025'; ctx.fillRect(0,0,canvas.width,canvas.height);
+function renderResults(data){
+  const container = $('resultArea');
+  container.innerHTML = '';
+  const order = ['24h','7d','month'];
+  for(let i=0;i<order.length;i++){
+    const item = data.results && data.results[order[i]] ? data.results[order[i]] : {};
+    const nextItem = (i<order.length-1) ? (data.results && data.results[order[i+1]] ? data.results[order[i+1]] : {}) : null;
+    container.appendChild( mkCard(order[i], item, nextItem) );
+  }
+  container.classList.remove('hidden');
+}
 
-  const marginX = 56;
-  let y = 60;
+/* =========================
+   SLIM PREMIUM SHARE CARD (canvas)
+   ========================= */
+function drawPremiumCard(handle, data){
+  // canvas is 1200x640 (slim)
+  const canvas = $('shareCanvas'); const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
 
-  // avatar attempt
-  const avatar = _preloaded.avatar;
-  if(avatar){
-    const avSize = 96;
-    const ax = marginX, ay = y - 8;
-    ctx.save(); ctx.beginPath(); ctx.arc(ax+avSize/2, ay+avSize/2, avSize/2, 0, Math.PI*2); ctx.closePath(); ctx.clip();
-    ctx.drawImage(avatar, ax, ay, avSize, avSize); ctx.restore();
+  // background gradient (soft premium)
+  const g = ctx.createLinearGradient(0,0, W, H);
+  g.addColorStop(0, '#071025');
+  g.addColorStop(1, '#041428');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+
+  // soft vignette
+  ctx.fillStyle = 'rgba(0,0,0,0.18)';
+  ctx.beginPath(); ctx.ellipse(W/2, H/2, W*0.55, H*0.55, 0, 0, Math.PI*2); ctx.fill();
+
+  // subtle glass panel for content
+  const pad = 36;
+  const panelW = W - pad*2, panelH = H - pad*2;
+  ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.roundRect = function(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); };
+  ctx.roundRect(pad, pad, panelW, panelH, 18); ctx.fill();
+
+  // left section: avatar + handle + small meta
+  const avatarSize = 128;
+  const avatarX = pad + 28;
+  const avatarY = pad + 26;
+
+  if(IMGS.avatar){
+    // avatar clipped circle
+    ctx.save(); ctx.beginPath(); ctx.arc(avatarX + avatarSize/2, avatarY + avatarSize/2, avatarSize/2, 0, Math.PI*2); ctx.closePath(); ctx.clip();
+    ctx.drawImage(IMGS.avatar, avatarX, avatarY, avatarSize, avatarSize); ctx.restore();
   } else {
-    // fallback to logo tile
-    ctx.fillStyle = '#ffd24b'; ctx.fillRect(marginX, y-8, 96, 96);
-    const lg = _preloaded['zama-logo.png']; if(lg) ctx.drawImage(lg, marginX+8, y, 80, 80);
+    // fallback circle with logo
+    ctx.fillStyle = '#ffd24b'; ctx.beginPath(); ctx.arc(avatarX + avatarSize/2, avatarY + avatarSize/2, avatarSize/2, 0, Math.PI*2); ctx.fill();
+    if(IMGS.logo) ctx.drawImage(IMGS.logo, avatarX+16, avatarY+16, avatarSize-32, avatarSize-32);
   }
 
-  ctx.fillStyle = '#eaf3fb'; ctx.font = '700 36px Inter, Arial';
-  ctx.fillText(handle.startsWith('@')?handle:`@${handle}`, marginX + 120, y + 30);
+  // handle large
+  ctx.fillStyle = '#eaf3fb'; ctx.font = '700 40px Inter, Arial';
+  const handleText = handle.startsWith('@') ? handle : '@' + handle;
+  ctx.fillText(handleText, avatarX + avatarSize + 28, avatarY + 44);
 
-  y += 96;
+  // sub small meta
+  ctx.font = '500 18px Inter, Arial'; ctx.fillStyle = 'rgba(234,243,251,0.8)';
+  ctx.fillText('Zama rank card', avatarX + avatarSize + 28, avatarY + 74);
 
-  const labels = ['24h','7d','month'];
-  const leftX = marginX + 120;
-  const rightX = canvas.width - 120;
-  const barWidth = canvas.width - leftX - 120;
+  // right large rank & mindshare
+  const rightX = W - pad - 260;
+  // rank big
+  const rankVal = (data.results && data.results['month'] && data.results.month.found) ? Number(data.results.month.rank) : '-';
+  ctx.fillStyle = '#ffffff'; ctx.font = '800 80px Inter, Arial'; ctx.textAlign = 'right';
+  ctx.fillText(rankVal, rightX + 220, avatarY + 100);
 
-  for(let i=0;i<labels.length;i++){
-    const key = labels[i];
-    const meta = (data.results && data.results[key]) ? data.results[key] : {};
-    const hasData = !!meta && meta.found === true && Number.isFinite(Number(meta.rank));
-    ctx.fillStyle = '#ffffff'; ctx.font = '700 18px Inter, Arial'; ctx.fillText(key.toUpperCase(), leftX, y);
-    ctx.font = '700 26px Inter, Arial'; ctx.fillText( (hasData ? meta.rank : '-') , rightX, y);
-    ctx.font = '400 15px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
-    ctx.fillText('Mindshare: ' + (hasData && meta.mindshare ? Number(meta.mindshare).toFixed(6) : '-'), leftX, y + 22);
+  // mindshare label & value
+  const msVal = (data.results && data.results['month'] && data.results.month.found) ? Number(data.results.month.mindshare).toFixed(6) : '-';
+  ctx.font = '600 18px Inter, Arial'; ctx.fillStyle = '#9fb0bf'; ctx.textAlign = 'right';
+  ctx.fillText('Mindshare', rightX + 220, avatarY + 150);
+  ctx.font = '800 28px Inter, Arial'; ctx.fillStyle = '#ffd24b'; ctx.fillText(msVal, rightX + 220, avatarY + 186);
 
-    const neighbor = (i < labels.length - 1) ? (data.results[labels[i+1]] || null) : null;
-    const neighborHas = neighbor && neighbor.found === true && Number.isFinite(Number(neighbor.rank));
-    const ch = computeChange(hasData ? meta : {}, neighborHas ? neighbor : {});
-    ctx.fillStyle = ch.dir === 'up' ? '#3ee6a8' : (ch.dir === 'down' ? '#ff7b7b' : '#9fb0bf');
-    ctx.font = '700 16px Inter, Arial';
-    ctx.fillText(hasData && neighborHas ? (ch.dir==='up' ? '▲ ' + ch.pct + '%' : (ch.dir==='down' ? '▼ ' + ch.pct + '%' : '-')) : '-', rightX - 160, y + 22);
+  // small progress bar under handle (overall month progress)
+  const pBarX = avatarX + avatarSize + 28;
+  const pBarY = avatarY + avatarSize - 6;
+  const pBarW = W - pBarX - 40 - 260;
+  // compute progress using month rank
+  const monthMeta = data.results && data.results.month ? data.results.month : null;
+  let prog = 0;
+  if(monthMeta && monthMeta.found && isFinite(Number(monthMeta.rank))){
+    const r = Number(monthMeta.rank);
+    prog = (r<=100) ? Math.round((100-r)/99*100) : Math.round((TOTAL_FETCHED - r) / (TOTAL_FETCHED-100) * 100);
+    prog = Math.max(0, Math.min(100, prog));
+  }
+  ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fillRect(pBarX, pBarY, pBarW, 12);
+  ctx.fillStyle = 'linear-gradient(90deg,#ffd24b,#ff6b6b)';
+  // draw gradient manually
+  const g2 = ctx.createLinearGradient(pBarX,0,pBarX+pBarW,0); g2.addColorStop(0,'#ffd24b'); g2.addColorStop(1,'#ff6b6b');
+  ctx.fillStyle = g2; ctx.fillRect(pBarX, pBarY, Math.max(10, pBarW * prog / 100), 12);
 
-    const prog = hasData ? Math.round(progressToTop100(Number(meta.rank)) * 100) : 0;
-    const barX = leftX; const barY = y + 30;
-    ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fillRect(barX, barY, barWidth, 14);
-    if(hasData) ctx.fillStyle = '#ffd24b', ctx.fillRect(barX, barY, Math.max(8, (barWidth * prog / 100)), 14);
-    y += 82;
+  // eligibility badge (month only)
+  if(monthMeta && monthMeta.found){
+    const r = Number(monthMeta.rank);
+    let badgeText = null;
+    if(r <= SHARE_TOP) badgeText = 'Eligible: OG NFT + Revenue Share';
+    else if(r <= OG_NFT_TOP) badgeText = 'Eligible: OG NFT';
+    if(badgeText){
+      ctx.fillStyle = 'rgba(62,230,168,0.12)'; ctx.roundRect(pBarX, pBarY + 24, 360, 36, 999); ctx.fill();
+      ctx.fillStyle = '#3ee6a8'; ctx.font = '700 18px Inter, Arial'; ctx.textAlign = 'left';
+      ctx.fillText(badgeText, pBarX + 16, pBarY + 48);
+    }
   }
 
-  const monthMeta = (data.results && data.results['month']) ? data.results['month'] : {};
-  const monthHas = monthMeta && monthMeta.found === true && Number.isFinite(Number(monthMeta.rank));
-  const mRank = monthHas ? Number(monthMeta.rank) : null;
-  ctx.font = '700 18px Inter, Arial';
-  ctx.fillStyle = (monthHas && (mRank <= SHARE_TOP || mRank <= OG_NFT_TOP)) ? '#3ee6a8' : '#9fb0bf';
-  let badgeText = 'Not eligible';
-  if(monthHas){
-    if(mRank <= SHARE_TOP) badgeText = 'Eligible: OG NFT + Revenue Share';
-    else if(mRank <= OG_NFT_TOP) badgeText = 'Eligible: OG NFT';
-    else badgeText = 'Not eligible';
-  } else {
-    badgeText = 'No data';
-  }
-  ctx.fillText(badgeText, leftX, y);
+  // smaller footer line
+  ctx.font = '500 14px Inter, Arial'; ctx.fillStyle = '#9fb0bf'; ctx.textAlign='left';
+  ctx.fillText('Powered by madara — zama-rank.vercel.app', pad + 18, H - 28);
 
-  if(monthHas && mRank <= SHARE_TOP){
-    const r = assumedPayoutRange(mRank);
-    ctx.font = '600 20px Inter, Arial'; ctx.fillStyle = '#ffffff';
-    ctx.fillText(`Assumed payout: ${money(r.min)} - ${money(r.max)}`, leftX, y + 36);
-  }
-
-  ctx.font = '500 14px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
-  ctx.fillText('Powered by madara — zama-rank.vercel.app', marginX, canvas.height - 40);
-
+  // return dataURL
   return canvas.toDataURL('image/png');
 }
 
-/* convert dataURL -> File */
-function dataURLtoFile(dataurl, filename){
-  const arr = dataurl.split(','); const mime = arr[0].match(/:(.*?);/)[1]; const bstr = atob(arr[1]); let n=bstr.length; const u8 = new Uint8Array(n);
-  while(n--) u8[n] = bstr.charCodeAt(n);
-  return new File([u8], filename, { type: mime });
+/* share / download logic */
+function downloadDataUrl(dataUrl, filename){
+  const a = document.createElement('a'); a.href = dataUrl; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
 }
-
-/* UI functions */
-function showSkeletons(){ const container = $('resultArea'); container.innerHTML=''; for(let i=0;i<3;i++){ const s=document.createElement('div'); s.className='card'; s.innerHTML='<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>'; container.appendChild(s);} }
-
-async function performSearch(){
-  const raw = ($('username').value||'').trim(); if(!raw){ $('username').focus(); return; }
-  const handle = raw.replace(/^@/,'');
-  showSkeletons();
-  await preloadAvatarForHandle(handle);
+async function shareDataUrl(dataUrl, filename, shareText){
   try{
-    const r = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
-    if(!r.ok) throw new Error('Network ' + r.status);
-    const data = await r.json();
-    const container = $('resultArea'); container.innerHTML='';
-    const order = ['24h','7d','month'];
-    for(let i=0;i<order.length;i++){
-      const key = order[i]; const neighbor = (i<order.length-1) ? (data.results[order[i+1]] || null) : null;
-      container.appendChild( mkCard(key, data.results[key], neighbor) );
+    const byteString = atob(dataUrl.split(',')[1]);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for(let i=0;i<byteString.length;i++) ia[i] = byteString.charCodeAt(i);
+    const blob = new Blob([ab], {type:'image/png'});
+    const file = new File([blob], filename, {type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], text: shareText});
+      return true;
+    } else {
+      downloadDataUrl(dataUrl, filename);
+      window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}`, '_blank');
+      return false;
     }
-    window._lastSearchData = { handle, data };
   }catch(err){
-    $('resultArea').innerHTML = `<div class="card"><h3>Error</h3><div style="color:var(--muted);margin-top:6px">${err.message}</div></div>`;
+    alert('Share failed: ' + (err.message || err));
+    return false;
   }
 }
 
-/* SHARE handler that keeps action inside user gesture (uses canvas.toBlob callback) */
-$('shareCardBtn').addEventListener('click', (evt) => {
+/* =========================
+   UI interactions
+   ========================= */
+let lastSearchData = null;
+preload();
+
+async function doSearch(){
   const raw = ($('username').value || '').trim();
-  if (!raw) { alert('Search a handle first'); return; }
-  const handle = raw.replace(/^@/, '');
+  if(!raw){ $('username').focus(); return; }
+  const handle = raw.replace(/^@/,'');
+  // load avatar
+  await loadAvatar(handle);
+  // show loader while fetching
+  $('resultArea').classList.remove('hidden');
+  $('resultArea').innerHTML = '<div class="card"><h3>Loading…</h3><div style="color:var(--muted);margin-top:8px">Fetching leaderboards</div></div>';
 
-  if (!window._lastSearchData || window._lastSearchData.handle !== handle) {
-    alert('Please run Search first, then tap Share Card (this ensures fast native share).');
-    return;
+  try{
+    const res = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
+    if(!res.ok) throw new Error('Network ' + res.status);
+    const data = await res.json();
+    lastSearchData = { handle, data };
+    renderResults(data);
+  }catch(err){
+    $('resultArea').innerHTML = `<div class="card"><h3>Error</h3><div style="color:var(--muted);margin-top:8px">${err.message}</div></div>`;
+    lastSearchData = null;
   }
+}
 
-  const data = window._lastSearchData.data;
-
-  try {
-    drawShareCanvasAll(handle, data);
-    const canvas = $('cardCanvas');
-
-    canvas.toBlob(async (blob) => {
-      if (!blob) { alert('Failed to prepare share image'); return; }
-      const file = new File([blob], `${handle}-zama-rank.png`, { type: blob.type || 'image/png' });
-      try {
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            text: `${handle} — Zama Rank (30d): ${data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`
-          });
-          return;
-        }
-
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = `${handle}-zama-rank.png`; document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(()=>URL.revokeObjectURL(url),2000);
-        const text = `${handle} — Zama Rank (30d): ${data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`;
-        window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
-
-      } catch (err) {
-        if (err && (err.name === 'AbortError' || (err.message && (err.message.toLowerCase().includes('cancel') || err.message.toLowerCase().includes('user'))))) {
-          return;
-        }
-        alert('Share failed: ' + (err && err.message ? err.message : err));
-      }
-    }, 'image/png');
-
-  } catch (err) {
-    alert('Share failed: ' + (err && err.message ? err.message : err));
-  }
+$('searchBtn').addEventListener('click', doSearch);
+$('username').addEventListener('keydown', (e)=>{ if(e.key==='Enter') doSearch(); });
+$('clearBtn').addEventListener('click', ()=>{
+  $('username').value = ''; $('resultArea').classList.add('hidden'); lastSearchData = null;
 });
 
-document.getElementById('searchBtn').addEventListener('click', performSearch);
-document.getElementById('username').addEventListener('keydown', (e)=>{ if(e.key==='Enter') performSearch(); });
-document.getElementById('clearBtn').addEventListener('click', ()=>{ document.getElementById('username').value=''; showPlaceholders(); });
+$('shareBtn').addEventListener('click', async ()=>{
+  if(!lastSearchData){ alert('Run Search first; Share Card works after search.'); return; }
+  const handle = lastSearchData.handle;
+  const data = lastSearchData.data;
+  const dataUrl = drawPremiumCard(handle, data);
+  const filename = `${handle}-zama-rank.png`;
+  const tweetText = `${handle} — Zama Rank (month): ${data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-'}\nCheck: https://zama-rank.vercel.app`;
+  await shareDataUrl(dataUrl, filename, tweetText);
+});
 
-/* small fallback: ensure placeholders on load */
-function showPlaceholders(){ showPlaceholdersInner(); }
-function showPlaceholdersInner(){
-  const container = $('resultArea'); container.innerHTML='';
-  ['24h','7d','month'].forEach(t => {
-    const el = document.createElement('div'); el.className='card';
-    el.innerHTML = `<h3>${t}</h3><div style="color:var(--muted);margin-top:8px">Search to show data</div>`;
-    container.appendChild(el);
-  });
-}
-showPlaceholdersInner();
-
+/* small fallback: hide results on load */
+$('resultArea').classList.add('hidden');
 </script>
 </body>
 </html>
