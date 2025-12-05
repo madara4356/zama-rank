@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>ZAMA RANK — Premium</title>
+<title>ZAMA RANK — Accessible + Debounced</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -20,45 +20,34 @@
     --footer-h: 72px;
     --footer-transition: 220ms;
 
-    /* premium background tweak */
     --vignette-alpha: 0.45;
     --noise-opacity: 0.04;
   }
 
+  /* basic reset */
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;padding:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;}
 
-/* ===== PREMIUM BACKGROUND =====
-   layering:
-   1) flat dark base
-   2) linear gradient (vertical)
-   3) radial glows for depth
-   4) subtle vignette at bottom
-   5) SVG noise overlay (very low opacity)
-*/
+/* ===== PREMIUM BACKGROUND ===== */
   body {
     background-color: #050814; /* stable dark base to avoid banding */
     min-height:100vh;
   }
 
-  /* main app gradient + depth */
   #app {
     min-height:100dvh;
     display:flex;
     flex-direction:column;
-    /* composite gradient: vertical + radial glows */
     background-image:
       radial-gradient(800px 420px at 10% 15%, rgba(6,18,36,0.14), rgba(6,18,36,0) 22%),
       radial-gradient(600px 360px at 85% 28%, rgba(12,26,44,0.12), rgba(12,26,44,0) 30%),
       linear-gradient(180deg, rgba(3,8,18,0.85) 0%, rgba(4,10,20,0.95) 55%, rgba(6,12,24,1) 100%);
-    /* subtle shift to make lower area slightly richer without a hard band */
     background-repeat:no-repeat;
     background-attachment: fixed;
     position:relative;
     overflow-x:hidden;
   }
 
-  /* film grain / noise using inline SVG - very low opacity for subtle texture */
   #app::after{
     content: "";
     position: fixed;
@@ -70,7 +59,6 @@
     z-index: 0;
   }
 
-  /* subtle bottom vignette to focus content */
   #app::before{
     content: "";
     position: fixed;
@@ -81,12 +69,11 @@
     z-index: 0;
   }
 
-  /* page content sits above bg layers */
+  /* content */
   .wrap{ position:relative; z-index: 2; max-width:940px; margin:18px auto; padding:18px 18px 18px;
     padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom, 0px) + 12px);
     flex:1; display:flex; flex-direction:column; transition:padding-bottom .12s ease; }
 
-  /* UI styles */
   .topbar{display:flex;align-items:center;justify-content:flex-start;gap:12px; z-index:2}
   .brand{display:flex;gap:12px;align-items:center}
   .logo{width:48px;height:48px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(0,0,0,0.45)}
@@ -94,13 +81,29 @@
   h1{margin:0;font-size:20px}
   .subtitle{color:var(--muted);font-size:13px;margin-top:2px}
 
+  /* skip link */
+  .skip-link{
+    position:absolute;
+    left:-9999px;
+    top:auto;
+    background:#061020;
+    color:white;
+    padding:8px 12px;
+    border-radius:8px;
+    z-index:9999;
+  }
+  .skip-link:focus{ left:12px; top:12px; outline:3px solid rgba(255,215,75,0.18); }
+
   .search-shell{margin-top:14px;background: rgba(255,255,255,0.02); padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,0.03); box-shadow: 0 10px 36px rgba(2,6,12,0.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
   .search-row{display:flex;gap:12px;align-items:center}
   .search-inner{flex:1;min-width:0}
-  input[type="text"]{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px; height:56px; outline:none}
+  input[type="text"]{
+    width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px; height:56px; outline:none;
+  }
 
   .actions{display:flex;gap:12px;align-items:center;flex:0 0 auto}
   .btn{padding:12px 18px;border-radius:12px;border:0;cursor:pointer;font-weight:800;display:inline-flex;align-items:center;justify-content:center;min-height:48px}
+  .btn:focus{ outline: 3px solid rgba(255,215,75,0.14); outline-offset:2px; }
   .btn-search{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020;box-shadow:0 10px 30px rgba(0,0,0,0.5);min-width:120px}
   .btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);min-width:88px}
   .btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#061020; min-width:132px;}
@@ -166,7 +169,29 @@
   a.powered{ text-decoration:none;color:inherit;display:flex;gap:12px;align-items:center;flex:0 0 auto}
   a.powered img{ width:56px; height:56px; border-radius:8px; object-fit:cover; box-shadow:0 8px 22px rgba(0,0,0,0.45) }
 
-  /* responsive tweaks */
+  /* toast */
+  .toast{
+    position:fixed;
+    left:50%;
+    transform:translateX(-50%);
+    bottom: calc(var(--footer-h) + 16px);
+    background: #061020;
+    color: #fff;
+    padding:8px 12px;
+    border-radius:10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    z-index:12000;
+    font-weight:600;
+    opacity:0;
+    transition:opacity 180ms ease, transform 180ms ease;
+    will-change:opacity, transform;
+  }
+  .toast.show{ opacity: 1; transform: translateX(-50%) translateY(-6px); }
+
+  /* focus-visible polyfill style */
+  :focus:not(:focus-visible) { outline: none; }
+
+  /* responsive & reduced motion */
   @media (max-width:760px){ h1{font-size:18px} }
   @media (max-width:560px){
     .search-row{flex-direction:column;align-items:stretch}
@@ -181,14 +206,22 @@
   @media (max-height:520px){
     .wrap{ padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom,0px) + 6px); }
   }
+
+  @media (prefers-reduced-motion: reduce){
+    * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+    .toast{ transition:none; }
+  }
+
 </style>
 </head>
 <body>
-  <div id="app">
+  <a href="#username" class="skip-link">Skip to search</a>
+
+  <div id="app" role="application" aria-label="Zama Rank app">
     <div class="wrap" id="wrap">
-      <div class="topbar">
-        <div class="brand">
-          <div class="logo"><img id="logoImg" src="zama-logo.png" alt="Zama"></div>
+      <div class="topbar" role="banner">
+        <div class="brand" aria-hidden="false">
+          <div class="logo" aria-hidden="true"><img id="logoImg" src="zama-logo.png" alt=""></div>
           <div>
             <h1>ZAMA SZN 5 RANK</h1>
             <div class="subtitle">Search X handle (e.g. @0x_madara_)</div>
@@ -196,34 +229,38 @@
         </div>
       </div>
 
-      <div class="search-shell" role="search" aria-label="Search X handle">
+      <form class="search-shell" role="search" aria-label="Search X handle" onsubmit="return false;">
         <div class="search-row">
           <div class="search-inner">
-            <input id="username" type="text" placeholder="@your_handle" aria-label="Search handle" />
+            <label for="username" class="sr-only" style="position:absolute;left:-9999px">Search handle</label>
+            <input id="username" type="text" placeholder="@your_handle" aria-label="Search handle" autocomplete="off" />
           </div>
-          <div class="actions">
-            <button id="searchBtn" class="btn btn-search">🔎 Search</button>
-            <button id="clearBtn" class="btn btn-clear">Clear</button>
-            <button id="shareCardBtn" class="btn btn-share">Share Card</button>
+          <div class="actions" role="group" aria-label="Search actions">
+            <button id="searchBtn" class="btn btn-search" aria-label="Search">🔎 Search</button>
+            <button id="clearBtn" class="btn btn-clear" aria-label="Clear search">Clear</button>
+            <button id="shareCardBtn" class="btn btn-share" aria-label="Share card">Share Card</button>
           </div>
         </div>
-      </div>
+      </form>
 
-      <div id="resultArea" class="results" aria-live="polite" style="display:none"></div>
-      <div id="emptyHint" class="results-empty">Search to show data</div>
+      <!-- aria-live region for results; polite so screen readers announce changes -->
+      <div id="resultStatus" aria-live="polite" aria-atomic="true" style="position:absolute;left:-9999px;top:auto;"></div>
+
+      <div id="resultArea" class="results" role="region" aria-live="polite" aria-label="Search results" style="display:none"></div>
+      <div id="emptyHint" class="results-empty" role="status">Search to show data</div>
     </div>
 
-    <footer class="site-footer" id="siteFooter" aria-hidden="false">
+    <footer class="site-footer" id="siteFooter" aria-hidden="false" role="contentinfo">
       <div class="footer-inner">
         <div class="footer-text" id="footerText">Made with ❤️ for Zama by Madara </div>
-        <a class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer" id="poweredLink">
+        <a class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer" id="poweredLink" aria-label="Madara on X">
           <img id="poweredAvatar" src="madara.png" alt="madara">
         </a>
       </div>
     </footer>
   </div>
 
-  <canvas id="cardCanvas" width="1200" height="720" style="display:none"></canvas>
+  <canvas id="cardCanvas" width="1200" height="720" style="display:none" aria-hidden="true"></canvas>
 
 <script>
 /* -------- CONFIG -------- */
@@ -231,6 +268,9 @@ const API_BASE = '/api/check';
 const TOTAL_FETCHED = 1500;
 const OG_NFT_TOP = 1006;
 const SHARE_TOP = 100;
+
+/* Small in-memory cache for results */
+const resultsCache = new Map();
 
 /* helpers */
 const $ = id => document.getElementById(id);
@@ -274,8 +314,26 @@ async function loadAvatar(handle){
   });
 }
 
+/* accessible toasts */
+function showToast(msg, ms=2200){
+  const existing = document.querySelector('.toast');
+  if(existing) existing.remove();
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.setAttribute('role','status');
+  t.setAttribute('aria-live','polite');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  // small delay to trigger CSS transition
+  requestAnimationFrame(()=> t.classList.add('show'));
+  setTimeout(()=> {
+    t.classList.remove('show');
+    setTimeout(()=> t.remove(), 200);
+  }, ms);
+}
+
 /* UI show/hide */
-function hideResults(){ $('resultArea').style.display = 'none'; $('emptyHint').style.display='block'; }
+function hideResults(){ $('resultArea').style.display = 'none'; $('emptyHint').style.display='block'; $('resultStatus').textContent = 'No results displayed'; }
 function showResults(){ $('resultArea').style.display = 'grid'; $('emptyHint').style.display='none'; }
 
 /* build a single card */
@@ -326,7 +384,7 @@ function mkCard(title, meta, neighbor){
   return el;
 }
 
-/* share canvas layout */
+/* share canvas layout (same as before) */
 function drawCanvasLayout(handle, data){
   const canvas = $('cardCanvas'); const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
@@ -420,10 +478,15 @@ function shareImageFromDataURL(dataUrl, handle, data){
       navigator.share({
         files: [file],
         text: `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`
-      }).catch(()=>{});
+      }).then(()=> {
+        showToast('Shared successfully');
+      }).catch((e)=> {
+        showToast('Share cancelled or failed');
+      });
       return;
     }
 
+    // Fallback: download + open tweet intent
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -433,70 +496,130 @@ function shareImageFromDataURL(dataUrl, handle, data){
     a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),2000);
 
+    showToast('Image downloaded');
+
     const text = `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`;
     window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
   }catch(err){
+    showToast('Share failed');
     alert('Share failed: '+(err.message||err));
   }
 }
 
+/* Debounce helper */
+function debounce(fn, wait){
+  let t = null;
+  return function(...args){
+    clearTimeout(t);
+    t = setTimeout(()=> fn.apply(this, args), wait);
+  };
+}
+
 /* UI flow */
 let lastSearch = null;
-async function performSearch(){
+
+/* performSearch with cache + accessibility announcements */
+async function performSearchImmediate(){
   const raw = ($('username').value||'').trim();
   if(!raw){ $('username').focus(); return; }
-  const handle = raw.replace(/^@/,'');
+  const handle = raw.replace(/^@/,'').toLowerCase();
   showResults();
-  const container = $('resultArea'); container.innerHTML = '';
+  const status = $('resultStatus');
+  status.textContent = 'Fetching data…';
+  $('resultArea').innerHTML = '';
+
+  // placeholder loading cards
   for(let i=0;i<3;i++){
     const s=document.createElement('div'); s.className='card';
     s.innerHTML = `<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`;
-    container.appendChild(s);
+    $('resultArea').appendChild(s);
   }
+
   await loadAvatar(handle);
+
+  // check cache
+  if(resultsCache.has(handle)){
+    const data = resultsCache.get(handle);
+    renderResults(handle, data);
+    status.textContent = `Showing cached results for ${handle}`;
+    return;
+  }
+
   try{
     const res = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
     if(!res.ok) throw new Error('Network ' + res.status);
     const data = await res.json();
+    // normalise keys
     const results = data.results || {};
     if(!results['30d'] && results['month']) results['30d'] = results['month'];
     if(!results['month'] && results['30d']) results['month'] = results['30d'];
-    container.innerHTML = '';
-    const order = ['24h','7d','30d'];
-    for(let i=0;i<order.length;i++){
-      const k = order[i];
-      const neighbor = (i<order.length-1) ? (results[order[i+1]] || null) : null;
-      container.appendChild( mkCard(k, results[k]||{}, neighbor) );
-    }
+
+    // store in cache
+    resultsCache.set(handle, data);
+
+    renderResults(handle, data);
+    status.textContent = `Results loaded for ${handle}`;
     lastSearch = { handle, data };
   }catch(err){
     const el = document.createElement('div'); el.className='card';
     el.innerHTML = `<h3>Error</h3><div style="color:var(--muted);margin-top:6px">${err.message}</div>`;
     $('resultArea').innerHTML = ''; $('resultArea').appendChild(el);
+    status.textContent = `Error fetching results`;
     lastSearch = null;
+    showToast('Error fetching data');
   }
+}
+
+/* debounced search (300ms) */
+const performSearch = debounce(performSearchImmediate, 300);
+
+/* render helper with dedupe and stable order */
+function renderResults(handle, data){
+  const container = $('resultArea');
+  container.innerHTML = '';
+  const results = data.results || {};
+  // ensure 24h,7d,30d (month)
+  if(!results['30d'] && results['month']) results['30d'] = results['month'];
+  if(!results['month'] && results['30d']) results['month'] = results['30d'];
+
+  // stable order and dedupe keys
+  const order = ['24h','7d','30d'];
+  const seen = new Set();
+  for(let k of order){
+    if(seen.has(k)) continue;
+    seen.add(k);
+    const neighbor = (k !== '30d') ? (results[ order[ order.indexOf(k)+1 ] ] || null) : null;
+    container.appendChild( mkCard(k, results[k]||{}, neighbor) );
+  }
+
+  showResults();
 }
 
 /* Share button (needs prior search) */
 $('shareCardBtn').addEventListener('click', async (e) => {
-  if(!lastSearch){ alert('Run Search first, then press Share Card.'); return; }
+  if(!lastSearch){ showToast('Run a search first'); $('username').focus(); return; }
   const { handle, data } = lastSearch;
   const dataUrl = drawCanvasLayout(handle, data);
   shareImageFromDataURL(dataUrl, handle, data);
 });
 
-/* Search + Enter key */
-$('searchBtn').addEventListener('click', performSearch);
-$('username').addEventListener('keydown', (e)=>{ if(e.key==='Enter') performSearch(); });
+/* Search button and Enter key (immediate) */
+$('searchBtn').addEventListener('click', (e)=> { e.preventDefault(); performSearchImmediate(); });
+$('username').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); performSearchImmediate(); } });
+
+/* Debounced input listener (300ms) */
+$('username').addEventListener('input', (e)=> { performSearch(); });
 
 /* Clear */
-$('clearBtn').addEventListener('click', ()=>{
+$('clearBtn').addEventListener('click', (e)=>{
+  e.preventDefault();
   $('username').value = '';
   lastSearch = null;
   hideResults();
+  showToast('Cleared');
 });
 
-/* ---------- footer hide/show on scroll (tiny JS, no measurements) ---------- */
+/* ---------- footer hide/show on scroll (tiny JS) ---------- */
 (function setupFooterVisibility(){
   const footer = $('siteFooter');
   if(!footer) return;
