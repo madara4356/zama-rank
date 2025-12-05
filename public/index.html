@@ -12,9 +12,14 @@
     --muted:#9fb0bf;
     --accent1:#ffd24b; --accent2:#ff6b6b;
     --text:#eaf3fb; --ok:#3ee6a8; --bad:#ff7b7b;
-    /* footer height that we reserve in CSS */
-    --footer-h:72px;
-    --footer-transition: 220ms cubic-bezier(.22,.9,.28,1);
+    /* footer sizing + tuneables */
+    --footer-h:72px;                   /* logical footer height to reserve in the page flow */
+    --footer-transition: 220ms;        /* animation timing */
+    /* footer visuals to tweak */
+    --footer-bg-top: rgba(8,10,12,0.06);
+    --footer-bg-bottom: rgba(8,10,12,0.18);
+    --footer-shadow: rgba(0,0,0,0.18);
+    --footer-fade: rgba(8,10,12,0.12);
   }
 
   *{box-sizing:border-box}
@@ -27,8 +32,8 @@
     max-width:940px;
     margin:18px auto;
     padding:18px 18px 18px;
-    /* Reserve footer space so it never visually overlaps content.
-       Add safe-area inset (for iPhone gesture bar) so content isn't hidden. */
+    /* Reserve footer space in CSS so footer cannot overlap content.
+       Includes safe-area inset for iOS gesture bar. No JS required. */
     padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom, 0px) + 12px);
     flex:1;display:flex;flex-direction:column;transition:padding-bottom .12s ease;
   }
@@ -75,7 +80,7 @@
   .results-empty{color:var(--muted);margin-top:16px}
 
   /* ------------------------
-     Bottom app-style footer
+     Bottom app-style footer (soft visuals)
      ------------------------ */
   footer.site-footer{
     position:fixed;
@@ -83,14 +88,28 @@
     height: var(--footer-h);
     display:flex; align-items:center; justify-content:center;
     padding:12px 18px;
-    background:linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.6));
-    border-top:1px solid rgba(255,255,255,0.02);
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.35);
+    background: linear-gradient(180deg, var(--footer-bg-top), var(--footer-bg-bottom));
+    border-top: 1px solid rgba(255,255,255,0.02);
+    box-shadow: 0 -6px 18px var(--footer-shadow);
     z-index:40;
     transform: translateY(0);
-    transition: transform var(--footer-transition);
+    transition: transform var(--footer-transition) cubic-bezier(.22,.9,.28,1);
     will-change: transform;
-    backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px) saturate(120%);
+    -webkit-backdrop-filter: blur(6px) saturate(120%);
+    overflow: visible;
+  }
+
+  /* soft top fade so the footer blends into content */
+  footer.site-footer::before{
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    top: -48px;
+    height: 48px;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(0,0,0,0), var(--footer-fade));
+    z-index: 39;
   }
 
   /* hidden state (slides out of view) */
@@ -103,7 +122,7 @@
   a.powered{ text-decoration:none;color:inherit;display:flex;gap:12px;align-items:center;flex:0 0 auto}
   a.powered img{ width:56px; height:56px; border-radius:8px; object-fit:cover; box-shadow:0 8px 22px rgba(0,0,0,0.45) }
 
-  /* smaller screens */
+  /* smaller screens tweaks */
   @media (max-width:760px){
     h1{font-size:18px}
   }
@@ -116,13 +135,14 @@
     .btn + .btn{margin-left:8px}
     .footer-inner{padding:0 6px; font-size:13px}
     a.powered img{width:48px;height:48px}
-    /* On mobile we slightly reduce footer height to maximize reading space */
+    /* slightly reduce footer height on mobile for reading space */
     :root{ --footer-h:64px; }
   }
 
   @media (max-height:520px){
     .wrap{ padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom,0px) + 6px); }
   }
+
 </style>
 </head>
 <body>
@@ -467,7 +487,9 @@ $('clearBtn').addEventListener('click', ()=>{
     requestAnimationFrame(onScroll);
   }, { passive: true });
 
+  // show when touching (helps UX)
   window.addEventListener('touchstart', ()=> footer.classList.remove('hidden'), {passive:true});
+  // ensure visible on load
   window.addEventListener('load', ()=> footer.classList.remove('hidden'));
 })();
 
