@@ -20,7 +20,7 @@
 
   /* page layout */
   #app{min-height:100vh;display:flex;flex-direction:column;}
-  .wrap{max-width:940px;margin:18px auto;padding:18px 18px 8px;flex:1;display:flex;flex-direction:column;padding-bottom: calc(var(--footer-h) + 18px);}
+  .wrap{max-width:940px;margin:18px auto;padding:18px 18px 18px;flex:1;display:flex;flex-direction:column;transition:padding-bottom .12s ease;}
 
   .topbar{display:flex;align-items:center;justify-content:flex-start;gap:12px}
   .brand{display:flex;gap:12px;align-items:center}
@@ -74,13 +74,15 @@
   footer.site-footer{
     position:fixed;
     left:0;right:0;bottom:0;
-    height:var(--footer-h);
+    height:auto; /* allow content to set height; we will measure it in JS */
     background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.6));
     border-top:1px solid rgba(255,255,255,0.02);
     display:flex;align-items:center;justify-content:center;padding:12px 18px;z-index:20;
+    box-shadow: 0 -6px 30px rgba(0,0,0,0.35);
   }
   .footer-inner{max-width:940px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:14px}
-  a.powered{ text-decoration:none;color:inherit;display:flex;gap:12px;align-items:center}
+  .footer-text{flex:1; min-width:0}
+  a.powered{ text-decoration:none;color:inherit;display:flex;gap:12px;align-items:center;flex:0 0 auto}
   a.powered img{ width:56px; height:56px; border-radius:8px; object-fit:cover; box-shadow:0 8px 22px rgba(0,0,0,0.45) }
 
   /* smaller screens */
@@ -99,13 +101,12 @@
     a.powered img{width:48px;height:48px}
   }
 
-  /* small visual helper when results hidden */
   .results-empty{color:var(--muted);margin-top:16px}
 </style>
 </head>
 <body>
   <div id="app">
-    <div class="wrap">
+    <div class="wrap" id="wrap">
       <div class="topbar">
         <div class="brand">
           <div class="logo"><img id="logoImg" src="zama-logo.png" alt="Zama"></div>
@@ -134,12 +135,12 @@
       <div id="emptyHint" class="results-empty">Search to show data</div>
     </div>
 
-    <footer class="site-footer" aria-hidden="false">
+    <footer class="site-footer" id="siteFooter" aria-hidden="false">
       <div class="footer-inner">
-        <div>Made with ❤️ for Zama — Powered by madara</div>
+        <div class="footer-text" id="footerText">Made with ❤️ for Zama by Madara </div>
         <a class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer" id="poweredLink">
           <img id="poweredAvatar" src="madara.png" alt="madara">
-          <div style="font-size:13px; color:var(--muted)"><div style="font-weight:700;color:var(--text)">madara</div></div>
+          <div style="font-size:13px; color:var(--muted)"><div style="font-weight:700;color:var(--text)"></div></div>
         </a>
       </div>
     </footer>
@@ -150,7 +151,7 @@
 
 <script>
 /* -------- CONFIG -------- */
-const API_BASE = '/api/check';           // server endpoint (unchanged)
+const API_BASE = '/api/check';
 const TOTAL_FETCHED = 1500;
 const OG_NFT_TOP = 1006;
 const SHARE_TOP = 100;
@@ -165,13 +166,10 @@ function progressToTop100(rank){
   if(rank <= 100) return Math.max(0, Math.min(1, (100-rank)/99));
   return Math.max(0, Math.min(1, (1500-rank)/(1500-100)));
 }
-
-/* compute change between current and neighbor for display */
 function computeChange(curr, next) {
   const a = Number(curr?.mindshare);
   const b = Number(next?.mindshare);
   if (!isFinite(a) || !isFinite(b)) return { dir: 'same', pctText: '-', absText: '', pct: 0, abs: 0 };
-
   const diff = a - b;
   const pct = (b === 0) ? ((a === 0) ? 0 : 100) : (diff / Math.abs(b) * 100);
   const pctRounded = Math.round(pct * 10) / 10;
@@ -204,16 +202,14 @@ async function loadAvatar(handle){
 function hideResults(){ $('resultArea').style.display = 'none'; $('emptyHint').style.display='block'; }
 function showResults(){ $('resultArea').style.display = 'grid'; $('emptyHint').style.display='none'; }
 
-/* build a single card (title: '24h'|'7d'|'30d') */
+/* build a single card */
 function mkCard(title, meta, neighbor){
   const el = document.createElement('div'); el.className='card';
-
   const found = !!meta && meta.found === true && Number.isFinite(Number(meta.rank));
   const rank = found ? Number(meta.rank) : null;
   const ms = found ? meta.mindshare : null;
   const prog = found ? Math.round(progressToTop100(rank)*100) : 0;
   const ch = computeChange(found ? meta : {}, (neighbor && neighbor.found===true)?neighbor:{});
-
   let changeHtml = '-';
   if(found){
     if(ch.dir === 'same') changeHtml = `<span class="ms-change">${ch.pctText}</span>`;
@@ -222,15 +218,12 @@ function mkCard(title, meta, neighbor){
       changeHtml = `<span class="ms-change ${ch.dir}">${arrow} ${ch.pctText}<span class="abs">${ch.absText}</span></span>`;
     }
   }
-
   const mindshareHtml = found ? `<div class="value mindshare">${fmtNum(ms,6)}</div>` : `<div class="value mindshare">-</div>`;
-
   let badgeHtml = '';
   if((title==='30d' || title==='month') && found){
     if(rank <= SHARE_TOP) badgeHtml = `<div style="margin-top:8px"><span class="badge ok">Eligible for OG NFT + Revenue Share</span></div>`;
     else if(rank <= OG_NFT_TOP) badgeHtml = `<div style="margin-top:8px"><span class="badge ok">Eligible for OG NFT</span></div>`;
   }
-
   let payoutHtml = '-';
   if((title==='30d' || title==='month') && found && rank <= SHARE_TOP){
     const topMin = 1500, topMax=2000, min100=150, max100=260;
@@ -239,7 +232,6 @@ function mkCard(title, meta, neighbor){
     const max = Math.round(topMax + (max100 - topMax)*t);
     payoutHtml = `${money(min)} - ${money(max)}`;
   }
-
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center">
       <h3>${title}</h3>
@@ -258,20 +250,13 @@ function mkCard(title, meta, neighbor){
   return el;
 }
 
-/* draw share canvas in the layout requested:
-   two small boxes (24h, 7d) on top, a middle-wide 'month/30d' box below, avatar and username on left and large rank on right.
-*/
+/* share canvas layout (same as provided earlier) */
 function drawCanvasLayout(handle, data){
   const canvas = $('cardCanvas'); const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0,0,W,H);
-
-  // background: dark green teal with subtle rounded overlay
   ctx.fillStyle = '#0f3b39'; ctx.fillRect(0,0,W,H);
-  // rounded card area
   ctx.fillStyle = 'rgba(0,0,0,0.06)'; roundRect(ctx, 20, 20, W-40, H-40, 20, true, false);
-
-  // draw avatar circle left
   const avatar = _pre.avatar;
   const aSize = 120, margin = 48;
   if(avatar){
@@ -280,60 +265,29 @@ function drawCanvasLayout(handle, data){
   } else {
     ctx.fillStyle = '#ffd24b'; ctx.fillRect(margin, margin, aSize, aSize);
   }
-
-  // handle text
   ctx.fillStyle = '#ffffff'; ctx.font = '700 36px Inter, Arial';
   const handleText = handle.startsWith('@') ? handle : '@' + handle;
   ctx.fillText(handleText, margin + aSize + 28, margin + 42);
-
-  // subtitle
   ctx.fillStyle = '#9fb0bf'; ctx.font = '400 16px Inter, Arial';
   ctx.fillText('Zama rank card', margin + aSize + 28, margin + 70);
 
-  // fetch timeframe data (allow keys both '24h','7d','30d' or 'month')
-  const r24 = data.results?.['24h'] || data.results?.['24'] || {};
-  const r7 = data.results?.['7d'] || data.results?.['7'] || {};
-  const r30 = data.results?.['30d'] || data.results?.['month'] || data.results?.['30'] || {};
-  const found24 = r24 && r24.found===true;
-  const found7 = r7 && r7.found===true;
-  const found30 = r30 && r30.found===true;
-
-  // small box sizes
-  const boxW = Math.floor((W - margin*3 - 400) / 2); // two small boxes width (leave space for big rank to the right)
-  const boxH = 96;
-  // positions
-  const topY = margin + aSize + 32;
-  const leftX = margin + 10;
-  const midX = leftX + boxW + 16;
-  const rightBoxX = W - margin - 320; // area reserved for large rank
-
-  // draw first two small boxes
-  drawSmallBox(ctx, leftX, topY, boxW, boxH, '24H', r24);
-  drawSmallBox(ctx, midX, topY, boxW, boxH, '7D', r7);
-
-  // draw middle big box below them (centered between them)
-  const bigW = (midX + boxW/2) - leftX + 8; // span width of first two boxes
-  const bigX = leftX;
-  const bigY = topY + boxH + 18;
-  drawBigBox(ctx, rightBoxX, topY, 300, 300, 'MONTH', r30); // draw big box on right top for month
-  // also a central medium month box under the small ones (optional) - we'll draw a center small one below
-  // draw central medium box under small boxes
-  drawMediumBox(ctx, bigX + Math.max(0,(bigW/2 - 160)), bigY, Math.min(520, bigW), 110, '30D', r30);
-
-  // draw big rank (large number) at top-right
+  const r24 = data.results?.['24h'] || {};
+  const r7 = data.results?.['7d'] || {};
+  const r30 = data.results?.['30d'] || data.results?.month || {};
+  // box positions & drawing helpers (kept simple)
+  drawSmallBox(ctx, margin + 8, margin + aSize + 32, 300, 96, '24H', r24);
+  drawSmallBox(ctx, margin + 8 + 300 + 16, margin + aSize + 32, 300, 96, '7D', r7);
+  drawMediumBox(ctx, margin + 8, margin + aSize + 32 + 96 + 16, Math.min(W - margin*3 - 300, 640), 120, '30D', r30);
   ctx.fillStyle = '#ffffff'; ctx.font = '900 110px Inter, Arial';
-  const rankText = (found30 && Number.isFinite(Number(r30.rank))) ? String(r30.rank) : '-';
+  const rankText = (r30 && r30.found && isFinite(Number(r30.rank))) ? String(r30.rank) : '-';
   ctx.textAlign = 'right';
   ctx.fillText(rankText, W - margin - 20, margin + 100);
   ctx.textAlign = 'left';
-
-  // footer credit
   ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = '500 14px Inter, Arial';
   ctx.fillText('Powered by madara — zama-rank.vercel.app', 36, H - 36);
 
   return canvas.toDataURL('image/png');
 
-  /* helpers used above */
   function roundRect(ctx, x, y, w, h, r, fill, stroke) {
     if (typeof r === 'undefined') r = 5;
     ctx.beginPath();
@@ -350,15 +304,12 @@ function drawCanvasLayout(handle, data){
     ctx.fillStyle = 'rgba(255,255,255,0.02)'; roundRect(ctx, x, y, w, h, 12, true, false);
     ctx.fillStyle = '#9fb0bf'; ctx.font = '700 14px Inter, Arial';
     ctx.fillText(title, x + 14, y + 24);
-    // rank top-right
     const rank = (meta && meta.found && isFinite(Number(meta.rank))) ? String(meta.rank) : '-';
     ctx.font = '800 22px Inter, Arial'; ctx.fillStyle = '#ffffff';
     ctx.fillText(rank, x + w - 18 - ctx.measureText(rank).width, y + 26);
-    // mindshare
     ctx.font = '400 13px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
     const msText = (meta && meta.found) ? Number(meta.mindshare).toFixed(6) : '-';
     ctx.fillText('Mindshare: ' + msText, x + 14, y + 52);
-    // progress bar
     const prog = (meta && meta.found && Number.isFinite(Number(meta.rank))) ? Math.round(progressToTop100(Number(meta.rank))*100) : 0;
     const barX = x + 14, barY = y + 62, barW = w - 28, barH = 12;
     ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fillRect(barX, barY, barW, barH);
@@ -378,37 +329,9 @@ function drawCanvasLayout(handle, data){
     ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fillRect(x + 14, y + 62, w - 28, 12);
     ctx.fillStyle = '#ffd24b'; ctx.fillRect(x + 14, y + 62, Math.max(6, ((w - 28) * prog / 100)), 12);
   }
-  function drawBigBox(ctx, x, y, w, h, title, meta) {
-    ctx.fillStyle = 'rgba(255,255,255,0.03)'; roundRect(ctx, x, y, w, h, 14, true, false);
-    ctx.fillStyle = '#9fb0bf'; ctx.font = '700 14px Inter, Arial';
-    ctx.fillText(title, x + 16, y + 28);
-    const rank = (meta && meta.found && isFinite(Number(meta.rank))) ? String(meta.rank) : '-';
-    ctx.font = '800 34px Inter, Arial'; ctx.fillStyle = '#ffffff';
-    ctx.fillText(rank, x + w - 16 - ctx.measureText(rank).width, y + 36);
-    ctx.font = '400 16px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
-    const msText = (meta && meta.found) ? Number(meta.mindshare).toFixed(6) : '-';
-    ctx.fillText(msText, x + 16, y + 70);
-    const prog = (meta && meta.found && Number.isFinite(Number(meta.rank))) ? Math.round(progressToTop100(Number(meta.rank))*100) : 0;
-    ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fillRect(x + 16, y + 90, w - 32, 14);
-    ctx.fillStyle = '#ffd24b'; ctx.fillRect(x + 16, y + 90, Math.max(6, ((w - 32) * prog / 100)), 14);
-
-    // eligible badge
-    if(meta && meta.found && Number.isFinite(Number(meta.rank))){
-      const r = Number(meta.rank);
-      if(r <= SHARE_TOP){
-        ctx.fillStyle = '#3ee6a8';
-        ctx.font = '700 14px Inter, Arial';
-        ctx.fillText('Eligible: OG NFT + Revenue Share', x + 16, y + 120);
-      } else if(r <= OG_NFT_TOP){
-        ctx.fillStyle = '#3ee6a8';
-        ctx.font = '700 14px Inter, Arial';
-        ctx.fillText('Eligible: OG NFT', x + 16, y + 120);
-      }
-    }
-  }
 }
 
-/* export dataURL -> file and share (runs inside user gesture) */
+/* export dataURL -> file and share */
 function shareImageFromDataURL(dataUrl, handle, data){
   try{
     const byteString = atob(dataUrl.split(',')[1]);
@@ -417,30 +340,24 @@ function shareImageFromDataURL(dataUrl, handle, data){
     for(let i=0;i<byteString.length;i++) ia[i]=byteString.charCodeAt(i);
     const blob = new Blob([ab], {type:'image/png'});
     const file = new File([blob], `${handle}-zama-rank.png`, {type:'image/png'});
-
     if(navigator.canShare && navigator.canShare({files:[file]})){
       navigator.share({
         files: [file],
         text: `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`
-      }).catch(e=>{
-        // ignore
-      });
+      }).catch(()=>{});
       return;
     }
-
-    // fallback: download then open tweet intent
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url; a.download = `${handle}-zama-rank.png`; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),2000);
     const text = `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`;
     window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
-
   }catch(err){
     alert('Share failed: '+(err.message||err));
   }
 }
 
-/* UI flow: search, render cards */
+/* UI flow */
 let lastSearch = null;
 async function performSearch(){
   const raw = ($('username').value||'').trim();
@@ -448,27 +365,19 @@ async function performSearch(){
   const handle = raw.replace(/^@/,'');
   showResults();
   const container = $('resultArea'); container.innerHTML = '';
-  // loading placeholders
   for(let i=0;i<3;i++){
     const s=document.createElement('div'); s.className='card';
     s.innerHTML=`<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`;
     container.appendChild(s);
   }
-
-  // preload avatar for share
   await loadAvatar(handle);
-
   try{
     const res = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
     if(!res.ok) throw new Error('Network ' + res.status);
     const data = await res.json();
-
-    // ensure results object exists
     const results = data.results || {};
-    // normalize keys: allow '30d' or 'month'
     if(!results['30d'] && results['month']) results['30d'] = results['month'];
     if(!results['month'] && results['30d']) results['month'] = results['30d'];
-
     container.innerHTML = '';
     const order = ['24h','7d','30d'];
     for(let i=0;i<order.length;i++){
@@ -477,6 +386,8 @@ async function performSearch(){
       container.appendChild( mkCard(k, results[k]||{}, neighbor) );
     }
     lastSearch = { handle, data };
+    // After rendering results, ensure footer padding still matches footer height
+    requestAnimationFrame(updateFooterPadding);
   }catch(err){
     const el = document.createElement('div'); el.className='card';
     el.innerHTML = `<h3>Error</h3><div style="color:var(--muted);margin-top:6px">${err.message}</div>`;
@@ -485,14 +396,11 @@ async function performSearch(){
   }
 }
 
-/* Share handler - requires a previous successful search, must be called directly by user gesture */
+/* Share button (needs prior search) */
 $('shareCardBtn').addEventListener('click', async (e) => {
   if(!lastSearch){ alert('Run Search first, then press Share Card.'); return; }
   const { handle, data } = lastSearch;
-
-  // draw canvas layout
   const dataUrl = drawCanvasLayout(handle, data);
-  // share or download
   shareImageFromDataURL(dataUrl, handle, data);
 });
 
@@ -506,6 +414,26 @@ $('clearBtn').addEventListener('click', ()=>{
   lastSearch = null;
   hideResults();
 });
+
+/* FOOTER: compute and set padding-bottom for wrap so content never hides below footer */
+function updateFooterPadding(){
+  const footer = $('siteFooter');
+  const wrap = $('wrap');
+  if(!footer || !wrap) return;
+  // measure height (including margins)
+  const rect = footer.getBoundingClientRect();
+  const computed = window.getComputedStyle(footer);
+  const marginBottom = parseInt(computed.marginBottom || '0',10);
+  const height = Math.ceil(rect.height + (isNaN(marginBottom)?0:marginBottom));
+  wrap.style.paddingBottom = (height + 18) + 'px'; // leave some breathing room
+}
+window.addEventListener('load', ()=>{
+  updateFooterPadding();
+  // also recalc after a short delay (mobile UI may adjust)
+  setTimeout(updateFooterPadding, 350);
+});
+window.addEventListener('resize', updateFooterPadding);
+window.addEventListener('orientationchange', ()=>setTimeout(updateFooterPadding,220));
 
 /* initial */
 hideResults();
