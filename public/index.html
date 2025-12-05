@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ZAMA SZN 5 RANK</title>
+<title>ZAMA RANK</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -14,32 +14,10 @@
     --text:#eaf3fb; --ok:#3ee6a8; --bad:#ff7b7b;
   }
   *{box-sizing:border-box}
-  html,body{
-    height:100%;
-    margin:0;
-    padding:0;
-    /* fixed gradient to prevent scrolling artifacts / white strip */
-    background: linear-gradient(180deg,var(--bg1),var(--bg2));
-    background-attachment: fixed;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    -webkit-tap-highlight-color: transparent;
-  }
-  body{
-    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;
-    color:var(--text);
-  }
-
-  /* APP layout - wrap will fill viewport and footer sits at bottom */
+  html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));}
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;}
   #app{min-height:100vh;display:flex;flex-direction:column;}
-  .wrap{
-    max-width:940px;
-    margin:18px auto;
-    padding:18px 18px 8px;
-    display:flex;
-    flex-direction:column;
-    min-height: calc(100vh - 36px); /* ensures footer will be pushed to bottom */
-  }
+  .wrap{max-width:940px;margin:18px auto;padding:18px 18px 8px;flex:1;display:flex;flex-direction:column}
 
   .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
   .brand{display:flex;gap:12px;align-items:center}
@@ -76,10 +54,7 @@
   .ms-change.up{color:var(--ok)} .ms-change.down{color:var(--bad)}
   hr.sep{border:none;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0}
 
-  footer{
-    margin-top:auto; /* pushes footer to bottom of .wrap */
-    color:var(--muted);font-size:13px;padding:8px 0 12px;display:flex;justify-content:space-between;align-items:center;
-  }
+  footer{margin-top:auto;color:var(--muted);font-size:13px;padding:12px 0 12px;display:flex;justify-content:space-between;align-items:center}
   a.powered{ text-decoration:none;color:inherit;display:flex;gap:8px;align-items:center}
   a.powered img{ width:44px; height:44px; border-radius:8px; object-fit:cover; box-shadow:0 8px 22px rgba(0,0,0,0.45) }
 
@@ -120,7 +95,7 @@
       <div id="resultArea" class="results" aria-live="polite" style="display:none"></div>
 
       <footer>
-        <div>Made with ❤️ for Zama — love & powered by madara</div>
+        <div>Made with ❤️ for Zama</div>
         <a class="powered" id="poweredLink" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer">
           <img id="poweredAvatar" src="madara.png" alt="madara">
           <div style="font-size:13px">
@@ -132,16 +107,17 @@
     </div>
   </div>
 
+  <!-- canvas used to generate share image -->
   <canvas id="cardCanvas" width="1200" height="760" style="display:none"></canvas>
 
 <script>
 /* -------- CONFIG -------- */
-const API_BASE = '/api/check';           // server endpoint
+const API_BASE = '/api/check';           // server endpoint (your server.js exposes /api/check)
 const TOTAL_FETCHED = 1500;
 const OG_NFT_TOP = 1006;
 const SHARE_TOP = 100;
 
-/* small helpers */
+/* helpers */
 const $ = id => document.getElementById(id);
 function fmtNum(n, d=8){ if(n==null || !isFinite(Number(n))) return '-'; return Number(n).toFixed(d); }
 function money(n){ if(n==null || !isFinite(Number(n))) return '-'; return '$' + Number(n).toLocaleString(); }
@@ -203,6 +179,7 @@ function mkCard(title, meta, neighbor){
 
   let payoutHtml = '-';
   if(title === 'month' && found && rank <= SHARE_TOP){
+    // simple linear assumption: top1 ~ 1500, top100 ~ 150
     const topMin = 1500, topMax=2000, min100=150, max100=260;
     const t = (Math.min(100, Math.max(1, rank)) - 1)/99;
     const min = Math.round(topMin + (min100 - topMin)*t);
@@ -233,29 +210,47 @@ function drawCanvas(handle, data){
   const canvas = $('cardCanvas'); const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0,0,W,H);
-  // bg
-  ctx.fillStyle = '#071025'; ctx.fillRect(0,0,W,H);
+  // background: subtle pattern / gradient (keeps card premium look)
+  const g = ctx.createLinearGradient(0,0,W,H); g.addColorStop(0,'#0b2430'); g.addColorStop(1,'#04202a');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+
+  // optional background blobs (soft)
+  ctx.globalAlpha = 0.12;
+  ctx.fillStyle = '#042f33'; ctx.beginPath(); ctx.ellipse(W*0.85,H*0.15,W*0.55,H*0.45,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#042f33'; ctx.beginPath(); ctx.ellipse(W*0.15,H*0.85,W*0.65,H*0.5,0,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 1;
+
   // avatar or logo
   const avatar = _pre.avatar;
-  const avatarSize = 120;
-  const margin = 60;
+  const avatarSize = 160;
+  const margin = 70;
   if(avatar){
     ctx.save(); ctx.beginPath(); ctx.arc(margin + avatarSize/2, margin + avatarSize/2, avatarSize/2, 0, Math.PI*2); ctx.closePath(); ctx.clip();
     ctx.drawImage(avatar, margin, margin, avatarSize, avatarSize); ctx.restore();
   } else {
-    // draw logo fallback
-    ctx.fillStyle = '#ffd24b'; ctx.fillRect(margin, margin, avatarSize, avatarSize);
+    // logo fallback circle
+    ctx.fillStyle = '#ffd24b'; ctx.beginPath(); ctx.arc(margin + avatarSize/2, margin + avatarSize/2, avatarSize/2, 0, Math.PI*2); ctx.fill();
   }
 
   // handle text
-  ctx.fillStyle = '#eaf3fb'; ctx.font = '700 44px Inter, Arial';
-  ctx.fillText(handle.startsWith('@')?handle:`@${handle}`, margin + avatarSize + 24, margin + 44);
+  ctx.fillStyle = '#ffffff'; ctx.font = '700 44px Inter, Arial';
+  const handleText = handle.startsWith('@')?handle:`@${handle}`;
+  ctx.fillText(handleText, margin + avatarSize + 36, margin + 50);
+
+  // right big rank
+  const month = (data.results && data.results.month) ? data.results.month : {};
+  const monthFound = month && month.found===true && Number.isFinite(Number(month.rank));
+  const bigRank = monthFound ? String(month.rank) : '-';
+  ctx.fillStyle = '#ffffff'; ctx.font = '800 120px Inter, Arial';
+  ctx.textAlign = 'right';
+  ctx.fillText(bigRank, W - margin, margin + 80);
+  ctx.textAlign = 'left';
 
   // list timeframes compact
   const labels = ['24h','7d','month'];
   let y = margin + avatarSize + 40;
   const left = margin;
-  const barW = W - margin*2;
+  const barW = W - margin*2 - 200;
   for(let i=0;i<labels.length;i++){
     const key = labels[i];
     const meta = (data.results && data.results[key]) ? data.results[key] : {};
@@ -273,8 +268,6 @@ function drawCanvas(handle, data){
   }
 
   // month eligibility & assumed payout
-  const month = (data.results && data.results.month) ? data.results.month : {};
-  const monthFound = month && month.found===true && Number.isFinite(Number(month.rank));
   let badgeText = 'No data';
   if(monthFound){
     const r = Number(month.rank);
@@ -296,6 +289,7 @@ function drawCanvas(handle, data){
   ctx.font = '500 14px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
   ctx.fillText('Powered by madara — zama-rank.vercel.app', margin, H - 40);
 
+  // return image
   return canvas.toDataURL('image/png');
 }
 
@@ -310,11 +304,12 @@ function shareImageFromDataURL(dataUrl, handle, data){
     const file = new File([blob], `${handle}-zama-rank.png`, {type:'image/png'});
 
     if(navigator.canShare && navigator.canShare({files:[file]})){
+      // navigator.share must be invoked from user gesture (button click) - this is bound correctly
       navigator.share({
         files: [file],
         text: `${handle} — Zama Rank (30d): ${data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`
       }).catch(e=>{
-        // user cancelled or error — ignore
+        // user cancelled or error — silently ignore
       });
       return;
     }
@@ -337,23 +332,29 @@ async function performSearch(){
   const raw = ($('username').value||'').trim();
   if(!raw){ $('username').focus(); return; }
   const handle = raw.replace(/^@/,'');
+  // show results area
   showResults();
+  // simple loading cards
   const container = $('resultArea'); container.innerHTML = '';
   for(let i=0;i<3;i++){ const s=document.createElement('div'); s.className='card'; s.innerHTML=`<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`; container.appendChild(s); }
 
-  // preload avatar (so share draws it later non-blocking)
-  loadAvatar(handle).catch(()=>{});
+  // preload avatar
+  await loadAvatar(handle);
 
   try{
     const res = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
     if(!res.ok) throw new Error('Network ' + res.status);
     const data = await res.json();
+    // render cards
     container.innerHTML = '';
     const order = ['24h','7d','month'];
     for(let i=0;i<order.length;i++){
       const k = order[i]; const neighbor = (i<order.length-1) ? data.results[order[i+1]] || null : null;
       container.appendChild( mkCard(k, data.results[k]||{}, neighbor) );
     }
+    // update footer avatar link to go to the user when clicked
+    $('poweredAvatar').src = _pre.powered ? 'madara.png' : 'madara.png';
+    $('poweredLink').href = `https://x.com/${encodeURIComponent(handle)}`;
     lastSearch = { handle, data };
   }catch(err){
     const el = document.createElement('div'); el.className='card';
@@ -367,7 +368,9 @@ async function performSearch(){
 $('shareCardBtn').addEventListener('click', async (e) => {
   if(!lastSearch){ alert('Run Search first, then press Share Card.'); return; }
   const { handle, data } = lastSearch;
+  // draw canvas and produce dataURL
   const dataUrl = drawCanvas(handle, data);
+  // share (from user click)
   shareImageFromDataURL(dataUrl, handle, data);
 });
 
@@ -381,6 +384,8 @@ $('clearBtn').addEventListener('click', ()=>{
   lastSearch = null;
   hideResults();
 });
+
+/* ensure footer stays at bottom even when results hidden (wrap has flex) */
 </script>
 </body>
 </html>
