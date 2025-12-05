@@ -3,49 +3,98 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>ZAMA RANK</title>
+<title>ZAMA RANK — Premium</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg1:#000409; --bg2:#071025;
-    --card:rgba(255,255,255,0.03);
-    --muted:#9fb0bf;
-    --accent1:#ffd24b; --accent2:#ff6b6b;
-    --text:#eaf3fb; --ok:#3ee6a8; --bad:#ff7b7b;
-    /* footer sizing + tuneables */
-    --footer-h:72px;                   /* logical footer height to reserve in the page flow */
-    --footer-transition: 220ms;        /* animation timing */
-    /* footer visuals to tweak */
-    --footer-bg-top: rgba(8,10,12,0.06);
-    --footer-bg-bottom: rgba(8,10,12,0.18);
-    --footer-shadow: rgba(0,0,0,0.18);
-    --footer-fade: rgba(8,10,12,0.12);
+    --bg-ink-1: #020617;
+    --bg-ink-2: #071025;
+    --card: rgba(255,255,255,0.03);
+    --muted: #9fb0bf;
+    --accent1: #ffd24b;
+    --accent2: #ff6b6b;
+    --text: #eaf3fb;
+    --ok: #3ee6a8;
+    --bad: #ff7b7b;
+
+    --footer-h: 72px;
+    --footer-transition: 220ms;
+
+    /* premium background tweak */
+    --vignette-alpha: 0.45;
+    --noise-opacity: 0.04;
   }
 
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));}
-  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;}
+  html,body{height:100%;margin:0;padding:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;}
 
-  /* page layout */
-  #app{min-height:100dvh;display:flex;flex-direction:column;}
-  .wrap{
-    max-width:940px;
-    margin:18px auto;
-    padding:18px 18px 18px;
-    /* Reserve footer space in CSS so footer cannot overlap content.
-       Includes safe-area inset for iOS gesture bar. */
-    padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom, 0px) + 12px);
-    flex:1;display:flex;flex-direction:column;transition:padding-bottom .12s ease;
+/* ===== PREMIUM BACKGROUND =====
+   layering:
+   1) flat dark base
+   2) linear gradient (vertical)
+   3) radial glows for depth
+   4) subtle vignette at bottom
+   5) SVG noise overlay (very low opacity)
+*/
+  body {
+    background-color: #050814; /* stable dark base to avoid banding */
+    min-height:100vh;
   }
 
-  .topbar{display:flex;align-items:center;justify-content:flex-start;gap:12px}
+  /* main app gradient + depth */
+  #app {
+    min-height:100dvh;
+    display:flex;
+    flex-direction:column;
+    /* composite gradient: vertical + radial glows */
+    background-image:
+      radial-gradient(800px 420px at 10% 15%, rgba(6,18,36,0.14), rgba(6,18,36,0) 22%),
+      radial-gradient(600px 360px at 85% 28%, rgba(12,26,44,0.12), rgba(12,26,44,0) 30%),
+      linear-gradient(180deg, rgba(3,8,18,0.85) 0%, rgba(4,10,20,0.95) 55%, rgba(6,12,24,1) 100%);
+    /* subtle shift to make lower area slightly richer without a hard band */
+    background-repeat:no-repeat;
+    background-attachment: fixed;
+    position:relative;
+    overflow-x:hidden;
+  }
+
+  /* film grain / noise using inline SVG - very low opacity for subtle texture */
+  #app::after{
+    content: "";
+    position: fixed;
+    left: 0; right: 0; top: 0; bottom: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.08' /></svg>");
+    opacity: var(--noise-opacity);
+    mix-blend-mode: overlay;
+    z-index: 0;
+  }
+
+  /* subtle bottom vignette to focus content */
+  #app::before{
+    content: "";
+    position: fixed;
+    left:0; right:0; bottom:0;
+    height: 42vh;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,var(--vignette-alpha)) 100%);
+    z-index: 0;
+  }
+
+  /* page content sits above bg layers */
+  .wrap{ position:relative; z-index: 2; max-width:940px; margin:18px auto; padding:18px 18px 18px;
+    padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom, 0px) + 12px);
+    flex:1; display:flex; flex-direction:column; transition:padding-bottom .12s ease; }
+
+  /* UI styles */
+  .topbar{display:flex;align-items:center;justify-content:flex-start;gap:12px; z-index:2}
   .brand{display:flex;gap:12px;align-items:center}
   .logo{width:48px;height:48px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(0,0,0,0.45)}
   .logo img{width:100%;height:100%;object-fit:cover}
   h1{margin:0;font-size:20px}
   .subtitle{color:var(--muted);font-size:13px;margin-top:2px}
 
-  .search-shell{margin-top:14px;background:var(--card);padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 36px rgba(0,0,0,0.45)}
+  .search-shell{margin-top:14px;background: rgba(255,255,255,0.02); padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,0.03); box-shadow: 0 10px 36px rgba(2,6,12,0.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
   .search-row{display:flex;gap:12px;align-items:center}
   .search-inner{flex:1;min-width:0}
   input[type="text"]{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px; height:56px; outline:none}
@@ -57,7 +106,7 @@
   .btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#061020; min-width:132px;}
 
   .results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start}
-  .card{background:var(--card);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 28px rgba(0,0,0,0.45)}
+  .card{background: linear-gradient(180deg, rgba(255,255,255,0.016), rgba(255,255,255,0.008)); padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 28px rgba(0,0,0,0.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index:2}
   .card h3{margin:0 0 10px;font-size:14px}
   .row{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
   .label{color:var(--muted);font-size:13px}
@@ -79,18 +128,16 @@
   hr.sep{border:none;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0}
   .results-empty{color:var(--muted);margin-top:16px}
 
-  /* ------------------------
-     Bottom app-style footer (soft visuals)
-     ------------------------ */
+  /* Footer — app-like bottom bar */
   footer.site-footer{
     position:fixed;
     left:0; right:0; bottom:0;
     height: var(--footer-h);
     display:flex; align-items:center; justify-content:center;
     padding:12px 18px;
-    background: linear-gradient(180deg, var(--footer-bg-top), var(--footer-bg-bottom));
+    background: linear-gradient(180deg, rgba(8,10,12,0.06), rgba(8,10,12,0.18));
     border-top: 1px solid rgba(255,255,255,0.02);
-    box-shadow: 0 -6px 18px var(--footer-shadow);
+    box-shadow: 0 -6px 18px rgba(0,0,0,0.18);
     z-index:40;
     transform: translateY(0);
     transition: transform var(--footer-transition) cubic-bezier(.22,.9,.28,1);
@@ -99,8 +146,6 @@
     -webkit-backdrop-filter: blur(6px) saturate(120%);
     overflow: visible;
   }
-
-  /* soft top fade so the footer blends into content */
   footer.site-footer::before{
     content: "";
     position: absolute;
@@ -108,32 +153,21 @@
     top: -48px;
     height: 48px;
     pointer-events: none;
-    background: linear-gradient(180deg, rgba(0,0,0,0), var(--footer-fade));
+    background: linear-gradient(180deg, rgba(0,0,0,0), rgba(8,10,12,0.12));
     z-index: 39;
     transition: opacity 180ms ease;
     opacity: 1;
   }
-
-  /* HIDE the fade overlay completely when footer is hidden (bulletproof) */
-  footer.site-footer.hidden::before {
-    display: none !important;
-  }
-
-  /* hidden state (slides out of view) */
-  footer.site-footer.hidden{
-    transform: translateY(calc(100% + env(safe-area-inset-bottom, 0px)));
-  }
+  footer.site-footer.hidden::before { display:none !important; }  /* bulletproof hide */
+  footer.site-footer.hidden { transform: translateY(calc(100% + env(safe-area-inset-bottom, 0px))); }
 
   .footer-inner{max-width:940px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:14px}
   .footer-text{flex:1; min-width:0}
   a.powered{ text-decoration:none;color:inherit;display:flex;gap:12px;align-items:center;flex:0 0 auto}
   a.powered img{ width:56px; height:56px; border-radius:8px; object-fit:cover; box-shadow:0 8px 22px rgba(0,0,0,0.45) }
 
-  /* smaller screens tweaks */
-  @media (max-width:760px){
-    h1{font-size:18px}
-  }
-
+  /* responsive tweaks */
+  @media (max-width:760px){ h1{font-size:18px} }
   @media (max-width:560px){
     .search-row{flex-direction:column;align-items:stretch}
     .search-inner{width:100%}
@@ -142,14 +176,11 @@
     .btn + .btn{margin-left:8px}
     .footer-inner{padding:0 6px; font-size:13px}
     a.powered img{width:48px;height:48px}
-    /* slightly reduce footer height on mobile for reading space */
     :root{ --footer-h:64px; }
   }
-
   @media (max-height:520px){
     .wrap{ padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom,0px) + 6px); }
   }
-
 </style>
 </head>
 <body>
@@ -178,7 +209,6 @@
         </div>
       </div>
 
-      <!-- results area -->
       <div id="resultArea" class="results" aria-live="polite" style="display:none"></div>
       <div id="emptyHint" class="results-empty">Search to show data</div>
     </div>
@@ -188,13 +218,11 @@
         <div class="footer-text" id="footerText">Made with ❤️ for Zama by Madara </div>
         <a class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer" id="poweredLink">
           <img id="poweredAvatar" src="madara.png" alt="madara">
-          <div style="font-size:13px; color:var(--muted)"><div style="font-weight:700;color:var(--text)"></div></div>
         </a>
       </div>
     </footer>
   </div>
 
-  <!-- canvas for share card (hidden) -->
   <canvas id="cardCanvas" width="1200" height="720" style="display:none"></canvas>
 
 <script>
@@ -322,7 +350,6 @@ function drawCanvasLayout(handle, data){
   const r24 = data.results?.['24h'] || {};
   const r7 = data.results?.['7d'] || {};
   const r30 = data.results?.['30d'] || data.results?.month || {};
-  // box positions & drawing helpers (kept simple)
   drawSmallBox(ctx, margin + 8, margin + aSize + 32, 300, 96, '24H', r24);
   drawSmallBox(ctx, margin + 8 + 300 + 16, margin + aSize + 32, 300, 96, '7D', r7);
   drawMediumBox(ctx, margin + 8, margin + aSize + 32 + 96 + 16, Math.min(W - margin*3 - 300, 640), 120, '30D', r30);
@@ -494,9 +521,7 @@ $('clearBtn').addEventListener('click', ()=>{
     requestAnimationFrame(onScroll);
   }, { passive: true });
 
-  // show when touching (helps UX)
   window.addEventListener('touchstart', ()=> footer.classList.remove('hidden'), {passive:true});
-  // ensure visible on load
   window.addEventListener('load', ()=> footer.classList.remove('hidden'));
 })();
 
