@@ -114,10 +114,9 @@
     opacity: 1;
   }
 
-  /* hide the fade when footer hidden so no ghost band remains */
+  /* HIDE the fade overlay completely when footer is hidden (bulletproof) */
   footer.site-footer.hidden::before {
-    opacity: 0;
-    /* keep display flow but invisible; opacity transition avoids jump */
+    display: none !important;
   }
 
   /* hidden state (slides out of view) */
@@ -501,7 +500,7 @@ $('clearBtn').addEventListener('click', ()=>{
   window.addEventListener('load', ()=> footer.classList.remove('hidden'));
 })();
 
-/* initial state */
+/* initial */
 hideResults();
 
 </script>
