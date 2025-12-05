@@ -260,7 +260,7 @@
     </footer>
   </div>
 
-  <canvas id="cardCanvas" width="1200" height="720" style="display:none" aria-hidden="true"></canvas>
+  <canvas id="cardCanvas" width="1200" height="630" style="display:none" aria-hidden="true"></canvas>
 
 <script>
 /* -------- CONFIG -------- */
@@ -384,45 +384,120 @@ function mkCard(title, meta, neighbor){
   return el;
 }
 
-/* share canvas layout (same as before) */
+/* ===========================
+   NEW share canvas layout:
+   3 boxes in a single horizontal row (equal widths + gap)
+   =========================== */
 function drawCanvasLayout(handle, data){
   const canvas = $('cardCanvas'); const ctx = canvas.getContext('2d');
+  // Canvas size already set in HTML: 1200x630
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0,0,W,H);
-  ctx.fillStyle = '#0f3b39'; ctx.fillRect(0,0,W,H);
-  ctx.fillStyle = 'rgba(0,0,0,0.06)'; roundRect(ctx, 20, 20, W-40, H-40, 20, true, false);
+
+  // Background gradient
+  const bg = ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#081822');
+  bg.addColorStop(1,'#00121a');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,W,H);
+
+  // big rounded panel
+  const pad = 28;
+  const panelX = pad, panelY = pad, panelW = W - pad*2, panelH = H - pad*2;
+  roundRect(ctx, panelX, panelY, panelW, panelH, 20, true, false, 'rgba(255,255,255,0.02)');
+
+  // left column: avatar + handle (top-left inside panel)
+  const leftPad = panelX + 28;
+  const topPad = panelY + 24;
+  const avatarSize = 96;
+  const avatarX = leftPad, avatarY = topPad;
   const avatar = _pre.avatar;
-  const aSize = 120, margin = 48;
   if(avatar){
-    ctx.save(); ctx.beginPath(); ctx.arc(margin + aSize/2, margin + aSize/2, aSize/2, 0, Math.PI*2); ctx.closePath(); ctx.clip();
-    ctx.drawImage(avatar, margin, margin, aSize, aSize); ctx.restore();
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(avatarX + avatarSize/2, avatarY + avatarSize/2, avatarSize/2, 0, Math.PI*2);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(avatar, avatarX, avatarY, avatarSize, avatarSize);
+    ctx.restore();
+    // stroke
+    ctx.beginPath();
+    ctx.arc(avatarX + avatarSize/2, avatarY + avatarSize/2, avatarSize/2 - 3, 0, Math.PI*2);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.stroke();
   } else {
-    ctx.fillStyle = '#ffd24b'; ctx.fillRect(margin, margin, aSize, aSize);
+    ctx.fillStyle = '#ffd24b';
+    roundRect(ctx, avatarX, avatarY, avatarSize, avatarSize, 10, true, false, '#ffd24b');
   }
-  ctx.fillStyle = '#ffffff'; ctx.font = '700 36px Inter, Arial';
+
+  // handle text
   const handleText = handle.startsWith('@') ? handle : '@' + handle;
-  ctx.fillText(handleText, margin + aSize + 28, margin + 42);
-  ctx.fillStyle = '#9fb0bf'; ctx.font = '400 16px Inter, Arial';
-  ctx.fillText('Zama rank card', margin + aSize + 28, margin + 70);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '700 28px Inter, Arial';
+  // ensure handle fits; if not, reduce font
+  let handleFont = 28;
+  while(handleFont > 14 && ctx.measureText(handleText).width > (panelW * 0.25)){
+    handleFont -= 1;
+    ctx.font = `700 ${handleFont}px Inter, Arial`;
+  }
+  ctx.fillText(handleText, avatarX + avatarSize + 16, avatarY + 32);
+
+  ctx.fillStyle = '#9fb0bf';
+  ctx.font = '400 14px Inter, Arial';
+  ctx.fillText('Zama rank card', avatarX + avatarSize + 16, avatarY + 52);
+
+  // Right area: large 30d rank (big number), place on the right side of panel
+  const rightAreaX = panelX + panelW - 200;
+  const r30 = data.results?.['30d'] || data.results?.month || {};
+  const bigRank = (r30 && r30.found && isFinite(Number(r30.rank)))?String(r30.rank):'-';
+
+  // autosize big rank to fit a max width and height
+  ctx.fillStyle = '#ffffff';
+  let bigSize = 110;
+  ctx.font = `900 ${bigSize}px Inter, Arial`;
+  while(bigSize > 36 && ctx.measureText(bigRank).width > 170){
+    bigSize = Math.floor(bigSize * 0.9);
+    ctx.font = `900 ${bigSize}px Inter, Arial`;
+  }
+  ctx.textAlign = 'right';
+  ctx.fillText(bigRank, panelX + panelW - 24, panelY + 120);
+  ctx.textAlign = 'left';
+
+  // Now draw the three stat boxes horizontally centered in the middle area
+  // compute widths: equal widths with gap
+  const boxGap = 20;
+  const totalBoxes = 3;
+  // Box area width - leave some left space for avatar and right space for big rank
+  const leftColumnWidth = (avatarSize + 16 + 140); // avatar + text area
+  const rightColumnWidth = 220; // where big rank lives
+  const boxesAreaX = panelX + leftColumnWidth + 16;
+  const boxesAreaW = panelW - leftColumnWidth - rightColumnWidth - 32;
+  const boxW = Math.floor((boxesAreaW - (boxGap * (totalBoxes - 1))) / totalBoxes);
+  const boxH = 130;
+  const boxY = panelY + 20 + avatarSize; // below the avatar row
 
   const r24 = data.results?.['24h'] || {};
-  const r7 = data.results?.['7d'] || {};
-  const r30 = data.results?.['30d'] || data.results?.month || {};
-  drawSmallBox(ctx, margin + 8, margin + aSize + 32, 300, 96, '24H', r24);
-  drawSmallBox(ctx, margin + 8 + 300 + 16, margin + aSize + 32, 300, 96, '7D', r7);
-  drawMediumBox(ctx, margin + 8, margin + aSize + 32 + 96 + 16, Math.min(W - margin*3 - 300, 640), 120, '30D', r30);
-  ctx.fillStyle = '#ffffff'; ctx.font = '900 110px Inter, Arial';
-  const rankText = (r30 && r30.found && isFinite(Number(r30.rank))) ? String(r30.rank) : '-';
-  ctx.textAlign = 'right';
-  ctx.fillText(rankText, W - margin - 20, margin + 100);
-  ctx.textAlign = 'left';
-  ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = '500 14px Inter, Arial';
-  ctx.fillText('Powered by madara — zama-rank.vercel.app', 36, H - 36);
+  const r7  = data.results?.['7d'] || {};
+  const r30b = r30;
 
+  // draw the boxes left-to-right
+  drawStatBox(ctx, boxesAreaX + 0*(boxW+boxGap), boxY, boxW, boxH, '24H', r24);
+  drawStatBox(ctx, boxesAreaX + 1*(boxW+boxGap), boxY, boxW, boxH, '7D', r7);
+  drawStatBox(ctx, boxesAreaX + 2*(boxW+boxGap), boxY, boxW, boxH, '30D', r30b);
+
+  // watermark bottom-left
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.font = '500 12px Inter, Arial';
+  ctx.fillText('Powered by madara — zama-rank.vercel.app', panelX + 18, panelY + panelH - 16);
+
+  // reset alignment
+  ctx.textAlign = 'left';
   return canvas.toDataURL('image/png');
 
-  function roundRect(ctx, x, y, w, h, r, fill, stroke) {
-    if (typeof r === 'undefined') r = 5;
+  /* helper functions inside drawCanvasLayout */
+  function roundRect(ctx, x, y, w, h, r, fill, stroke, fillStyle){
+    if(typeof r === 'undefined') r = 6;
     ctx.beginPath();
     ctx.moveTo(x + r, y);
     ctx.arcTo(x + w, y, x + w, y + h, r);
@@ -430,37 +505,68 @@ function drawCanvasLayout(handle, data){
     ctx.arcTo(x, y + h, x, y, r);
     ctx.arcTo(x, y, x + w, y, r);
     ctx.closePath();
-    if (fill) ctx.fill();
-    if (stroke) ctx.stroke();
+    if(fill){ ctx.fillStyle = fillStyle || 'rgba(255,255,255,0.02)'; ctx.fill(); }
+    if(stroke){ ctx.stroke(); }
   }
-  function drawSmallBox(ctx, x, y, w, h, title, meta) {
-    ctx.fillStyle = 'rgba(255,255,255,0.02)'; roundRect(ctx, x, y, w, h, 12, true, false);
-    ctx.fillStyle = '#9fb0bf'; ctx.font = '700 14px Inter, Arial';
-    ctx.fillText(title, x + 14, y + 24);
-    const rank = (meta && meta.found && isFinite(Number(meta.rank))) ? String(meta.rank) : '-';
-    ctx.font = '800 22px Inter, Arial'; ctx.fillStyle = '#ffffff';
-    ctx.fillText(rank, x + w - 18 - ctx.measureText(rank).width, y + 26);
-    ctx.font = '400 13px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
-    const msText = (meta && meta.found) ? Number(meta.mindshare).toFixed(6) : '-';
-    ctx.fillText('Mindshare: ' + msText, x + 14, y + 52);
+
+  function drawStatBox(ctx, x, y, w, h, title, meta){
+    // box background
+    roundRect(ctx, x, y, w, h, 12, true, false, 'rgba(255,255,255,0.02)');
+    // title
+    ctx.fillStyle = '#9fb0bf';
+    ctx.font = '700 13px Inter, Arial';
+    ctx.fillText(title, x + 12, y + 22);
+    // rank (right)
+    ctx.font = '800 22px Inter, Arial';
+    ctx.fillStyle = '#ffffff';
+    const rankVal = (meta && meta.found && isFinite(Number(meta.rank))) ? String(meta.rank) : '-';
+    // right align rank
+    const rankX = x + w - 12;
+    ctx.textAlign = 'right';
+    ctx.fillText(rankVal, rankX, y + 26);
+    ctx.textAlign = 'left';
+
+    // mindshare
+    ctx.font = '400 12px Inter, Arial';
+    ctx.fillStyle = '#9fb0bf';
+    const msText = (meta && meta.found) ? Number(meta.mindshare).toFixed(8) : '-';
+    ctx.fillText('Mindshare: ' + msText, x + 12, y + 48);
+
+    // change vs next (green/red)
+    const ch = computeChange(meta || {}, {});
+    if(meta && meta.found && ch.pctText !== '-'){
+      const isUp = ch.dir === 'up';
+      ctx.fillStyle = isUp ? '#3ee6a8' : '#ff7b7b';
+      ctx.font = '800 13px Inter, Arial';
+      ctx.fillText((isUp ? '▲ ' : '▼ ') + ch.pctText, x + 12, y + 72);
+      // absolute
+      if(ch.absText){
+        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+        ctx.font = '700 12px Inter, Arial';
+        ctx.fillText(ch.absText, x + w - 12, y + 72);
+      }
+    } else {
+      ctx.fillStyle = '#9fb0bf';
+      ctx.font = '400 12px Inter, Arial';
+      ctx.fillText('Change vs next', x + 12, y + 72);
+    }
+
+    // progress bar at bottom
+    const barX = x + 12, barY = y + h - 28, barW = w - 24, barH = 10;
+    ctx.fillStyle = 'rgba(255,255,255,0.03)';
+    roundRect(ctx, barX, barY, barW, barH, 999, true, false, 'rgba(255,255,255,0.03)');
     const prog = (meta && meta.found && Number.isFinite(Number(meta.rank))) ? Math.round(progressToTop100(Number(meta.rank))*100) : 0;
-    const barX = x + 14, barY = y + 62, barW = w - 28, barH = 12;
-    ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fillRect(barX, barY, barW, barH);
-    ctx.fillStyle = '#ffd24b'; ctx.fillRect(barX, barY, Math.max(6, (barW * prog / 100)), barH);
-  }
-  function drawMediumBox(ctx, x, y, w, h, title, meta) {
-    ctx.fillStyle = 'rgba(255,255,255,0.02)'; roundRect(ctx, x, y, w, h, 12, true, false);
-    ctx.fillStyle = '#9fb0bf'; ctx.font = '700 14px Inter, Arial';
-    ctx.fillText(title, x + 14, y + 24);
-    const rank = (meta && meta.found && isFinite(Number(meta.rank))) ? String(meta.rank) : '-';
-    ctx.font = '800 20px Inter, Arial'; ctx.fillStyle = '#ffffff';
-    ctx.fillText(rank, x + w - 18 - ctx.measureText(rank).width, y + 26);
-    ctx.font = '400 13px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
-    const msText = (meta && meta.found) ? Number(meta.mindshare).toFixed(6) : '-';
-    ctx.fillText('Mindshare: ' + msText, x + 14, y + 52);
-    const prog = (meta && meta.found && Number.isFinite(Number(meta.rank))) ? Math.round(progressToTop100(Number(meta.rank))*100) : 0;
-    ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fillRect(x + 14, y + 62, w - 28, 12);
-    ctx.fillStyle = '#ffd24b'; ctx.fillRect(x + 14, y + 62, Math.max(6, ((w - 28) * prog / 100)), 12);
+    const fillW = Math.max(barW * (prog/100), Math.min(barW * 0.06, barW));
+    // gradient
+    const g = ctx.createLinearGradient(barX, 0, barX + barW, 0);
+    g.addColorStop(0, '#ffd24b'); g.addColorStop(1, '#ff6b6b');
+    ctx.fillStyle = g;
+    roundRect(ctx, barX, barY, fillW, barH, 999, true, false, g);
+
+    // meta text
+    ctx.fillStyle = '#9fb0bf';
+    ctx.font = '400 11px Inter, Arial';
+    ctx.fillText(`Progress to Top 100: ${prog}% • Total fetched: ${TOTAL_FETCHED}`, x + 12, y + h - 8);
   }
 }
 
