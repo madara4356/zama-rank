@@ -12,15 +12,26 @@
     --muted:#9fb0bf;
     --accent1:#ffd24b; --accent2:#ff6b6b;
     --text:#eaf3fb; --ok:#3ee6a8; --bad:#ff7b7b;
-    --footer-h:88px;
+    --footer-h:88px; /* keep this in sync with footer.height */
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));}
   body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;}
 
   /* page layout */
-  #app{min-height:100vh;display:flex;flex-direction:column;}
-  .wrap{max-width:940px;margin:18px auto;padding:18px 18px 18px;flex:1;display:flex;flex-direction:column;transition:padding-bottom .12s ease;}
+  /* use dynamic viewport so mobile browsers behave better */
+  #app{min-height:100dvh;display:flex;flex-direction:column;}
+  .wrap{
+    max-width:940px;
+    margin:18px auto;
+    padding:18px 18px 18px;
+    /* reserve space for footer in CSS so fixed footer doesn't overlap content */
+    padding-bottom: calc(var(--footer-h) + 18px);
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    transition:padding-bottom .12s ease;
+  }
 
   .topbar{display:flex;align-items:center;justify-content:flex-start;gap:12px}
   .brand{display:flex;gap:12px;align-items:center}
@@ -70,11 +81,11 @@
 
   hr.sep{border:none;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0}
 
-  /* fixed footer */
+  /* fixed footer - explicit height (matches --footer-h) */
   footer.site-footer{
     position:fixed;
     left:0;right:0;bottom:0;
-    height:auto; /* allow content to set height; we will measure it in JS */
+    height: var(--footer-h); /* explicit height, keep in sync with root var */
     background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.6));
     border-top:1px solid rgba(255,255,255,0.02);
     display:flex;align-items:center;justify-content:center;padding:12px 18px;z-index:20;
@@ -415,18 +426,23 @@ $('clearBtn').addEventListener('click', ()=>{
   hideResults();
 });
 
-/* FOOTER: compute and set padding-bottom for wrap so content never hides below footer */
+/* FOOTER: compute and set padding-bottom for wrap so content never hides below footer
+   - CSS already reserves space using --footer-h; JS is a safety net to expand if footer grows */
 function updateFooterPadding(){
   const footer = $('siteFooter');
   const wrap = $('wrap');
   if(!footer || !wrap) return;
-  // measure height (including margins)
   const rect = footer.getBoundingClientRect();
-  const computed = window.getComputedStyle(footer);
-  const marginBottom = parseInt(computed.marginBottom || '0',10);
-  const height = Math.ceil(rect.height + (isNaN(marginBottom)?0:marginBottom));
-  wrap.style.paddingBottom = (height + 18) + 'px'; // leave some breathing room
+  const height = Math.ceil(rect.height || 0);
+  // CSS-reserved height (root var)
+  const root = getComputedStyle(document.documentElement);
+  const reserved = parseInt(root.getPropertyValue('--footer-h')) || 88;
+  // ensure paddingBottom is at least reserved + 18 (matching CSS). If footer is taller, expand.
+  const pb = Math.max(reserved + 18, height + 18);
+  wrap.style.paddingBottom = pb + 'px';
 }
+
+/* more reliable mobile viewport handling */
 window.addEventListener('load', ()=>{
   updateFooterPadding();
   // also recalc after a short delay (mobile UI may adjust)
@@ -434,6 +450,10 @@ window.addEventListener('load', ()=>{
 });
 window.addEventListener('resize', updateFooterPadding);
 window.addEventListener('orientationchange', ()=>setTimeout(updateFooterPadding,220));
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', updateFooterPadding);
+  window.visualViewport.addEventListener('scroll', updateFooterPadding);
+}
 
 /* initial */
 hideResults();
