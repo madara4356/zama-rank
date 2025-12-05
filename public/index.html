@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ZAMA RANK</title>
+<title>ZAMA SZN 5 RANK</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -14,11 +14,32 @@
     --text:#eaf3fb; --ok:#3ee6a8; --bad:#ff7b7b;
   }
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));}
-  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;}
+  html,body{
+    height:100%;
+    margin:0;
+    padding:0;
+    /* fixed gradient to prevent scrolling artifacts / white strip */
+    background: linear-gradient(180deg,var(--bg1),var(--bg2));
+    background-attachment: fixed;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body{
+    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    color:var(--text);
+  }
 
+  /* APP layout - wrap will fill viewport and footer sits at bottom */
   #app{min-height:100vh;display:flex;flex-direction:column;}
-  .wrap{max-width:940px;margin:18px auto;padding:18px 18px 8px;flex:1;display:flex;flex-direction:column}
+  .wrap{
+    max-width:940px;
+    margin:18px auto;
+    padding:18px 18px 8px;
+    display:flex;
+    flex-direction:column;
+    min-height: calc(100vh - 36px); /* ensures footer will be pushed to bottom */
+  }
 
   .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
   .brand{display:flex;gap:12px;align-items:center}
@@ -55,7 +76,10 @@
   .ms-change.up{color:var(--ok)} .ms-change.down{color:var(--bad)}
   hr.sep{border:none;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0}
 
-  footer{margin-top:8px;color:var(--muted);font-size:13px;padding:8px 0 12px;display:flex;justify-content:space-between;align-items:center}
+  footer{
+    margin-top:auto; /* pushes footer to bottom of .wrap */
+    color:var(--muted);font-size:13px;padding:8px 0 12px;display:flex;justify-content:space-between;align-items:center;
+  }
   a.powered{ text-decoration:none;color:inherit;display:flex;gap:8px;align-items:center}
   a.powered img{ width:44px; height:44px; border-radius:8px; object-fit:cover; box-shadow:0 8px 22px rgba(0,0,0,0.45) }
 
@@ -97,7 +121,7 @@
 
       <footer>
         <div>Made with ❤️ for Zama — love & powered by madara</div>
-        <a class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer">
+        <a class="powered" id="poweredLink" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer">
           <img id="poweredAvatar" src="madara.png" alt="madara">
           <div style="font-size:13px">
             <div style="color:var(--muted);font-size:12px">Powered by</div>
@@ -179,7 +203,6 @@ function mkCard(title, meta, neighbor){
 
   let payoutHtml = '-';
   if(title === 'month' && found && rank <= SHARE_TOP){
-    // simple linear assumption: top1 ~ 1500, top100 ~ 150
     const topMin = 1500, topMax=2000, min100=150, max100=260;
     const t = (Math.min(100, Math.max(1, rank)) - 1)/99;
     const min = Math.round(topMin + (min100 - topMin)*t);
@@ -262,7 +285,6 @@ function drawCanvas(handle, data){
   y += 36;
   if(monthFound && Number(month.rank) <= SHARE_TOP){
     const rnk = Number(month.rank);
-    // compute simple assumed range
     const topMin = 1500, topMax=2000, min100=150, max100=260;
     const t = (Math.min(100, Math.max(1, rnk)) - 1)/99;
     const mn = Math.round(topMin + (min100 - topMin)*t), mx = Math.round(topMax + (max100 - topMax)*t);
@@ -292,7 +314,7 @@ function shareImageFromDataURL(dataUrl, handle, data){
         files: [file],
         text: `${handle} — Zama Rank (30d): ${data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`
       }).catch(e=>{
-        // user cancelled or error — silently ignore
+        // user cancelled or error — ignore
       });
       return;
     }
@@ -315,20 +337,17 @@ async function performSearch(){
   const raw = ($('username').value||'').trim();
   if(!raw){ $('username').focus(); return; }
   const handle = raw.replace(/^@/,'');
-  // show results area
   showResults();
-  // simple loading cards
   const container = $('resultArea'); container.innerHTML = '';
   for(let i=0;i<3;i++){ const s=document.createElement('div'); s.className='card'; s.innerHTML=`<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`; container.appendChild(s); }
 
-  // preload avatar
-  await loadAvatar(handle);
+  // preload avatar (so share draws it later non-blocking)
+  loadAvatar(handle).catch(()=>{});
 
   try{
     const res = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
     if(!res.ok) throw new Error('Network ' + res.status);
     const data = await res.json();
-    // render cards
     container.innerHTML = '';
     const order = ['24h','7d','month'];
     for(let i=0;i<order.length;i++){
@@ -348,10 +367,7 @@ async function performSearch(){
 $('shareCardBtn').addEventListener('click', async (e) => {
   if(!lastSearch){ alert('Run Search first, then press Share Card.'); return; }
   const { handle, data } = lastSearch;
-  // draw canvas and produce dataURL
-  // ensure avatar is loaded (we attempted on search)
   const dataUrl = drawCanvas(handle, data);
-  // share
   shareImageFromDataURL(dataUrl, handle, data);
 });
 
@@ -365,10 +381,6 @@ $('clearBtn').addEventListener('click', ()=>{
   lastSearch = null;
   hideResults();
 });
-
-/* show only search area on initial load */
-hideResults();
-
 </script>
 </body>
 </html>
