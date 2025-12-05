@@ -15,9 +15,9 @@
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));}
-  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;}
-  #app{min-height:100vh;display:flex;flex-direction:column;}
-  .wrap{max-width:940px;margin:18px auto;padding:18px 18px 8px;flex:1;display:flex;flex-direction:column}
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;min-height:100vh;}
+  /* container that leaves space for footer and prevents weird color edge on mobile */
+  .wrap{max-width:940px;margin:18px auto;padding:18px;flex:1;display:flex;flex-direction:column;gap:12px;min-height:calc(100vh - 120px);}
 
   .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
   .brand{display:flex;gap:12px;align-items:center}
@@ -26,7 +26,7 @@
   h1{margin:0;font-size:18px}
   .subtitle{color:var(--muted);font-size:13px;margin-top:2px}
 
-  .search-shell{margin-top:14px;background:var(--card);padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 36px rgba(0,0,0,0.45)}
+  .search-shell{margin-top:6px;background:var(--card);padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 36px rgba(0,0,0,0.45)}
   .search-row{display:flex;gap:12px;align-items:center}
   .search-inner{flex:1;min-width:0}
   input[type="text"]{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px; height:48px;}
@@ -37,12 +37,12 @@
   .btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);min-width:84px}
   .btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#061020; min-width:132px;}
 
-  .results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start}
+  .results{margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;align-items:start}
   .card{background:var(--card);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 28px rgba(0,0,0,0.45)}
-  .card h3{margin:0 0 10px;font-size:14px}
-  .row{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
+  .card h3{margin:0 0 8px;font-size:14px}
+  .row{display:flex;justify-content:space-between;align-items:center;margin:6px 0}
   .label{color:var(--muted);font-size:13px}
-  .value{font-size:20px;font-weight:800}
+  .value{font-size:18px;font-weight:800}
 
   .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;font-size:13px}
   .badge.ok{background:rgba(62,230,168,0.12);color:var(--ok);border:1px solid rgba(62,230,168,0.12)}
@@ -52,16 +52,19 @@
   .progress-bar{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .6s ease}
   .ms-change{display:inline-flex;gap:6px;align-items:center;font-weight:700}
   .ms-change.up{color:var(--ok)} .ms-change.down{color:var(--bad)}
-  hr.sep{border:none;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0}
+  hr.sep{border:none;border-top:1px solid rgba(255,255,255,0.03);margin:8px 0}
 
-  footer{margin-top:auto;color:var(--muted);font-size:13px;padding:12px 0 12px;display:flex;justify-content:space-between;align-items:center}
+  footer{margin-top:12px;color:var(--muted);font-size:13px;padding:12px 18px 24px;display:flex;justify-content:space-between;align-items:center;background:transparent}
   a.powered{ text-decoration:none;color:inherit;display:flex;gap:8px;align-items:center}
   a.powered img{ width:44px; height:44px; border-radius:8px; object-fit:cover; box-shadow:0 8px 22px rgba(0,0,0,0.45) }
+
+  .small-note{color:var(--muted)}
 
   /* small devices */
   @media (max-width:560px){
     .search-row{flex-direction:column;align-items:stretch}
     .actions{justify-content:space-between}
+    .btn-share{min-width:110px}
   }
 </style>
 </head>
@@ -95,7 +98,7 @@
       <div id="resultArea" class="results" aria-live="polite" style="display:none"></div>
 
       <footer>
-        <div>Made with ❤️ for Zama</div>
+        <div class="small-note">Made with ❤️ for Zama</div>
         <a class="powered" id="poweredLink" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer">
           <img id="poweredAvatar" src="madara.png" alt="madara">
           <div style="font-size:13px">
@@ -112,7 +115,7 @@
 
 <script>
 /* -------- CONFIG -------- */
-const API_BASE = '/api/check';           // server endpoint (your server.js exposes /api/check)
+const API_BASE = '/api/check';           // server endpoint
 const TOTAL_FETCHED = 1500;
 const OG_NFT_TOP = 1006;
 const SHARE_TOP = 100;
@@ -190,7 +193,7 @@ function mkCard(title, meta, neighbor){
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center">
       <h3>${title}</h3>
-      <div style="text-align:right;font-weight:800;font-size:20px">${found?rank:'-'}</div>
+      <div style="text-align:right;font-weight:800;font-size:18px">${found?rank:'-'}</div>
     </div>
     <div class="row"><div class="label">Mindshare</div><div class="value">${found?fmtNum(ms):'-'}</div></div>
     <div class="row"><div class="label">Change vs next</div><div class="value">${found? (changeHtml + absHtml) : '-'}</div></div>
@@ -205,92 +208,121 @@ function mkCard(title, meta, neighbor){
   return el;
 }
 
-/* draw share canvas, returns dataURL */
+/* draw share canvas with three small boxes + one main box; returns dataURL */
 function drawCanvas(handle, data){
   const canvas = $('cardCanvas'); const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0,0,W,H);
-  // background: subtle pattern / gradient (keeps card premium look)
-  const g = ctx.createLinearGradient(0,0,W,H); g.addColorStop(0,'#0b2430'); g.addColorStop(1,'#04202a');
-  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
 
-  // optional background blobs (soft)
+  // background gradient + subtle shapes
+  const g = ctx.createLinearGradient(0,0,W,H); g.addColorStop(0,'#07242b'); g.addColorStop(1,'#02202a');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
   ctx.globalAlpha = 0.12;
-  ctx.fillStyle = '#042f33'; ctx.beginPath(); ctx.ellipse(W*0.85,H*0.15,W*0.55,H*0.45,0,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#042f33'; ctx.beginPath(); ctx.ellipse(W*0.15,H*0.85,W*0.65,H*0.5,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#02262a'; ctx.beginPath(); ctx.ellipse(W*0.85,H*0.2,W*0.6,H*0.45,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#02262a'; ctx.beginPath(); ctx.ellipse(W*0.15,H*0.85,W*0.7,H*0.55,0,0,Math.PI*2); ctx.fill();
   ctx.globalAlpha = 1;
 
-  // avatar or logo
+  // avatar (left)
   const avatar = _pre.avatar;
-  const avatarSize = 160;
-  const margin = 70;
+  const as = 140, margin = 50;
   if(avatar){
-    ctx.save(); ctx.beginPath(); ctx.arc(margin + avatarSize/2, margin + avatarSize/2, avatarSize/2, 0, Math.PI*2); ctx.closePath(); ctx.clip();
-    ctx.drawImage(avatar, margin, margin, avatarSize, avatarSize); ctx.restore();
+    ctx.save(); ctx.beginPath(); ctx.arc(margin + as/2, margin + as/2, as/2, 0, Math.PI*2); ctx.closePath(); ctx.clip();
+    ctx.drawImage(avatar, margin, margin, as, as); ctx.restore();
   } else {
-    // logo fallback circle
-    ctx.fillStyle = '#ffd24b'; ctx.beginPath(); ctx.arc(margin + avatarSize/2, margin + avatarSize/2, avatarSize/2, 0, Math.PI*2); ctx.fill();
+    // draw fallback circle with logo color
+    ctx.fillStyle = '#ffd24b'; ctx.beginPath(); ctx.arc(margin + as/2, margin + as/2, as/2, 0, Math.PI*2); ctx.fill();
   }
 
   // handle text
-  ctx.fillStyle = '#ffffff'; ctx.font = '700 44px Inter, Arial';
+  ctx.fillStyle = '#ffffff'; ctx.font = '700 40px Inter, Arial';
   const handleText = handle.startsWith('@')?handle:`@${handle}`;
-  ctx.fillText(handleText, margin + avatarSize + 36, margin + 50);
+  ctx.fillText(handleText, margin + as + 36, margin + 50);
 
-  // right big rank
+  // small timeframe boxes on top row
+  const smallW = (W - margin*3 - 420) / 3; // leave space right for main big box
+  const smallH = 90;
+  const smallLeft = margin + as + 36;
+  const keys = ['24h','7d','month'];
+  for(let i=0;i<keys.length;i++){
+    const x = smallLeft + (smallW + 12)*i;
+    const y = margin + 80;
+    // rounded rect background
+    roundRect(ctx, x, y, smallW, smallH, 12, true, false, 'rgba(255,255,255,0.03)');
+    // title + rank
+    ctx.fillStyle = '#ffffff'; ctx.font = '700 18px Inter, Arial'; ctx.fillText(keys[i].toUpperCase(), x + 12, y + 26);
+    const meta = (data.results && data.results[keys[i]]) ? data.results[keys[i]] : {};
+    const found = !!meta && meta.found===true && Number.isFinite(Number(meta.rank));
+    ctx.font = '700 24px Inter, Arial'; ctx.fillText(found?String(meta.rank):'-', x + smallW - 24, y + 32);
+    // mindshare line
+    ctx.font = '400 14px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
+    ctx.fillText('Mindshare: ' + (found?Number(meta.mindshare).toFixed(6):'-'), x + 12, y + 56);
+    // progress bar
+    const prog = found ? Math.round(progressToTop100(Number(meta.rank))*100) : 0;
+    ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fillRect(x + 12, y + 64, smallW - 24, 8);
+    if(found){ ctx.fillStyle = '#ffd24b'; ctx.fillRect(x + 12, y + 64, Math.max(6,(smallW - 24) * prog/100), 8); }
+  }
+
+  // main big box on the right
+  const bigX = W - margin - 380;
+  const bigY = margin + 20;
+  const bigW = 360, bigH = 420;
+  roundRect(ctx, bigX, bigY, bigW, bigH, 18, true, false, 'rgba(255,255,255,0.02)');
+
+  // big rank top-right inside big box
   const month = (data.results && data.results.month) ? data.results.month : {};
   const monthFound = month && month.found===true && Number.isFinite(Number(month.rank));
   const bigRank = monthFound ? String(month.rank) : '-';
-  ctx.fillStyle = '#ffffff'; ctx.font = '800 120px Inter, Arial';
+  ctx.fillStyle = '#ffffff'; ctx.font = '800 96px Inter, Arial';
   ctx.textAlign = 'right';
-  ctx.fillText(bigRank, W - margin, margin + 80);
+  ctx.fillText(bigRank, bigX + bigW - 24, bigY + 108);
   ctx.textAlign = 'left';
 
-  // list timeframes compact
-  const labels = ['24h','7d','month'];
-  let y = margin + avatarSize + 40;
-  const left = margin;
-  const barW = W - margin*2 - 200;
-  for(let i=0;i<labels.length;i++){
-    const key = labels[i];
-    const meta = (data.results && data.results[key]) ? data.results[key] : {};
-    const found = !!meta && meta.found===true && Number.isFinite(Number(meta.rank));
-    ctx.fillStyle = '#ffffff'; ctx.font = '700 22px Inter, Arial'; ctx.fillText(key.toUpperCase(), left, y);
-    ctx.font = '700 22px Inter, Arial'; ctx.fillText(found?String(meta.rank):'-', W - margin - 40, y);
-    ctx.font = '400 16px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
-    ctx.fillText('Mindshare: ' + (found?Number(meta.mindshare).toFixed(6):'-'), left, y + 22);
+  // inside big box: title, mindshare, eligibility, payout
+  ctx.fillStyle = '#9fb0bf'; ctx.font = '600 14px Inter, Arial'; ctx.fillText('MONTH', bigX + 24, bigY + 48);
+  ctx.fillStyle = '#ffd24b'; ctx.font = '700 32px Inter, Arial'; ctx.fillText(monthFound ? Number(month.mindshare).toFixed(6) : '-', bigX + 24, bigY + 90);
 
-    // progress bar
-    const prog = found ? Math.round(progressToTop100(Number(meta.rank))*100) : 0;
-    ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fillRect(left, y + 32, barW, 12);
-    if(found){ ctx.fillStyle = '#ffd24b'; ctx.fillRect(left, y + 32, Math.max(8, (barW * prog / 100)), 12); }
-    y += 82;
-  }
-
-  // month eligibility & assumed payout
-  let badgeText = 'No data';
+  // eligibility badge
+  let badge = 'No data';
   if(monthFound){
     const r = Number(month.rank);
-    badgeText = (r <= SHARE_TOP) ? 'Eligible: OG NFT + Revenue Share' : ((r <= OG_NFT_TOP) ? 'Eligible: OG NFT' : 'Not eligible');
+    badge = (r <= SHARE_TOP) ? 'Eligible: OG NFT + Revenue Share' : ((r <= OG_NFT_TOP) ? 'Eligible: OG NFT' : 'Not eligible');
   }
   ctx.fillStyle = monthFound && Number(month.rank) <= SHARE_TOP ? '#3ee6a8' : '#9fb0bf';
-  ctx.font = '700 20px Inter, Arial'; ctx.fillText(badgeText, left, y);
-  y += 36;
+  ctx.font = '700 14px Inter, Arial'; ctx.fillText(badge, bigX + 24, bigY + 138);
+
+  // payout line (if eligible)
   if(monthFound && Number(month.rank) <= SHARE_TOP){
     const rnk = Number(month.rank);
     const topMin = 1500, topMax=2000, min100=150, max100=260;
     const t = (Math.min(100, Math.max(1, rnk)) - 1)/99;
     const mn = Math.round(topMin + (min100 - topMin)*t), mx = Math.round(topMax + (max100 - topMax)*t);
-    ctx.fillStyle = '#ffffff'; ctx.font = '600 20px Inter, Arial';
-    ctx.fillText(`Assumed payout: ${money(mn)} - ${money(mx)}`, left, y);
+    ctx.fillStyle = '#ffffff'; ctx.font = '600 18px Inter, Arial';
+    ctx.fillText(`Assumed payout: ${money(mn)} - ${money(mx)}`, bigX + 24, bigY + 172);
+  } else {
+    ctx.fillStyle = '#9fb0bf'; ctx.font = '500 14px Inter, Arial';
+    ctx.fillText('Assumed payout (if eligible): -', bigX + 24, bigY + 172);
   }
 
-  // footer text
+  // bottom footer text
   ctx.font = '500 14px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
   ctx.fillText('Powered by madara — zama-rank.vercel.app', margin, H - 40);
 
-  // return image
+  // done
   return canvas.toDataURL('image/png');
+
+  // helper: rounded rect
+  function roundRect(ctx,x,y,w,h,r,fill,stroke, fillStyle){
+    if(typeof r === 'undefined') r=8;
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+    if(fill){ ctx.save(); if(fillStyle) ctx.fillStyle=fillStyle; ctx.fill(); ctx.restore(); }
+    if(stroke){ ctx.stroke(); }
+  }
 }
 
 /* export dataURL -> file and share (runs inside user gesture) */
@@ -304,17 +336,16 @@ function shareImageFromDataURL(dataUrl, handle, data){
     const file = new File([blob], `${handle}-zama-rank.png`, {type:'image/png'});
 
     if(navigator.canShare && navigator.canShare({files:[file]})){
-      // navigator.share must be invoked from user gesture (button click) - this is bound correctly
       navigator.share({
         files: [file],
         text: `${handle} — Zama Rank (30d): ${data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`
       }).catch(e=>{
-        // user cancelled or error — silently ignore
+        // user cancelled or error — ignore
       });
       return;
     }
 
-    // fallback: download then open tweet intent
+    // fallback: download + open tweet compose
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url; a.download = `${handle}-zama-rank.png`; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),2000);
@@ -332,19 +363,24 @@ async function performSearch(){
   const raw = ($('username').value||'').trim();
   if(!raw){ $('username').focus(); return; }
   const handle = raw.replace(/^@/,'');
-  // show results area
   showResults();
-  // simple loading cards
-  const container = $('resultArea'); container.innerHTML = '';
-  for(let i=0;i<3;i++){ const s=document.createElement('div'); s.className='card'; s.innerHTML=`<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`; container.appendChild(s); }
 
-  // preload avatar
+  // loading placeholders
+  const container = $('resultArea'); container.innerHTML = '';
+  for(let i=0;i<3;i++){
+    const s=document.createElement('div'); s.className='card';
+    s.innerHTML=`<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`;
+    container.appendChild(s);
+  }
+
+  // load avatar for share card
   await loadAvatar(handle);
 
   try{
     const res = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
     if(!res.ok) throw new Error('Network ' + res.status);
     const data = await res.json();
+
     // render cards
     container.innerHTML = '';
     const order = ['24h','7d','month'];
@@ -352,8 +388,8 @@ async function performSearch(){
       const k = order[i]; const neighbor = (i<order.length-1) ? data.results[order[i+1]] || null : null;
       container.appendChild( mkCard(k, data.results[k]||{}, neighbor) );
     }
-    // update footer avatar link to go to the user when clicked
-    $('poweredAvatar').src = _pre.powered ? 'madara.png' : 'madara.png';
+
+    // ensure footer link points to user's X by default (so clicking avatar goes to their profile)
     $('poweredLink').href = `https://x.com/${encodeURIComponent(handle)}`;
     lastSearch = { handle, data };
   }catch(err){
@@ -364,13 +400,11 @@ async function performSearch(){
   }
 }
 
-/* Share handler - requires a previous successful search, must be called directly by user gesture */
+/* Share handler - must be triggered by user click */
 $('shareCardBtn').addEventListener('click', async (e) => {
   if(!lastSearch){ alert('Run Search first, then press Share Card.'); return; }
   const { handle, data } = lastSearch;
-  // draw canvas and produce dataURL
   const dataUrl = drawCanvas(handle, data);
-  // share (from user click)
   shareImageFromDataURL(dataUrl, handle, data);
 });
 
@@ -383,9 +417,9 @@ $('clearBtn').addEventListener('click', ()=>{
   $('username').value = '';
   lastSearch = null;
   hideResults();
+  // reset footer link
+  $('poweredLink').href = 'https://x.com/0x_madara_';
 });
-
-/* ensure footer stays at bottom even when results hidden (wrap has flex) */
 </script>
 </body>
 </html>
