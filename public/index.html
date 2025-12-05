@@ -7,36 +7,40 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg1:#000409; --bg2:#071025; --card:rgba(255,255,255,0.03);
-    --muted:#9fb0bf; --accent1:#ffd24b; --accent2:#ff6b6b; --text:#eaf3fb;
-    --ok:#3ee6a8; --bad:#ff7b7b;
+    --bg1:#000409; --bg2:#071025;
+    --card:rgba(255,255,255,0.03);
+    --muted:#9fb0bf;
+    --accent1:#ffd24b; --accent2:#ff6b6b;
+    --text:#eaf3fb; --ok:#3ee6a8; --bad:#ff7b7b;
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));}
-  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;min-height:100vh;background-attachment:fixed;}
-  #app{min-height:100vh;display:flex;flex-direction:column}
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;min-height:100vh;background-attachment:fixed;}
 
-  .wrap{max-width:940px;margin:20px auto;padding:22px 18px 64px;flex:1;display:flex;flex-direction:column} /* increased bottom padding */
+  #app{min-height:100vh;display:flex;flex-direction:column;}
+  .wrap{max-width:940px;margin:18px auto;padding:20px 18px 36px;flex:1;display:flex;flex-direction:column}
 
   .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
   .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:44px;height:44px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(0,0,0,0.45)}
+  .logo{width:48px;height:48px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(0,0,0,0.45)}
   .logo img{width:100%;height:100%;object-fit:cover}
-  h1{margin:0;font-size:16px}
+  h1{margin:0;font-size:18px}
   .subtitle{color:var(--muted);font-size:13px;margin-top:2px}
 
-  .search-shell{margin-top:14px;background:var(--card);padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 12px 40px rgba(0,0,0,0.5)}
-  .search-row{display:flex;gap:10px;align-items:center}
-  .search-inner{flex:1}
-  input[type="text"]{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px}
-  .actions{display:flex;gap:10px;align-items:center}
-  .btn{padding:10px 14px;border-radius:12px;border:0;cursor:pointer;font-weight:700}
-  .btn-search{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020;box-shadow:0 8px 30px rgba(0,0,0,0.5)}
-  .btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+  .search-shell{margin-top:14px;background:var(--card);padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 36px rgba(0,0,0,0.45)}
+  .search-row{display:flex;gap:12px;align-items:center}
+  .search-inner{flex:1;min-width:0}
+  input[type="text"]{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px; height:48px;}
 
-  .results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start}
-  .card{background:var(--card);padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 30px rgba(0,0,0,0.45)}
-  .card h3{margin:0 0 12px;font-size:14px}
+  .actions{display:flex;gap:10px;align-items:center}
+  .btn{padding:10px 16px;border-radius:12px;border:0;cursor:pointer;font-weight:800;display:inline-flex;align-items:center;justify-content:center;min-height:44px}
+  .btn-search{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020;box-shadow:0 10px 30px rgba(0,0,0,0.5);min-width:120px}
+  .btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);min-width:84px}
+  .btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#061020; min-width:132px;}
+
+  .results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start;min-height:420px}
+  .card{background:var(--card);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 28px rgba(0,0,0,0.45)}
+  .card h3{margin:0 0 10px;font-size:14px}
   .row{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
   .label{color:var(--muted);font-size:13px}
   .value{font-size:20px;font-weight:800}
@@ -47,20 +51,18 @@
 
   .progress-shell{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
   .progress-bar{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .6s ease}
-
   .ms-change{display:inline-flex;gap:6px;align-items:center;font-weight:700}
   .ms-change.up{color:var(--ok)} .ms-change.down{color:var(--bad)}
   hr.sep{border:none;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0}
 
-  footer{margin-top:18px;color:var(--muted);font-size:13px;padding:18px 0 28px;display:flex;justify-content:space-between;align-items:center}
-  a.powered { text-decoration:none;color:inherit;display:flex;gap:8px;align-items:center }
-  a.powered img { width:44px; height:44px; border-radius:8px; object-fit:cover; transition: transform .18s ease, box-shadow .18s ease; box-shadow: 0 8px 22px rgba(0,0,0,0.45) }
-  a.powered:hover img { transform: rotate(-6deg) scale(1.03); box-shadow: 0 14px 40px rgba(0,0,0,0.45); }
+  footer{margin-top:18px;color:var(--muted);font-size:13px;padding:12px 0 18px;display:flex;justify-content:space-between;align-items:center}
+  a.powered{ text-decoration:none;color:inherit;display:flex;gap:8px;align-items:center}
+  a.powered img{ width:44px; height:44px; border-radius:8px; object-fit:cover; box-shadow:0 8px 22px rgba(0,0,0,0.45) }
 
   @media (max-width:560px){
     .search-row{flex-direction:column;align-items:stretch}
     .actions{justify-content:space-between}
-    a.powered img{width:40px;height:40px}
+    .results{min-height:480px}
   }
 </style>
 </head>
@@ -85,15 +87,17 @@
           <div class="actions">
             <button id="searchBtn" class="btn btn-search">🔎 Search</button>
             <button id="clearBtn" class="btn btn-clear">Clear</button>
-            <button id="shareCardBtn" class="btn btn-search" title="Share card (premium)">Share Card</button>
+            <button id="shareCardBtn" class="btn btn-share">Share Card</button>
           </div>
         </div>
       </div>
 
-      <div id="resultArea" class="results" aria-live="polite"></div>
+      <div id="resultArea" class="results" aria-live="polite">
+        <!-- placeholders -->
+      </div>
 
       <footer>
-        <div>Made with ❤️ </div>
+        <div>Made with ❤️ for Zama — love & powered by madara</div>
         <a class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer">
           <img id="poweredAvatar" src="madara.png" alt="madara">
           <div style="font-size:13px">
@@ -105,7 +109,7 @@
     </div>
   </div>
 
-  <!-- increased canvas height to avoid clipping and black bottom -->
+  <!-- canvas used for share card -->
   <canvas id="cardCanvas" width="1200" height="760" style="display:none"></canvas>
 
 <script>
@@ -117,11 +121,12 @@ const SHARE_TOP = 100;
 
 const ASSUMED_TOP_MIN = 1500;
 const ASSUMED_TOP_MAX = 2000;
-const ASSUMED_100_MIN = 200;
-const ASSUMED_100_MAX = 200;
+const ASSUMED_100_MIN = 150;
+const ASSUMED_100_MAX = 260;
 
-/* HELPERS */
 const $ = id => document.getElementById(id);
+
+/* helpers */
 function fmtNum(n, dec = 8){ if(n==null || !isFinite(Number(n))) return '-'; return Number(n).toFixed(dec); }
 function money(n){ if(n==null || !isFinite(Number(n))) return '-'; return '$' + Number(n).toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0}); }
 function lerp(a,b,t){ return a + (b-a)*t; }
@@ -146,7 +151,7 @@ function computeChange(curr,next){
   return {dir: diff>0 ? 'up' : (diff<0 ? 'down' : 'same'), pct: Math.round(Math.abs(pct)*10)/10, abs: Math.round(diff*1000000)/1000000};
 }
 
-/* PRELOAD: static images */
+/* preload static images */
 const _preloaded = { 'zama-logo.png': null, 'madara.png': null, avatar: null };
 function preloadStatic(){
   ['zama-logo.png','madara.png'].forEach(src=>{
@@ -157,64 +162,75 @@ function preloadStatic(){
 }
 preloadStatic();
 
-/* Try to load avatar from unavatar, fallback to null */
+/* avatar fetch */
 async function preloadAvatarForHandle(handle){
   return new Promise(resolve=>{
     const url = `https://unavatar.io/x/${encodeURIComponent(handle)}`;
     const im = new Image(); im.crossOrigin='anonymous';
     im.onload = ()=>{
-      // ensure it's not tiny (site icons can be small)
       if((im.naturalWidth||0) >= 32 && (im.naturalHeight||0) >= 32){
-        _preloaded.avatar = im;
-        resolve(true);
-      } else {
-        _preloaded.avatar = null; resolve(false);
-      }
+        _preloaded.avatar = im; resolve(true);
+      } else { _preloaded.avatar = null; resolve(false); }
     };
     im.onerror = ()=>{ _preloaded.avatar = null; resolve(false); };
-    im.src = url + '?fallback=true'; // try to get avatar (unavatar will return placeholder if not found)
-    // note: if unavatar returns site-icon sometimes it's small and we reject above
+    im.src = url + '?fallback=true';
   });
 }
 
-/* UI building */
-function skeletonCard(){ const c=document.createElement('div'); c.className='card'; c.innerHTML='<h3 style="background:rgba(255,255,255,0.02;width:110px;height:18px;border-radius:6px"></h3><div class="row"><div class="label" style="background:rgba(255,255,255,0.02;width:80px;height:12px"></div><div class="value" style="background:rgba(255,255,255,0.02;width:80px;height:20px"></div></div>'; return c; }
+/* placeholders */
+function showPlaceholders(){
+  const container = $('resultArea'); container.innerHTML='';
+  ['24h','7d','month'].forEach(t => {
+    const el = document.createElement('div'); el.className='card';
+    el.innerHTML = `<h3>${t}</h3><div style="color:var(--muted);margin-top:8px">Search to show data</div>`;
+    container.appendChild(el);
+  });
+}
+showPlaceholders();
 
+/* UI card builder - only show eligibility/progress/payout when meta.found === true and rank is finite */
 function mkCard(title, meta, neighbor){
   const c=document.createElement('div'); c.className='card';
-  const rank = meta?.rank ?? null;
-  const ms = meta?.mindshare ?? null;
-  const prog = Math.round(progressToTop100(rank)*100);
-  const change = computeChange(meta||{}, neighbor||{});
-  const changeHtml = change.dir==='same' ? '-' : `<span class="ms-change ${change.dir}">${change.dir==='up'?'▲':'▼'} ${change.pct}%</span>`;
-  const absHtml = change.abs ? ` (${change.abs>0?'+':''}${change.abs})` : '';
 
-  // only show eligibility badge on 'month' timeframe (winners use 30d)
+  const hasData = !!meta && meta.found === true && Number.isFinite(Number(meta.rank));
+  const rank = hasData ? Number(meta.rank) : null;
+  const ms = hasData ? meta.mindshare : null;
+  const prog = hasData ? Math.round(progressToTop100(rank)*100) : 0;
+  const change = computeChange(hasData ? meta : {}, neighbor && neighbor.found===true ? neighbor : {});
+  const changeHtml = change.dir==='same' ? '-' : `<span class="ms-change ${change.dir}">${change.dir==='up'?'▲':'▼'} ${change.pct}%</span>`;
+  const absHtml = (change.abs && change.abs !== 0) ? ` (${change.abs>0?'+':''}${change.abs})` : '';
+
   let badgeHtml = '';
-  if (title === 'month' && isFinite(rank)) {
+  if (title === 'month' && hasData) {
     if (rank <= SHARE_TOP) badgeHtml = `<span class="badge ok">Eligible for OG NFT + Revenue Share</span>`;
     else if (rank <= OG_NFT_TOP) badgeHtml = `<span class="badge ok">Eligible for OG NFT</span>`;
     else badgeHtml = `<span class="badge neutral">Not Eligible</span>`;
   }
 
   let payoutHtml = '-';
-  if(title === 'month' && isFinite(rank) && rank <= SHARE_TOP){
+  if(title === 'month' && hasData && rank <= SHARE_TOP){
     const r = assumedPayoutRange(rank);
     payoutHtml = `${money(r.min)} - ${money(r.max)}`;
   }
 
+  // When no data, show '-' placeholders
+  const rankDisplay = hasData ? rank : '-';
+  const msDisplay = hasData ? fmtNum(ms) : '-';
+  const changeDisplay = hasData ? (changeHtml + absHtml) : '-';
+  const progressText = hasData ? `Progress to Top 100: ${prog}% • Total fetched: ${TOTAL_FETCHED}` : 'No data • Total fetched: ' + TOTAL_FETCHED;
+
   c.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center">
       <h3>${title}</h3>
-      <div style="text-align:right;font-weight:800;font-size:20px">${rank ?? '-'}</div>
+      <div style="text-align:right;font-weight:800;font-size:20px">${rankDisplay}</div>
     </div>
 
-    <div class="row"><div class="label">Mindshare</div><div class="value">${fmtNum(ms)}</div></div>
-    <div class="row"><div class="label">Change vs next</div><div class="value">${changeHtml}${absHtml}</div></div>
+    <div class="row"><div class="label">Mindshare</div><div class="value">${msDisplay}</div></div>
+    <div class="row"><div class="label">Change vs next</div><div class="value">${changeDisplay}</div></div>
 
     <div style="margin-top:8px">
-      <div class="progress-shell" aria-hidden="true"><div class="progress-bar" style="width:${prog}%"></div></div>
-      <div style="font-size:12px;color:var(--muted);margin-top:6px">Progress to Top 100: ${prog}% • Total fetched: ${TOTAL_FETCHED}</div>
+      <div class="progress-shell" aria-hidden="true"><div class="progress-bar" style="width:${hasData ? prog + '%' : '0%'}"></div></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px">${progressText}</div>
     </div>
 
     <div style="margin-top:10px">${badgeHtml}</div>
@@ -224,17 +240,16 @@ function mkCard(title, meta, neighbor){
   return c;
 }
 
-/* Share canvas drawing (includes all timeframes and uses user avatar if loaded) */
+/* draw share canvas (only show eligibility when month meta found true) */
 function drawShareCanvasAll(handle, data){
   const canvas = $('cardCanvas'); const ctx = canvas.getContext('2d');
-  // ensure full opaque bg to avoid any transparent black strip
+  ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.fillStyle = '#071025'; ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  // safe margins
   const marginX = 56;
   let y = 60;
 
-  // avatar (circle) on left
+  // avatar attempt
   const avatar = _preloaded.avatar;
   if(avatar){
     const avSize = 96;
@@ -242,18 +257,16 @@ function drawShareCanvasAll(handle, data){
     ctx.save(); ctx.beginPath(); ctx.arc(ax+avSize/2, ay+avSize/2, avSize/2, 0, Math.PI*2); ctx.closePath(); ctx.clip();
     ctx.drawImage(avatar, ax, ay, avSize, avSize); ctx.restore();
   } else {
-    // fallback square logo
+    // fallback to logo tile
     ctx.fillStyle = '#ffd24b'; ctx.fillRect(marginX, y-8, 96, 96);
     const lg = _preloaded['zama-logo.png']; if(lg) ctx.drawImage(lg, marginX+8, y, 80, 80);
   }
 
-  // header
   ctx.fillStyle = '#eaf3fb'; ctx.font = '700 36px Inter, Arial';
   ctx.fillText(handle.startsWith('@')?handle:`@${handle}`, marginX + 120, y + 30);
 
   y += 96;
 
-  // three timeframes
   const labels = ['24h','7d','month'];
   const leftX = marginX + 120;
   const rightX = canvas.width - 120;
@@ -262,128 +275,148 @@ function drawShareCanvasAll(handle, data){
   for(let i=0;i<labels.length;i++){
     const key = labels[i];
     const meta = (data.results && data.results[key]) ? data.results[key] : {};
+    const hasData = !!meta && meta.found === true && Number.isFinite(Number(meta.rank));
     ctx.fillStyle = '#ffffff'; ctx.font = '700 18px Inter, Arial'; ctx.fillText(key.toUpperCase(), leftX, y);
-    ctx.font = '700 26px Inter, Arial'; ctx.fillText((meta.rank!=null ? meta.rank : '-'), rightX, y);
+    ctx.font = '700 26px Inter, Arial'; ctx.fillText( (hasData ? meta.rank : '-') , rightX, y);
     ctx.font = '400 15px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
-    ctx.fillText('Mindshare: ' + (meta.mindshare ? Number(meta.mindshare).toFixed(6) : '-'), leftX, y + 22);
+    ctx.fillText('Mindshare: ' + (hasData && meta.mindshare ? Number(meta.mindshare).toFixed(6) : '-'), leftX, y + 22);
 
-    // change
     const neighbor = (i < labels.length - 1) ? (data.results[labels[i+1]] || null) : null;
-    const ch = computeChange(meta, neighbor);
+    const neighborHas = neighbor && neighbor.found === true && Number.isFinite(Number(neighbor.rank));
+    const ch = computeChange(hasData ? meta : {}, neighborHas ? neighbor : {});
     ctx.fillStyle = ch.dir === 'up' ? '#3ee6a8' : (ch.dir === 'down' ? '#ff7b7b' : '#9fb0bf');
     ctx.font = '700 16px Inter, Arial';
-    ctx.fillText(ch.dir==='same' ? '-' : `${ch.dir==='up' ? '▲' : '▼'} ${ch.pct}%`, rightX - 160, y + 22);
+    ctx.fillText(hasData && neighborHas ? (ch.dir==='up' ? '▲ ' + ch.pct + '%' : (ch.dir==='down' ? '▼ ' + ch.pct + '%' : '-')) : '-', rightX - 160, y + 22);
 
-    // progress bar
-    const prog = Math.round(progressToTop100(meta.rank) * 100);
+    const prog = hasData ? Math.round(progressToTop100(Number(meta.rank)) * 100) : 0;
     const barX = leftX; const barY = y + 30;
     ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fillRect(barX, barY, barWidth, 14);
-    ctx.fillStyle = '#ffd24b'; ctx.fillRect(barX, barY, Math.max(8, (barWidth * prog / 100)), 14);
-
+    if(hasData) ctx.fillStyle = '#ffd24b', ctx.fillRect(barX, barY, Math.max(8, (barWidth * prog / 100)), 14);
     y += 82;
   }
 
-  // month eligibility and payout
   const monthMeta = (data.results && data.results['month']) ? data.results['month'] : {};
-  const mRank = Number(monthMeta.rank) || 999999;
+  const monthHas = monthMeta && monthMeta.found === true && Number.isFinite(Number(monthMeta.rank));
+  const mRank = monthHas ? Number(monthMeta.rank) : null;
   ctx.font = '700 18px Inter, Arial';
-  ctx.fillStyle = (mRank <= SHARE_TOP || mRank <= OG_NFT_TOP) ? '#3ee6a8' : '#9fb0bf';
+  ctx.fillStyle = (monthHas && (mRank <= SHARE_TOP || mRank <= OG_NFT_TOP)) ? '#3ee6a8' : '#9fb0bf';
   let badgeText = 'Not eligible';
-  if(mRank <= SHARE_TOP) badgeText = 'Eligible: OG NFT + Revenue Share';
-  else if(mRank <= OG_NFT_TOP) badgeText = 'Eligible: OG NFT';
+  if(monthHas){
+    if(mRank <= SHARE_TOP) badgeText = 'Eligible: OG NFT + Revenue Share';
+    else if(mRank <= OG_NFT_TOP) badgeText = 'Eligible: OG NFT';
+    else badgeText = 'Not eligible';
+  } else {
+    badgeText = 'No data';
+  }
   ctx.fillText(badgeText, leftX, y);
 
-  if(mRank <= SHARE_TOP){
+  if(monthHas && mRank <= SHARE_TOP){
     const r = assumedPayoutRange(mRank);
     ctx.font = '600 20px Inter, Arial'; ctx.fillStyle = '#ffffff';
     ctx.fillText(`Assumed payout: ${money(r.min)} - ${money(r.max)}`, leftX, y + 36);
   }
 
-  // footer credit
   ctx.font = '500 14px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
   ctx.fillText('Powered by madara — zama-rank.vercel.app', marginX, canvas.height - 40);
 
-  // return base64
   return canvas.toDataURL('image/png');
 }
 
+/* convert dataURL -> File */
 function dataURLtoFile(dataurl, filename){
   const arr = dataurl.split(','); const mime = arr[0].match(/:(.*?);/)[1]; const bstr = atob(arr[1]); let n=bstr.length; const u8 = new Uint8Array(n);
   while(n--) u8[n] = bstr.charCodeAt(n);
   return new File([u8], filename, { type: mime });
 }
 
-async function shareWithFile(handle, data){
-  try{
-    const dataUrl = drawShareCanvasAll(handle, data);
-    const file = dataURLtoFile(dataUrl, `${handle}-zama-rank.png`);
-    const text = `${handle} — Zama Rank (30d): ${data.results?.['month']?.rank || '-'} • Mindshare: ${data.results?.['month']?.mindshare || '-'}\nCheck: https://zama-rank.vercel.app`;
-
-    if(navigator.canShare && navigator.canShare({ files: [file] })){
-      await navigator.share({ files: [file], text });
-      return;
-    }
-
-    // fallback: download, then open X compose prefilled
-    const url = URL.createObjectURL(file);
-    const a = document.createElement('a'); a.href = url; a.download = `${handle}-zama-rank.png`; document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url),2000);
-    const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
-    window.open(xUrl, '_blank');
-  }catch(err){
-    alert('Share failed: ' + (err.message || err));
-  }
-}
-
-/* MAIN */
-const resultArea = $('resultArea'), searchBtn = $('searchBtn'), clearBtn = $('clearBtn'), shareCardBtn = $('shareCardBtn');
-
-function showSkeletons(){ resultArea.innerHTML=''; for(let i=0;i<3;i++) resultArea.appendChild(skeletonCard()); }
+/* UI functions */
+function showSkeletons(){ const container = $('resultArea'); container.innerHTML=''; for(let i=0;i<3;i++){ const s=document.createElement('div'); s.className='card'; s.innerHTML='<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>'; container.appendChild(s);} }
 
 async function performSearch(){
   const raw = ($('username').value||'').trim(); if(!raw){ $('username').focus(); return; }
   const handle = raw.replace(/^@/,'');
-  showSkeletons(); searchBtn.disabled = true;
-  // preload avatar (non-blocking until awaited)
+  showSkeletons();
   await preloadAvatarForHandle(handle);
-
   try{
     const r = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
     if(!r.ok) throw new Error('Network ' + r.status);
     const data = await r.json();
-    resultArea.innerHTML = '';
+    const container = $('resultArea'); container.innerHTML='';
     const order = ['24h','7d','month'];
     for(let i=0;i<order.length;i++){
-      const key = order[i];
-      const neighbor = (i<order.length-1) ? (data.results[order[i+1]] || null) : null;
-      resultArea.appendChild( mkCard(key, data.results[key], neighbor) );
+      const key = order[i]; const neighbor = (i<order.length-1) ? (data.results[order[i+1]] || null) : null;
+      container.appendChild( mkCard(key, data.results[key], neighbor) );
     }
-    // share uses latest data
-    shareCardBtn.onclick = ()=> shareWithFile(handle, data);
+    window._lastSearchData = { handle, data };
   }catch(err){
-    resultArea.innerHTML = `<div class="card"><h3>Error</h3><div style="color:var(--muted);margin-top:6px">${err.message}</div></div>`;
-  }finally{ searchBtn.disabled = false; }
+    $('resultArea').innerHTML = `<div class="card"><h3>Error</h3><div style="color:var(--muted);margin-top:6px">${err.message}</div></div>`;
+  }
 }
 
-searchBtn.addEventListener('click', performSearch);
-clearBtn.addEventListener('click', ()=>{ $('username').value=''; resultArea.innerHTML=''; });
+/* SHARE handler that keeps action inside user gesture (uses canvas.toBlob callback) */
+$('shareCardBtn').addEventListener('click', (evt) => {
+  const raw = ($('username').value || '').trim();
+  if (!raw) { alert('Search a handle first'); return; }
+  const handle = raw.replace(/^@/, '');
 
-shareCardBtn.addEventListener('click', async ()=>{
-  const raw = ($('username').value||'').trim(); if(!raw) return alert('Search a handle first');
-  const handle = raw.replace(/^@/,'');
-  await preloadAvatarForHandle(handle);
-  try{
-    const r = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
-    if(!r.ok) throw new Error('Network ' + r.status);
-    const data = await r.json();
-    await shareWithFile(handle, data);
-  }catch(e){ alert('Failed to prepare share card: ' + (e.message || e)); }
+  if (!window._lastSearchData || window._lastSearchData.handle !== handle) {
+    alert('Please run Search first, then tap Share Card (this ensures fast native share).');
+    return;
+  }
+
+  const data = window._lastSearchData.data;
+
+  try {
+    drawShareCanvasAll(handle, data);
+    const canvas = $('cardCanvas');
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) { alert('Failed to prepare share image'); return; }
+      const file = new File([blob], `${handle}-zama-rank.png`, { type: blob.type || 'image/png' });
+      try {
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            text: `${handle} — Zama Rank (30d): ${data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`
+          });
+          return;
+        }
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = `${handle}-zama-rank.png`; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url),2000);
+        const text = `${handle} — Zama Rank (30d): ${data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`;
+        window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+
+      } catch (err) {
+        if (err && (err.name === 'AbortError' || (err.message && (err.message.toLowerCase().includes('cancel') || err.message.toLowerCase().includes('user'))))) {
+          return;
+        }
+        alert('Share failed: ' + (err && err.message ? err.message : err));
+      }
+    }, 'image/png');
+
+  } catch (err) {
+    alert('Share failed: ' + (err && err.message ? err.message : err));
+  }
 });
 
-$('username').addEventListener('keydown', (e)=>{ if(e.key==='Enter') performSearch(); });
+document.getElementById('searchBtn').addEventListener('click', performSearch);
+document.getElementById('username').addEventListener('keydown', (e)=>{ if(e.key==='Enter') performSearch(); });
+document.getElementById('clearBtn').addEventListener('click', ()=>{ document.getElementById('username').value=''; showPlaceholders(); });
 
-// safety: increase bottom padding to avoid any small flash
-document.querySelector('.wrap').style.paddingBottom = '64px';
+/* small fallback: ensure placeholders on load */
+function showPlaceholders(){ showPlaceholdersInner(); }
+function showPlaceholdersInner(){
+  const container = $('resultArea'); container.innerHTML='';
+  ['24h','7d','month'].forEach(t => {
+    const el = document.createElement('div'); el.className='card';
+    el.innerHTML = `<h3>${t}</h3><div style="color:var(--muted);margin-top:8px">Search to show data</div>`;
+    container.appendChild(el);
+  });
+}
+showPlaceholdersInner();
+
 </script>
 </body>
 </html>
