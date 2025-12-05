@@ -7,48 +7,29 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg: #02070b;
-      --card: rgba(255,255,255,0.03);
-      --muted: #9fb0bf;
-      --accent1: #ffd24b;
-      --accent2: #ff6b6b;
-      --glass: rgba(255,255,255,0.03);
-      --text: #eaf3fb;
-      --success: #3ee6a8;
-      --danger: #ff7b7b;
+      --bg:#02070b; --card:rgba(255,255,255,0.03); --muted:#9fb0bf;
+      --accent1:#ffd24b; --accent2:#ff6b6b; --text:#eaf3fb;
+      --ok:#3ee6a8; --bad:#ff7b7b;
     }
-    [data-theme="light"]{
-      --bg: #f7fafc; --card:#fff; --muted:#5b6b76; --text:#061020; --glass: rgba(0,0,0,0.04);
-    }
-
     *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; min-height:100vh; background: linear-gradient(180deg,var(--bg),#071025 100%);
-      color:var(--text); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial; -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-    }
-
-    .wrap{max-width:980px;margin:18px auto;padding:16px;}
-    .toprow{display:flex;gap:12px;align-items:center;justify-content:space-between}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#071025 100%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    #app{min-height:100vh;display:flex;flex-direction:column}
+    .wrap{max-width:880px;margin:18px auto;padding:16px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
     .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:48px;height:48px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center}
+    .logo{width:44px;height:44px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center}
     .logo img{width:100%;height:100%;object-fit:cover}
-    h1{margin:0;font-size:18px}
+    h1{margin:0;font-size:16px}
     .subtitle{color:var(--muted);font-size:13px;margin-top:2px}
 
-    .controls{display:flex;gap:12px;align-items:center}
-    .theme-toggle{padding:8px 12px;border-radius:10px;border:0;background:transparent;color:var(--muted);cursor:pointer}
-
-    .search-shell{margin-top:14px;background:var(--card);padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,0.03)}
+    .search-shell{margin-top:14px;background:var(--card);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
     .search-row{display:flex;gap:10px;align-items:center}
-    .search-inner{flex:1;position:relative;min-width:0}
-    .search-row input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px}
-    .actions{display:flex;gap:10px}
+    .search-inner{flex:1}
+    input[type="text"]{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:16px}
+    .actions{display:flex;gap:8px;min-width:260px;justify-content:flex-end}
     .btn{padding:10px 14px;border-radius:12px;border:0;cursor:pointer;font-weight:700}
     .btn-search{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020}
     .btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
-    .btn[disabled]{opacity:0.6;cursor:not-allowed}
 
     .results{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
     .card{background:var(--card);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
@@ -57,234 +38,321 @@
     .label{color:var(--muted);font-size:13px}
     .value{font-size:20px;font-weight:800}
 
-    /* progress bar */
+    .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;font-size:13px}
+    .badge.ok{background:rgba(62,230,168,0.12);color:var(--ok);border:1px solid rgba(62,230,168,0.12)}
+    .badge.no{background:rgba(255,123,123,0.06);color:var(--bad);border:1px solid rgba(255,123,123,0.06)}
+    .badge.neutral{background:rgba(255,255,255,0.03);color:var(--muted);border:1px solid rgba(255,255,255,0.03)}
+
     .progress-shell{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
     .progress-bar{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .6s ease}
 
     .ms-change{display:inline-flex;gap:6px;align-items:center;font-weight:700}
-    .ms-change.up{color:var(--success)} .ms-change.down{color:var(--danger)}
+    .ms-change.up{color:var(--ok)} .ms-change.down{color:var(--bad)}
 
-    .bottom-actions{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
-    .share-btn{padding:8px 12px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));cursor:pointer;font-weight:700;color:#061020}
-
-    .skeleton{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.04), rgba(255,255,255,0.02));height:14px;border-radius:6px}
-
-    footer{margin-top:18px;display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px}
+    footer{margin-top:auto;display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px;padding:20px 0 28px}
     .powered{display:flex;gap:8px;align-items:center}
-    .powered img{width:40px;height:40px;border-radius:8px;object-fit:cover;box-shadow:0 8px 22px rgba(0,0,0,0.5)}
-
-    @media (max-width:520px){
-      .toprow{flex-direction:column;align-items:flex-start;gap:8px}
-      .search-row{flex-direction:column;align-items:stretch}
-    }
+    a.powered { text-decoration: none; color: inherit; display:flex; gap:8px; align-items:center }
+    a.powered img { transition: transform .18s ease, box-shadow .18s ease; }
+    a.powered:hover img { transform: rotate(-6deg) scale(1.03); box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
+    @media (max-width:520px){ .topbar{flex-direction:column;align-items:flex-start;gap:8px} .search-row{flex-direction:column;align-items:stretch} .actions{justify-content:space-between} }
   </style>
 </head>
 <body>
-  <div class="wrap" id="app">
-    <div class="toprow">
-      <div class="brand">
-        <div class="logo"><img src="zama-logo.png" alt="logo" /></div>
-        <div>
-          <h1>ZAMA RANK</h1>
-          <div class="subtitle">Search X handle (e.g. @0x_madara_)</div>
+  <div id="app">
+    <div class="wrap">
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo"><img src="zama-logo.png" alt="Zama"></div>
+          <div>
+            <h1>ZAMA SZN 5 RANK</h1>
+            <div class="subtitle">Search X handle (e.g. @0x_madara_)</div>
+          </div>
         </div>
       </div>
 
-      <div class="controls">
-        <button id="themeToggle" class="theme-toggle">Toggle theme</button>
+      <div class="search-shell" role="search" aria-label="Search X handle">
+        <div class="search-row">
+          <div class="search-inner">
+            <input id="username" type="text" placeholder="@your_handle" aria-label="Search handle" />
+          </div>
+          <div class="actions">
+            <button id="searchBtn" class="btn btn-search">🔎 Search</button>
+            <button id="clearBtn" class="btn btn-clear">Clear</button>
+            <button id="shareCardBtn" class="btn btn-search" title="Share card (premium)">Share Card</button>
+          </div>
+        </div>
       </div>
+
+      <div id="resultArea" class="results" aria-live="polite"></div>
+
+      <footer>
+        <div>Made with ❤️ </div>
+
+        <!-- clickable powered by madara (opens X profile) -->
+        <a class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer">
+          <img id="poweredAvatar" src="madara.png" alt="madara" style="width:40px;height:40px;border-radius:8px;object-fit:cover">
+          <div style="font-size:13px">
+            <div style="color:var(--muted);font-size:12px">Powered by</div>
+            <div style="font-weight:700">madara</div>
+          </div>
+        </a>
+      </footer>
     </div>
-
-    <div class="search-shell" role="search">
-      <div class="search-row">
-        <div class="search-inner">
-          <input id="username" type="text" placeholder="@your_handle" autocomplete="off" />
-        </div>
-
-        <div class="actions">
-          <button id="searchBtn" class="btn btn-search">🔎 Search</button>
-          <button id="clearBtn" class="btn btn-clear">Clear</button>
-        </div>
-      </div>
-
-      <div class="bottom-actions">
-        <button id="shareBtn" class="share-btn" title="Generate share image">Share Card</button>
-      </div>
-    </div>
-
-    <div id="resultArea" class="results"></div>
-
-    <footer style="margin-top:20px">
-      <div>Made with ❤️ for Zama — love & powered by madara</div>
-      <a id="poweredLink" class="powered" href="https://x.com/0x_madara_" target="_blank" rel="noopener noreferrer">
-        <img id="poweredAvatar" src="madara.png" alt="madara avatar">
-        <div>
-          <div style="font-size:12px;color:var(--muted)">Powered by</div>
-          <div style="font-weight:700">madara</div>
-        </div>
-      </a>
-    </footer>
   </div>
 
+  <!-- canvas for generating share image -->
   <canvas id="cardCanvas" width="1200" height="630" style="display:none"></canvas>
 
   <script>
-    // ---- config
-    const apiBase = '/api/check';
-    const THEME_KEY = 'zama_theme_v1';
+    // minimal config
+    const API_BASE = '/api/check';
+    const TOTAL_FETCHED = 1500;
+    const OG_NFT_TOP = 1006;
+    const SHARE_TOP = 100;
 
-    // ---- helpers
-    function fmtNum(n,dec=8){ if(n==null||!isFinite(Number(n))) return '-'; return Number(n).toFixed(dec) }
+    // Assumed payout curve for display: linear range between TOP and R100
+    const ASSUMED_TOP_MIN = 1500; // rank1 lower bound
+    const ASSUMED_TOP_MAX = 2000; // rank1 upper bound
+    const ASSUMED_100_MIN = 200;  // rank100 lower bound
+    const ASSUMED_100_MAX = 200;  // rank100 upper bound
 
-    function setTheme(t){
-      if(t) document.documentElement.setAttribute('data-theme', t);
-      else document.documentElement.removeAttribute('data-theme');
-      localStorage.setItem(THEME_KEY, t || '');
-    }
-    function initTheme(){
-      const t = localStorage.getItem(THEME_KEY);
-      if(t) setTheme(t);
-      else setTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme:light)').matches ? 'light' : '');
-    }
+    // helpers
+    function fmtNum(n, dec = 8) { if (n == null || !isFinite(Number(n))) return '-'; return Number(n).toFixed(dec); }
+    function money(n) { if (n == null || !isFinite(Number(n))) return '-'; return '$' + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
-    function computeProgress(meta){
-      if(!meta) return 0;
-      const ms = Number(meta.mindshare);
-      const rank100_ms = Number(meta.rank100_mindshare);
-      if(isFinite(ms) && isFinite(rank100_ms) && rank100_ms > 0){
-        return Math.max(0, Math.min(1, ms / rank100_ms));
+    // progress: if rank <= 100 use (100 - rank)/99; else use (1500 - rank)/(1500 - 100)
+    function progressToTop100(rank) {
+      if (!isFinite(rank)) return 0;
+      rank = Number(rank);
+      if (rank <= 100) {
+        return Math.max(0, Math.min(1, (100 - rank) / 99 ));
       }
-      if(isFinite(meta.rank)){
-        return Math.max(0, Math.min(1, (1500 - meta.rank) / 1500));
-      }
-      return 0;
+      return Math.max(0, Math.min(1, (1500 - rank) / (1500 - 100)));
     }
 
-    function computeChange(curr, next){
+    function computeChange(curr, next) {
       const a = Number(curr?.mindshare); const b = Number(next?.mindshare);
-      if(!isFinite(a) || !isFinite(b)) return {dir:'same', pct:0};
-      if(b === 0) return {dir: a>0 ? 'up' : 'same', pct: 100};
+      if (!isFinite(a) || !isFinite(b)) return { dir: 'same', pct: 0, abs: 0 };
       const diff = a - b;
-      const pct = Math.abs(diff / (Math.abs(b) || 1)) * 100;
-      return {dir: diff > 0 ? 'up' : (diff < 0 ? 'down' : 'same'), pct: Math.round(pct*10)/10};
+      const pct = b === 0 ? (a === 0 ? 0 : 100) : (diff / Math.abs(b) * 100);
+      return { dir: diff > 0 ? 'up' : (diff < 0 ? 'down' : 'same'), pct: Math.round(Math.abs(pct) * 10) / 10, abs: Math.round(diff * 1000000) / 1000000 };
     }
 
-    function skeletonCard(){
-      const c = document.createElement('div'); c.className='card';
-      c.innerHTML = '<h3 class="skeleton" style="width:90px;height:18px"></h3>'
-        + '<div class="row"><div class="label skeleton" style="width:64px;height:12px"></div><div class="value skeleton" style="width:80px;height:20px"></div></div>'
-        + '<div class="row"><div class="label skeleton" style="width:90px;height:12px"></div><div class="value skeleton" style="width:120px;height:20px"></div></div>'
-        + '<div class="row"><div class="label skeleton" style="width:120px;height:12px"></div><div class="value skeleton" style="width:60px;height:20px"></div></div>';
+    function lerp(a, b, t) { return a + (b - a) * t; }
+
+    function assumedPayoutRange(rank) {
+      if (!isFinite(rank) || rank < 1) return { min: null, max: null };
+      rank = Math.min(100, Math.max(1, Math.round(rank)));
+      const t = (rank - 1) / 99; // 0..1
+      const min = lerp(ASSUMED_TOP_MIN, ASSUMED_100_MIN, t);
+      const max = lerp(ASSUMED_TOP_MAX, ASSUMED_100_MAX, t);
+      return { min: Math.round(min * 100) / 100, max: Math.round(max * 100) / 100 };
+    }
+
+    // UI pieces
+    function skeletonCard() {
+      const c = document.createElement('div'); c.className = 'card';
+      c.innerHTML = '<h3 style="background:rgba(255,255,255,0.02;width:120px;height:18px;border-radius:6px"></h3><div class="row"><div class="label" style="background:rgba(255,255,255,0.02;width:80px;height:12px"></div><div class="value" style="background:rgba(255,255,255,0.02;width:80px;height:20px"></div></div>';
       return c;
     }
 
-    function mkCard(title, meta, neighborMeta=null){
-      const c = document.createElement('div'); c.className='card';
+    function mkCard(title, meta, neighbor) {
+      const c = document.createElement('div'); c.className = 'card';
       const rank = meta?.rank ?? null;
       const ms = meta?.mindshare ?? null;
-      const total = 1500;
-      const progressPct = Math.round(computeProgress(meta)*100);
-      const change = computeChange(meta, neighborMeta);
-      const changeHtml = change.dir === 'same' ? '-' : `<span class="ms-change ${change.dir}">${change.dir==='up' ? '▲' : '▼'} ${change.pct}%</span>`;
+      const progressPct = Math.round(progressToTop100(rank) * 100);
+      const change = computeChange(meta || {}, neighbor || {});
+      const changeHtml = change.dir === 'same' ? '-' : `<span class="ms-change ${change.dir}">${change.dir === 'up' ? '▲' : '▼'} ${change.pct}%</span>`;
+      const absHtml = change.abs ? ` (${change.abs>0?'+':''}${change.abs})` : '';
+
+      // badges
+      let badgeHtml = '';
+      if (isFinite(rank)) {
+        if (rank <= SHARE_TOP) {
+          badgeHtml = `<span class="badge ok">Eligible for OG NFT + Revenue Share</span>`;
+        } else if (rank <= OG_NFT_TOP) {
+          badgeHtml = `<span class="badge ok">Eligible for OG NFT</span>`;
+        } else {
+          badgeHtml = `<span class="badge neutral">Not Eligible</span>`;
+        }
+      }
+
+      // assumed payout
+      let payoutHtml = '-';
+      if (isFinite(rank) && rank <= SHARE_TOP) {
+        const r = assumedPayoutRange(rank);
+        payoutHtml = `${money(r.min)} — ${money(r.max)} (assumption)`;
+      }
+
       c.innerHTML = `
-        <h3>${title}</h3>
-        <div class="row"><div class="label">Rank</div><div class="value">${rank ?? '-'}</div></div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3>${title}</h3>
+          <div style="text-align:right;font-weight:800;font-size:20px">${rank ?? '-'}</div>
+        </div>
+
         <div class="row"><div class="label">Mindshare</div><div class="value">${fmtNum(ms)}</div></div>
-        <div class="row"><div class="label">Change vs next</div><div class="value">${changeHtml}</div></div>
+        <div class="row"><div class="label">Change vs next</div><div class="value">${changeHtml}${absHtml}</div></div>
+
         <div style="margin-top:8px">
           <div class="progress-shell" aria-hidden="true"><div class="progress-bar" style="width:${progressPct}%"></div></div>
-          <div style="font-size:12px;color:var(--muted);margin-top:6px">Progress to #100: ${progressPct}% • Total fetched: ${total}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:6px">Progress to Top 100: ${progressPct}% • Total fetched: ${TOTAL_FETCHED}</div>
         </div>
+
+        <div style="margin-top:10px">${badgeHtml}</div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0" />
+        <div class="row"><div class="label">Assumed payout (if eligible)</div><div class="value">${payoutHtml}</div></div>
       `;
       return c;
     }
 
-    // ---- share card generator
-    async function generateShareCard(handle, data){
-      const canvas = document.getElementById('cardCanvas');
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#071025';
-      ctx.fillRect(0,0,canvas.width,canvas.height);
-      ctx.fillStyle = '#ffd24b';
-      ctx.font = 'bold 48px Inter, Arial';
-      ctx.fillText(handle.startsWith('@')?handle:`@${handle}`, 60, 120);
-      const keys = ['24h','7d','month'];
-      ctx.font = 'bold 36px Inter, Arial';
-      for(let i=0;i<3;i++){
-        const x = 60 + i*360; const y = 190;
-        ctx.fillStyle = '#061020';
-        ctx.fillRect(x, y, 320, 240);
-        ctx.fillStyle = '#eaf3fb';
-        ctx.fillText(keys[i], x+18, y+44);
-        const meta = data.results[keys[i]] || {};
-        ctx.font = 'bold 32px Inter, Arial';
-        ctx.fillText('Rank: ' + (meta.rank || '-'), x+18, y+100);
-        ctx.fillText('MS: ' + (meta.mindshare ? Number(meta.mindshare).toFixed(6) : '-'), x+18, y+150);
-      }
-      return new Promise(resolve => canvas.toBlob(blob => resolve(blob)));
-    }
-    async function downloadShare(handle, data){
-      const blob = await generateShareCard(handle, data);
-      if(!blob) return alert('Failed to generate image');
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `${handle}-zama-rank.png`;
-      document.body.appendChild(a); a.click();
-      a.remove(); URL.revokeObjectURL(url);
+    // canvas share card
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image(); img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img); img.onerror = () => reject(new Error('failed to load image')); img.src = src;
+      });
     }
 
-    // ---- main
+    async function generateShareCard(handle, data) {
+      const canvas = document.getElementById('cardCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      // background
+      ctx.fillStyle = '#071025'; ctx.fillRect(0,0,canvas.width,canvas.height);
+
+      // logo
+      ctx.fillStyle = '#ffd24b'; ctx.fillRect(48,40,110,110);
+      try { const lg = await loadImage('zama-logo.png'); ctx.drawImage(lg,56,48,94,94); } catch(e){}
+
+      // header
+      ctx.fillStyle = '#eaf3fb'; ctx.font = '700 40px Inter, Arial';
+      ctx.fillText(handle.startsWith('@')?handle:`@${handle}`, 180, 90);
+
+      // 24h block
+      const tf = data.results && data.results['24h'] ? data.results['24h'] : {};
+      ctx.font = '700 52px Inter, Arial'; ctx.fillStyle = '#eaf3fb';
+      ctx.fillText('Rank ' + (tf.rank || '-'), 180, 170);
+      ctx.font = '600 24px Inter, Arial'; ctx.fillStyle = '#ffd24b';
+      ctx.fillText('Mindshare: ' + (tf.mindshare ? Number(tf.mindshare).toFixed(6) : '-'), 180, 206);
+
+      // badges
+      const rank = Number(tf.rank) || 999999;
+      ctx.font = '700 20px Inter, Arial';
+      if (rank <= SHARE_TOP) {
+        ctx.fillStyle = '#3ee6a8'; ctx.fillRect(48,240,280,42); ctx.fillStyle = '#041017'; ctx.fillText('Eligible: OG NFT + Revenue Share', 60, 270);
+      } else if (rank <= OG_NFT_TOP) {
+        ctx.fillStyle = '#3ee6a8'; ctx.fillRect(48,240,200,42); ctx.fillStyle = '#041017'; ctx.fillText('Eligible: OG NFT', 60, 270);
+      } else {
+        ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fillRect(48,240,200,42); ctx.fillStyle = '#9fb0bf'; ctx.fillText('Not Eligible', 60, 270);
+      }
+
+      // progress (draw simple bar)
+      const prog = Math.round(progressToTop100(rank) * 100);
+      ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fillRect(48,312,1100,18);
+      ctx.fillStyle = '#ffd24b'; ctx.fillRect(48,312,Math.max(2, (1100 * prog / 100)),18);
+      ctx.font = '500 16px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
+      ctx.fillText(`Progress to Top 100: ${prog}%`, 48, 358);
+
+      // assumed payout
+      if (rank <= SHARE_TOP) {
+        const r = assumedPayoutRange(rank);
+        ctx.font = '600 22px Inter, Arial'; ctx.fillStyle = '#fff';
+        ctx.fillText(`Assumed payout: ${money(r.min)} - ${money(r.max)}`, 48, 404);
+      }
+
+      // footer
+      ctx.font = '500 16px Inter, Arial'; ctx.fillStyle = '#9fb0bf';
+      ctx.fillText('Powered by madara', 48, canvas.height - 60);
+      ctx.fillText('zama-rank.vercel.app', canvas.width - 320, canvas.height - 60);
+
+      return new Promise(resolve => canvas.toBlob(blob => resolve(blob)));
+    }
+
+    async function shareFlow(handle, data) {
+      try {
+        const blob = await generateShareCard(handle, data);
+        if (!blob) throw new Error('image generation failed');
+        const file = new File([blob], `${handle}-zama-rank.png`, { type: blob.type });
+        const text = `${handle} — Zama Rank: ${data.results?.['24h']?.rank || '-'} • Mindshare: ${data.results?.['24h']?.mindshare || '-'}\nCheck your rank: https://zama-rank.vercel.app`;
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], text });
+          return;
+        }
+
+        // fallback: download image and open X compose with text
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = `${handle}-zama-rank.png`;
+        document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+
+        const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
+        window.open(xUrl, '_blank');
+      } catch (err) {
+        alert('Share failed: ' + (err.message || err));
+      }
+    }
+
+    // main logic
     const resultArea = document.getElementById('resultArea');
     const searchBtn = document.getElementById('searchBtn');
     const clearBtn = document.getElementById('clearBtn');
-    const shareBtn = document.getElementById('shareBtn');
+    const shareCardBtn = document.getElementById('shareCardBtn');
 
-    async function performSearch(){
-      const raw = (document.getElementById('username').value||'').trim();
-      if(!raw) { document.getElementById('username').focus(); return; }
-      const handle = raw.replace(/^@/,'');
-      // skeleton UI
-      resultArea.innerHTML = '';
-      for(let i=0;i<3;i++) resultArea.appendChild(skeletonCard());
+    function showSkeletons() { resultArea.innerHTML = ''; for (let i = 0; i < 3; i++) resultArea.appendChild(skeletonCard()); }
 
+    async function performSearch() {
+      const raw = (document.getElementById('username').value || '').trim();
+      if (!raw) { document.getElementById('username').focus(); return; }
+      const handle = raw.replace(/^@/, '');
+      showSkeletons();
       searchBtn.disabled = true;
-      try{
-        const r = await fetch(`${apiBase}?username=${encodeURIComponent(handle)}`);
-        if(!r.ok) throw new Error('Network '+r.status);
+      try {
+        const r = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
+        if (!r.ok) throw new Error('Network ' + r.status);
         const data = await r.json();
         resultArea.innerHTML = '';
-        const order = ['24h','7d','month'];
-        for(let i=0;i<order.length;i++){
+        const order = ['24h', '7d', 'month'];
+        for (let i = 0; i < order.length; i++) {
           const key = order[i];
-          const neighbor = order[i+1] ? data.results[order[i+1]] : null;
+          const neighbor = order[i + 1] ? data.results[order[i + 1]] : null;
           resultArea.appendChild(mkCard(key, data.results[key], neighbor));
         }
-        shareBtn.onclick = () => downloadShare(handle, data);
-      } catch(err){
+        // set share button to use this data
+        shareCardBtn.onclick = () => shareFlow(handle, data);
+      } catch (err) {
         resultArea.innerHTML = `<div class="card"><h3>Error</h3><div style="color:var(--muted);margin-top:6px">${err.message}</div></div>`;
-      } finally { searchBtn.disabled = false }
+      } finally {
+        searchBtn.disabled = false;
+      }
     }
 
-    // buttons
     searchBtn.addEventListener('click', performSearch);
-    clearBtn.addEventListener('click', ()=>{ document.getElementById('username').value=''; resultArea.innerHTML=''; });
-    shareBtn.addEventListener('click', async () => {
-      const handle = (document.getElementById('username').value||'').trim();
-      if(!handle) return alert('Search for a handle first to generate card');
-      try{ const r = await fetch(`${apiBase}?username=${encodeURIComponent(handle.replace(/^@/,''))}`); const data = await r.json(); await downloadShare(handle.replace(/^@/,''), data); }
-      catch(e){ alert('Failed to generate card: '+e.message) }
+    clearBtn.addEventListener('click', () => {
+      document.getElementById('username').value = '';
+      resultArea.innerHTML = '';
     });
 
-    // theme toggle
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme');
-      setTheme(current === 'light' ? '' : 'light');
+    // If user presses Share without prior search, fetch first
+    shareCardBtn.addEventListener('click', async () => {
+      const handleRaw = (document.getElementById('username').value || '').trim();
+      if (!handleRaw) return alert('Search a handle first to share');
+      const handle = handleRaw.replace(/^@/, '');
+      // call API to ensure fresh data then share
+      try {
+        const r = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
+        if (!r.ok) throw new Error('Network ' + r.status);
+        const data = await r.json();
+        await shareFlow(handle, data);
+      } catch (e) {
+        alert('Failed to prepare share card: ' + (e.message || e));
+      }
     });
 
-    // init theme
-    initTheme();
-    // enter key submits
-    document.getElementById('username').addEventListener('keydown', (e) => { if(e.key==='Enter') performSearch(); });
+    document.getElementById('username').addEventListener('keydown', (e) => { if (e.key === 'Enter') performSearch(); });
+
+    // init: nothing else needed
   </script>
 </body>
 </html>
