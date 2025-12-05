@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ZAMA RANK — sticky footer (fixed band removed)</title>
+<title>ZAMA RANK — footer no-overlap</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -12,7 +12,7 @@
     --muted:#9fb0bf;
     --accent1:#ffd24b; --accent2:#ff6b6b;
     --text:#eaf3fb; --ok:#3ee6a8; --bad:#ff7b7b;
-    --footer-h:80px;
+    --footer-h:86px;
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));}
@@ -53,18 +53,16 @@
   .ms-change{display:inline-flex;gap:8px;align-items:center;font-weight:700;white-space:nowrap}
   .ms-change.up{color:var(--ok)} .ms-change.down{color:var(--bad)}
 
-  /* footer uses sticky positioning — no overlay band */
+  /* FOOTER — normal flow (not fixed/sticky) so it cannot overlay content */
   footer.site-footer{
-    position:sticky; /* sticky instead of fixed */
-    bottom:0;
+    position:relative; /* no fixed/sticky */
     display:flex;align-items:center;justify-content:center;
-    padding:12px 18px calc(12px + env(safe-area-inset-bottom, 0px));
+    padding:18px 18px calc(18px + env(safe-area-inset-bottom, 0px));
     margin-top:28px;
-    /* subtle top gradient that matches page so the footer blends naturally */
-    background: linear-gradient(180deg, rgba(7,16,37,0.0), rgba(7,16,37,0.20));
+    background: linear-gradient(180deg, rgba(7,16,37,0.0), rgba(7,16,37,0.06));
     border-top:1px solid rgba(255,255,255,0.02);
-    backdrop-filter: blur(6px);
-    z-index:5;
+    backdrop-filter: blur(4px);
+    z-index:1;
   }
   .footer-inner{max-width:980px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:14px}
   .footer-text{opacity:0.85}
@@ -92,7 +90,7 @@
         </div>
 
         <div class="title-wrap">
-          <h1>ZAMA RANK</h1>
+          <h1>ZAMA SZN 5 RANK</h1>
           <div class="subtitle">Search X handle (e.g. @0x_madara_)</div>
         </div>
       </div>
@@ -112,6 +110,7 @@
 
       <div id="resultArea" class="results" aria-live="polite" style="display:none"></div>
       <div id="emptyHint" class="results-empty">Search to show data</div>
+
     </div>
 
     <footer class="site-footer" id="siteFooter" aria-hidden="false">
@@ -125,13 +124,11 @@
     </footer>
   </div>
 
-  <!-- canvas for share card (kept) -->
+  <!-- canvas for share card (unchanged skeleton) -->
   <canvas id="cardCanvas" width="1400" height="900" style="display:none"></canvas>
 
 <script>
-/* only essential JS differences: keep reveal fallback and footer padding helper removed (not required for sticky) */
-
-/* reveal raster logo + footer avatar if available otherwise fallback */
+/* reveal raster logo + footer avatar fallback */
 function revealAssets(){
   const logoImg = document.getElementById('logoImg');
   const logoFallback = document.getElementById('logoFallback');
@@ -154,7 +151,7 @@ function revealAssets(){
 }
 revealAssets();
 
-/* rest of your JS (helpers, fetch, render, share) - minimal version to keep this example concise */
+/* helpers and UI (kept minimal for clarity) */
 const $ = id => document.getElementById(id);
 function fmtNum(n,d=6){ if(n==null || !isFinite(Number(n))) return '-'; return Number(n).toFixed(d); }
 function progressToTop100(rank){ if(!isFinite(rank)) return 0; rank=Number(rank); if(rank<=100) return Math.max(0,Math.min(1,(100-rank)/99)); return Math.max(0,Math.min(1,(1500-rank)/(1500-100))); }
@@ -183,7 +180,7 @@ function mkCard(title, meta, neighbor){
   return el;
 }
 
-/* minimal performSearch example — replace with your API logic */
+/* Search flow (demo fetch stub — replace with your API) */
 let lastSearch = null;
 async function performSearch(){
   const raw = ($('username').value||'').trim(); if(!raw){ $('username').focus(); return; }
@@ -192,8 +189,8 @@ async function performSearch(){
   const container = $('resultArea'); container.innerHTML='';
   for(let i=0;i<3;i++){ const s=document.createElement('div'); s.className='card'; s.innerHTML=`<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`; container.appendChild(s); }
 
-  // simulate API response (replace with fetch to API_BASE)
-  await new Promise(r=>setTimeout(r,420));
+  // Replace the block below with your real fetch to API_BASE
+  await new Promise(r=>setTimeout(r,400));
   const data = {
     results: {
       '24h': { found:true, rank:186, mindshare:0.149065 },
@@ -201,6 +198,7 @@ async function performSearch(){
       '30d': { found:true, rank:289, mindshare:0.083846 }
     }
   };
+
   const results = data.results || {};
   container.innerHTML='';
   const order = ['24h','7d','30d'];
@@ -210,7 +208,6 @@ async function performSearch(){
     container.appendChild(mkCard(k, results[k]||{}, neighbor));
   }
   lastSearch = { handle, data };
-  // no footer padding logic required; sticky footer avoids overlay
 }
 
 function hideResults(){ $('resultArea').style.display='none'; $('emptyHint').style.display='block'; }
