@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>ZAMA RANK — Accessible + Debounced</title>
+<title>ZAMA RANK — Share Card Fixed</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -30,7 +30,7 @@
 
 /* ===== PREMIUM BACKGROUND ===== */
   body {
-    background-color: #050814; /* stable dark base to avoid banding */
+    background-color: #050814;
     min-height:100vh;
   }
 
@@ -69,7 +69,6 @@
     z-index: 0;
   }
 
-  /* content */
   .wrap{ position:relative; z-index: 2; max-width:940px; margin:18px auto; padding:18px 18px 18px;
     padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom, 0px) + 12px);
     flex:1; display:flex; flex-direction:column; transition:padding-bottom .12s ease; }
@@ -81,17 +80,7 @@
   h1{margin:0;font-size:20px}
   .subtitle{color:var(--muted);font-size:13px;margin-top:2px}
 
-  /* skip link */
-  .skip-link{
-    position:absolute;
-    left:-9999px;
-    top:auto;
-    background:#061020;
-    color:white;
-    padding:8px 12px;
-    border-radius:8px;
-    z-index:9999;
-  }
+  .skip-link{position:absolute;left:-9999px;top:auto;background:#061020;color:white;padding:8px 12px;border-radius:8px;z-index:9999}
   .skip-link:focus{ left:12px; top:12px; outline:3px solid rgba(255,215,75,0.18); }
 
   .search-shell{margin-top:14px;background: rgba(255,255,255,0.02); padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,0.03); box-shadow: 0 10px 36px rgba(2,6,12,0.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
@@ -131,7 +120,6 @@
   hr.sep{border:none;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0}
   .results-empty{color:var(--muted);margin-top:16px}
 
-  /* Footer — app-like bottom bar */
   footer.site-footer{
     position:fixed;
     left:0; right:0; bottom:0;
@@ -161,7 +149,7 @@
     transition: opacity 180ms ease;
     opacity: 1;
   }
-  footer.site-footer.hidden::before { display:none !important; }  /* bulletproof hide */
+  footer.site-footer.hidden::before { display:none !important; }
   footer.site-footer.hidden { transform: translateY(calc(100% + env(safe-area-inset-bottom, 0px))); }
 
   .footer-inner{max-width:940px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:14px}
@@ -169,7 +157,6 @@
   a.powered{ text-decoration:none;color:inherit;display:flex;gap:12px;align-items:center;flex:0 0 auto}
   a.powered img{ width:56px; height:56px; border-radius:8px; object-fit:cover; box-shadow:0 8px 22px rgba(0,0,0,0.45) }
 
-  /* toast */
   .toast{
     position:fixed;
     left:50%;
@@ -188,10 +175,8 @@
   }
   .toast.show{ opacity: 1; transform: translateX(-50%) translateY(-6px); }
 
-  /* focus-visible polyfill style */
   :focus:not(:focus-visible) { outline: none; }
 
-  /* responsive & reduced motion */
   @media (max-width:760px){ h1{font-size:18px} }
   @media (max-width:560px){
     .search-row{flex-direction:column;align-items:stretch}
@@ -243,7 +228,6 @@
         </div>
       </form>
 
-      <!-- aria-live region for results; polite so screen readers announce changes -->
       <div id="resultStatus" aria-live="polite" aria-atomic="true" style="position:absolute;left:-9999px;top:auto;"></div>
 
       <div id="resultArea" class="results" role="region" aria-live="polite" aria-label="Search results" style="display:none"></div>
@@ -260,7 +244,8 @@
     </footer>
   </div>
 
-  <canvas id="cardCanvas" width="1200" height="630" style="display:none" aria-hidden="true"></canvas>
+  <!-- DPR-safe canvas: CSS size = logical size, internal buffer set by script -->
+  <canvas id="cardCanvas" width="1200" height="630" style="display:none; width:1200px; height:630px" aria-hidden="true"></canvas>
 
 <script>
 /* -------- CONFIG -------- */
@@ -324,7 +309,6 @@ function showToast(msg, ms=2200){
   t.setAttribute('aria-live','polite');
   t.textContent = msg;
   document.body.appendChild(t);
-  // small delay to trigger CSS transition
   requestAnimationFrame(()=> t.classList.add('show'));
   setTimeout(()=> {
     t.classList.remove('show');
@@ -384,166 +368,152 @@ function mkCard(title, meta, neighbor){
   return el;
 }
 
-/* ===========================
-   NEW share canvas layout:
-   3 boxes in a single horizontal row (equal widths + gap)
-   =========================== */
+/* ===== DPR-safe share canvas: 3 boxes in a single horizontal row (NO big rank on right) ===== */
 function drawCanvasLayout(handle, data){
-  const canvas = $('cardCanvas'); const ctx = canvas.getContext('2d');
-  // Canvas size already set in HTML: 1200x630
-  const W = canvas.width, H = canvas.height;
-  ctx.clearRect(0,0,W,H);
+  // logical size
+  const LOGICAL_W = 1200;
+  const LOGICAL_H = 630;
+  const canvas = $('cardCanvas');
 
-  // Background gradient
-  const bg = ctx.createLinearGradient(0,0,0,H);
-  bg.addColorStop(0,'#081822');
-  bg.addColorStop(1,'#00121a');
+  // device pixel ratio (cap it)
+  const DPR = Math.min(window.devicePixelRatio || 1, 2.5);
+  canvas.width = Math.round(LOGICAL_W * DPR);
+  canvas.height = Math.round(LOGICAL_H * DPR);
+  canvas.style.width = LOGICAL_W + 'px';
+  canvas.style.height = LOGICAL_H + 'px';
+
+  const ctx = canvas.getContext('2d');
+  // work in logical pixels
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.clearRect(0, 0, LOGICAL_W, LOGICAL_H);
+
+  // background gradient
+  const bg = ctx.createLinearGradient(0, 0, 0, LOGICAL_H);
+  bg.addColorStop(0, '#081822');
+  bg.addColorStop(1, '#00121a');
   ctx.fillStyle = bg;
-  ctx.fillRect(0,0,W,H);
+  ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
 
-  // big rounded panel
+  // panel
   const pad = 28;
-  const panelX = pad, panelY = pad, panelW = W - pad*2, panelH = H - pad*2;
-  roundRect(ctx, panelX, panelY, panelW, panelH, 20, true, false, 'rgba(255,255,255,0.02)');
+  const panelX = pad, panelY = pad;
+  const panelW = LOGICAL_W - pad*2, panelH = LOGICAL_H - pad*2;
+  roundRectFill(ctx, panelX, panelY, panelW, panelH, 20, 'rgba(255,255,255,0.02)');
 
-  // left column: avatar + handle (top-left inside panel)
-  const leftPad = panelX + 28;
-  const topPad = panelY + 24;
+  // avatar + handle (left)
   const avatarSize = 96;
-  const avatarX = leftPad, avatarY = topPad;
-  const avatar = _pre.avatar;
-  if(avatar){
+  const leftColX = panelX + 26;
+  const leftColY = panelY + 20;
+  const avatarX = leftColX, avatarY = leftColY;
+
+  if(_pre.avatar){
     ctx.save();
     ctx.beginPath();
     ctx.arc(avatarX + avatarSize/2, avatarY + avatarSize/2, avatarSize/2, 0, Math.PI*2);
     ctx.closePath();
     ctx.clip();
-    ctx.drawImage(avatar, avatarX, avatarY, avatarSize, avatarSize);
+    ctx.drawImage(_pre.avatar, avatarX, avatarY, avatarSize, avatarSize);
     ctx.restore();
-    // stroke
     ctx.beginPath();
     ctx.arc(avatarX + avatarSize/2, avatarY + avatarSize/2, avatarSize/2 - 3, 0, Math.PI*2);
     ctx.lineWidth = 3;
     ctx.strokeStyle = 'rgba(255,255,255,0.06)';
     ctx.stroke();
   } else {
-    ctx.fillStyle = '#ffd24b';
-    roundRect(ctx, avatarX, avatarY, avatarSize, avatarSize, 10, true, false, '#ffd24b');
+    roundRectFill(ctx, avatarX, avatarY, avatarSize, avatarSize, 10, '#ffd24b');
   }
 
-  // handle text
   const handleText = handle.startsWith('@') ? handle : '@' + handle;
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '700 28px Inter, Arial';
-  // ensure handle fits; if not, reduce font
-  let handleFont = 28;
-  while(handleFont > 14 && ctx.measureText(handleText).width > (panelW * 0.25)){
-    handleFont -= 1;
-    ctx.font = `700 ${handleFont}px Inter, Arial`;
-  }
-  ctx.fillText(handleText, avatarX + avatarSize + 16, avatarY + 32);
+  ctx.fillStyle = '#fff';
+  fitText(ctx, handleText, avatarX + avatarSize + 18, avatarY + 34, panelW * 0.28, { weight:700, size:28, family:'Inter, Arial' });
 
   ctx.fillStyle = '#9fb0bf';
   ctx.font = '400 14px Inter, Arial';
-  ctx.fillText('Zama rank card', avatarX + avatarSize + 16, avatarY + 52);
+  ctx.fillText('Zama rank card', avatarX + avatarSize + 18, avatarY + 56);
 
-  // Right area: large 30d rank (big number), place on the right side of panel
-  const rightAreaX = panelX + panelW - 200;
-  const r30 = data.results?.['30d'] || data.results?.month || {};
-  const bigRank = (r30 && r30.found && isFinite(Number(r30.rank)))?String(r30.rank):'-';
-
-  // autosize big rank to fit a max width and height
-  ctx.fillStyle = '#ffffff';
-  let bigSize = 110;
-  ctx.font = `900 ${bigSize}px Inter, Arial`;
-  while(bigSize > 36 && ctx.measureText(bigRank).width > 170){
-    bigSize = Math.floor(bigSize * 0.9);
-    ctx.font = `900 ${bigSize}px Inter, Arial`;
-  }
-  ctx.textAlign = 'right';
-  ctx.fillText(bigRank, panelX + panelW - 24, panelY + 120);
-  ctx.textAlign = 'left';
-
-  // Now draw the three stat boxes horizontally centered in the middle area
-  // compute widths: equal widths with gap
-  const boxGap = 20;
-  const totalBoxes = 3;
-  // Box area width - leave some left space for avatar and right space for big rank
-  const leftColumnWidth = (avatarSize + 16 + 140); // avatar + text area
-  const rightColumnWidth = 220; // where big rank lives
-  const boxesAreaX = panelX + leftColumnWidth + 16;
-  const boxesAreaW = panelW - leftColumnWidth - rightColumnWidth - 32;
-  const boxW = Math.floor((boxesAreaW - (boxGap * (totalBoxes - 1))) / totalBoxes);
+  // three centered boxes (single row)
+  const leftReserve = avatarX + avatarSize + 26;
+  const rightReserve = 36; // no big rank now; just a small right breathing room
+  const boxesX = panelX + leftReserve;
+  const boxesW = panelW - leftReserve - rightReserve - 24;
+  const gap = 20;
+  const boxCount = 3;
+  const boxW = Math.floor((boxesW - gap*(boxCount-1)) / boxCount);
   const boxH = 130;
-  const boxY = panelY + 20 + avatarSize; // below the avatar row
+  const boxY = panelY + avatarSize + 28;
 
   const r24 = data.results?.['24h'] || {};
   const r7  = data.results?.['7d'] || {};
-  const r30b = r30;
+  const r30b = data.results?.['30d'] || data.results?.month || {};
 
-  // draw the boxes left-to-right
-  drawStatBox(ctx, boxesAreaX + 0*(boxW+boxGap), boxY, boxW, boxH, '24H', r24);
-  drawStatBox(ctx, boxesAreaX + 1*(boxW+boxGap), boxY, boxW, boxH, '7D', r7);
-  drawStatBox(ctx, boxesAreaX + 2*(boxW+boxGap), boxY, boxW, boxH, '30D', r30b);
+  drawStatBox(ctx, boxesX + 0*(boxW+gap), boxY, boxW, boxH, '24H', r24);
+  drawStatBox(ctx, boxesX + 1*(boxW+gap), boxY, boxW, boxH, '7D', r7);
+  drawStatBox(ctx, boxesX + 2*(boxW+gap), boxY, boxW, boxH, '30D', r30b);
 
-  // watermark bottom-left
+  // watermark
   ctx.fillStyle = 'rgba(255,255,255,0.6)';
   ctx.font = '500 12px Inter, Arial';
   ctx.fillText('Powered by madara — zama-rank.vercel.app', panelX + 18, panelY + panelH - 16);
 
-  // reset alignment
-  ctx.textAlign = 'left';
   return canvas.toDataURL('image/png');
 
-  /* helper functions inside drawCanvasLayout */
-  function roundRect(ctx, x, y, w, h, r, fill, stroke, fillStyle){
-    if(typeof r === 'undefined') r = 6;
+  /* helpers */
+  function roundRectFill(ctx, x, y, w, h, r, fillStyle){
     ctx.beginPath();
     ctx.moveTo(x + r, y);
     ctx.arcTo(x + w, y, x + w, y + h, r);
     ctx.arcTo(x + w, y + h, x, y + h, r);
     ctx.arcTo(x, y + h, x, y, r);
-    ctx.arcTo(x, y, x + w, y, r);
     ctx.closePath();
-    if(fill){ ctx.fillStyle = fillStyle || 'rgba(255,255,255,0.02)'; ctx.fill(); }
-    if(stroke){ ctx.stroke(); }
+    ctx.fillStyle = fillStyle;
+    ctx.fill();
+  }
+
+  function fitText(ctx, text, x, y, maxWidth, opts = {}){
+    const family = opts.family || 'Inter, Arial';
+    const weight = opts.weight || 700;
+    let size = opts.size || 28;
+    ctx.font = `${weight} ${size}px ${family}`;
+    while(size > 10 && ctx.measureText(text).width > maxWidth){
+      size = Math.floor(size * 0.94);
+      ctx.font = `${weight} ${size}px ${family}`;
+    }
+    ctx.textAlign = 'left';
+    ctx.fillText(text, x, y);
   }
 
   function drawStatBox(ctx, x, y, w, h, title, meta){
-    // box background
-    roundRect(ctx, x, y, w, h, 12, true, false, 'rgba(255,255,255,0.02)');
-    // title
+    roundRectFill(ctx, x, y, w, h, 12, 'rgba(255,255,255,0.02)');
+
     ctx.fillStyle = '#9fb0bf';
     ctx.font = '700 13px Inter, Arial';
     ctx.fillText(title, x + 12, y + 22);
-    // rank (right)
-    ctx.font = '800 22px Inter, Arial';
-    ctx.fillStyle = '#ffffff';
+
     const rankVal = (meta && meta.found && isFinite(Number(meta.rank))) ? String(meta.rank) : '-';
-    // right align rank
-    const rankX = x + w - 12;
+    ctx.font = '800 22px Inter, Arial';
+    ctx.fillStyle = '#fff';
     ctx.textAlign = 'right';
-    ctx.fillText(rankVal, rankX, y + 26);
+    ctx.fillText(rankVal, x + w - 12, y + 26);
     ctx.textAlign = 'left';
 
-    // mindshare
     ctx.font = '400 12px Inter, Arial';
     ctx.fillStyle = '#9fb0bf';
     const msText = (meta && meta.found) ? Number(meta.mindshare).toFixed(8) : '-';
     ctx.fillText('Mindshare: ' + msText, x + 12, y + 48);
 
-    // change vs next (green/red)
     const ch = computeChange(meta || {}, {});
     if(meta && meta.found && ch.pctText !== '-'){
       const isUp = ch.dir === 'up';
       ctx.fillStyle = isUp ? '#3ee6a8' : '#ff7b7b';
       ctx.font = '800 13px Inter, Arial';
       ctx.fillText((isUp ? '▲ ' : '▼ ') + ch.pctText, x + 12, y + 72);
-      // absolute
+
       if(ch.absText){
         ctx.fillStyle = 'rgba(255,255,255,0.85)';
         ctx.font = '700 12px Inter, Arial';
+        ctx.textAlign = 'right';
         ctx.fillText(ch.absText, x + w - 12, y + 72);
+        ctx.textAlign = 'left';
       }
     } else {
       ctx.fillStyle = '#9fb0bf';
@@ -551,19 +521,14 @@ function drawCanvasLayout(handle, data){
       ctx.fillText('Change vs next', x + 12, y + 72);
     }
 
-    // progress bar at bottom
     const barX = x + 12, barY = y + h - 28, barW = w - 24, barH = 10;
-    ctx.fillStyle = 'rgba(255,255,255,0.03)';
-    roundRect(ctx, barX, barY, barW, barH, 999, true, false, 'rgba(255,255,255,0.03)');
+    roundRectFill(ctx, barX, barY, barW, barH, 999, 'rgba(255,255,255,0.03)');
     const prog = (meta && meta.found && Number.isFinite(Number(meta.rank))) ? Math.round(progressToTop100(Number(meta.rank))*100) : 0;
     const fillW = Math.max(barW * (prog/100), Math.min(barW * 0.06, barW));
-    // gradient
     const g = ctx.createLinearGradient(barX, 0, barX + barW, 0);
     g.addColorStop(0, '#ffd24b'); g.addColorStop(1, '#ff6b6b');
-    ctx.fillStyle = g;
-    roundRect(ctx, barX, barY, fillW, barH, 999, true, false, g);
+    roundRectFill(ctx, barX, barY, fillW, barH, 999, g);
 
-    // meta text
     ctx.fillStyle = '#9fb0bf';
     ctx.font = '400 11px Inter, Arial';
     ctx.fillText(`Progress to Top 100: ${prog}% • Total fetched: ${TOTAL_FETCHED}`, x + 12, y + h - 8);
@@ -586,13 +551,12 @@ function shareImageFromDataURL(dataUrl, handle, data){
         text: `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`
       }).then(()=> {
         showToast('Shared successfully');
-      }).catch((e)=> {
+      }).catch(()=> {
         showToast('Share cancelled or failed');
       });
       return;
     }
 
-    // Fallback: download + open tweet intent
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -634,7 +598,6 @@ async function performSearchImmediate(){
   status.textContent = 'Fetching data…';
   $('resultArea').innerHTML = '';
 
-  // placeholder loading cards
   for(let i=0;i<3;i++){
     const s=document.createElement('div'); s.className='card';
     s.innerHTML = `<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`;
@@ -643,11 +606,11 @@ async function performSearchImmediate(){
 
   await loadAvatar(handle);
 
-  // check cache
   if(resultsCache.has(handle)){
     const data = resultsCache.get(handle);
     renderResults(handle, data);
     status.textContent = `Showing cached results for ${handle}`;
+    lastSearch = { handle, data };
     return;
   }
 
@@ -655,12 +618,10 @@ async function performSearchImmediate(){
     const res = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
     if(!res.ok) throw new Error('Network ' + res.status);
     const data = await res.json();
-    // normalise keys
     const results = data.results || {};
     if(!results['30d'] && results['month']) results['30d'] = results['month'];
     if(!results['month'] && results['30d']) results['month'] = results['30d'];
 
-    // store in cache
     resultsCache.set(handle, data);
 
     renderResults(handle, data);
@@ -679,22 +640,18 @@ async function performSearchImmediate(){
 /* debounced search (300ms) */
 const performSearch = debounce(performSearchImmediate, 300);
 
-/* render helper with dedupe and stable order */
+/* render helper */
 function renderResults(handle, data){
   const container = $('resultArea');
   container.innerHTML = '';
   const results = data.results || {};
-  // ensure 24h,7d,30d (month)
   if(!results['30d'] && results['month']) results['30d'] = results['month'];
   if(!results['month'] && results['30d']) results['month'] = results['30d'];
 
-  // stable order and dedupe keys
   const order = ['24h','7d','30d'];
-  const seen = new Set();
-  for(let k of order){
-    if(seen.has(k)) continue;
-    seen.add(k);
-    const neighbor = (k !== '30d') ? (results[ order[ order.indexOf(k)+1 ] ] || null) : null;
+  for(let i=0;i<order.length;i++){
+    const k = order[i];
+    const neighbor = (i<order.length-1) ? (results[order[i+1]] || null) : null;
     container.appendChild( mkCard(k, results[k]||{}, neighbor) );
   }
 
@@ -709,11 +666,9 @@ $('shareCardBtn').addEventListener('click', async (e) => {
   shareImageFromDataURL(dataUrl, handle, data);
 });
 
-/* Search button and Enter key (immediate) */
+/* Search/read interactions */
 $('searchBtn').addEventListener('click', (e)=> { e.preventDefault(); performSearchImmediate(); });
 $('username').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); performSearchImmediate(); } });
-
-/* Debounced input listener (300ms) */
 $('username').addEventListener('input', (e)=> { performSearch(); });
 
 /* Clear */
@@ -725,7 +680,7 @@ $('clearBtn').addEventListener('click', (e)=>{
   showToast('Cleared');
 });
 
-/* ---------- footer hide/show on scroll (tiny JS) ---------- */
+/* footer hide/show on scroll */
 (function setupFooterVisibility(){
   const footer = $('siteFooter');
   if(!footer) return;
