@@ -5,38 +5,21 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>ZAMA RANK — footer fixed + safe padding</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-
 <style>
   :root{
-    --bg1:#000409; 
-    --bg2:#071025;
+    --bg1:#000409; --bg2:#071025;
     --card:rgba(255,255,255,0.03);
     --muted:#9fb0bf;
-    --accent1:#ffd24b; 
-    --accent2:#ff6b6b;
-    --text:#eaf3fb; 
-    --ok:#3ee6a8; 
-    --bad:#ff7b7b;
-    --footer-h:86px;
+    --accent1:#ffd24b; --accent2:#ff6b6b;
+    --text:#eaf3fb; --ok:#3ee6a8; --bad:#ff7b7b;
+    --footer-h:86px; /* default footer height used for padding */
   }
 
   *{box-sizing:border-box}
-  
-  /* FIX: remove body gradient causing dark band */
-  html,body{
-    height:100%;
-    margin:0;
-    padding:0;
-    background:var(--bg2);
-  }
+  html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));}
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.25;}
 
-  body{
-    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;
-    color:var(--text);
-    -webkit-font-smoothing:antialiased;
-    line-height:1.25;
-  }
-
+  /* Layout */
   #app{min-height:100vh;display:flex;flex-direction:column;}
   .wrap{max-width:980px;margin:18px auto;padding:18px;flex:1;display:flex;flex-direction:column;gap:12px;transition:padding-bottom .12s ease;}
 
@@ -44,80 +27,65 @@
   .logo{width:56px;height:56px;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;box-shadow:0 8px 30px rgba(2,6,12,0.6)}
   .logo img{width:100%;height:100%;object-fit:cover;display:none}
   .logoFallback{width:72%;height:72%;display:flex;align-items:center;justify-content:center}
-
+  .title-wrap{display:flex;flex-direction:column}
   h1{margin:0;font-size:18px;font-weight:800;letter-spacing:0.4px}
   .subtitle{margin-top:4px;color:var(--muted);font-size:13px}
 
   .search-shell{background:var(--card);padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 36px rgba(0,0,0,0.45)}
   .search-row{display:flex;gap:12px;align-items:center}
-  input[type="text"]{
-    width:100%;padding:14px 16px;border-radius:12px;
-    border:1px solid rgba(255,255,255,0.06);
-    background:rgba(255,255,255,0.02);
-    color:inherit;font-size:16px;height:56px;
-    outline:none;box-shadow:inset 0 -4px 18px rgba(0,0,0,0.35)
-  }
+  .search-inner{flex:1;min-width:0}
+  input[type="text"]{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);background:linear-gradient(180deg, rgba(255,255,255,0.012), transparent);color:inherit;font-size:16px; height:56px; outline:none;box-shadow:inset 0 -4px 18px rgba(0,0,0,0.35)}
 
   .actions{display:flex;gap:12px;align-items:center;flex:0 0 auto}
   .btn{padding:12px 18px;border-radius:12px;border:0;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;justify-content:center;min-height:48px}
   .btn-search{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020;box-shadow:0 8px 24px rgba(0,0,0,0.45)}
   .btn-clear{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
-  .btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061020;}
+  .btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#061020;}
 
   .results{margin-top:6px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start}
-  .card{background:rgba(255,255,255,0.016);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 30px rgba(2,6,12,0.6)}
-
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.016), rgba(255,255,255,0.01));padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 30px rgba(2,6,12,0.6)}
   .card h3{margin:0 0 8px;font-size:14px;font-weight:700;color:#dfeff9}
   .row{display:flex;justify-content:space-between;align-items:center;margin:6px 0}
-
   .label{color:var(--muted);font-size:13px}
-  .value{font-size:20px;font-weight:800;font-variant-numeric: tabular-nums;}
-  .value.mindshare{font-size:18px;color:var(--accent1);text-align:right}
+  .value{font-size:20px;font-weight:800; font-variant-numeric: tabular-nums;}
+  .value.mindshare{font-size:18px;color:var(--accent1);text-align:right;white-space:nowrap}
+  .progress-shell{position:relative;height:12px;background:linear-gradient(90deg, rgba(255,255,255,0.018), rgba(255,255,255,0.01));border-radius:999px;overflow:hidden;box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);}
+  .progress-bar{height:100%;width:0;border-radius:999px;transition:width .6s ease;min-width:6px;background:linear-gradient(90deg,var(--accent1),#7aa2ff);}
+  .ms-change{display:inline-flex;gap:8px;align-items:center;font-weight:700;white-space:nowrap}
+  .ms-change.up{color:var(--ok)} .ms-change.down{color:var(--bad)}
 
-  .progress-shell{position:relative;height:12px;background:rgba(255,255,255,0.02);border-radius:999px;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,0.02)}
-  .progress-bar{height:100%;width:0;border-radius:999px;transition:width .6s ease;background:linear-gradient(90deg,var(--accent1),#7aa2ff);min-width:6px}
-
-  .ms-change{display:inline-flex;gap:8px;align-items:center;font-weight:700}
-  .ms-change.up{color:var(--ok)}
-  .ms-change.down{color:var(--bad)}
-
-  /* FIXED FOOTER FIXED: No gradient — no black band */
+  /* Fixed footer — but page content gets exact bottom padding so nothing is hidden */
   footer.site-footer{
     position:fixed;
     left:0;right:0;bottom:0;
     height:var(--footer-h);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:12px 18px;
-    background:var(--bg2); /* FIXED */
+    display:flex;align-items:center;justify-content:center;padding:12px 18px;
+    background: linear-gradient(180deg, var(--bg2), #05060a); /* solid dark to avoid translucent band */
     border-top:1px solid rgba(255,255,255,0.02);
     z-index:50;
   }
-
-  .footer-inner{max-width:980px;width:100%;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:14px}
-
+  .footer-inner{max-width:980px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:14px}
+  .footer-text{opacity:0.92}
   .powered img{width:56px;height:56px;border-radius:8px;object-fit:cover;box-shadow:0 8px 22px rgba(0,0,0,0.45);display:none}
   .poweredFallback{width:56px;height:56px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent1),var(--accent2));font-weight:800;color:#061020}
 
   .results-empty{color:var(--muted);margin-top:28px;text-align:center}
-
   @media (max-width:640px){
-    .search-row{flex-direction:column}
-    .actions{width:100%}
+    .search-row{flex-direction:column;align-items:stretch}
+    .actions{width:100%;display:flex;gap:10px}
     .btn{flex:1}
   }
 </style>
 </head>
-
 <body>
   <div id="app">
     <div class="wrap" id="wrap">
-
       <div class="topbar">
-        <div class="logo">
-          <img id="logoImg" src="zama-logo.png" crossorigin="anonymous" />
-          <div id="logoFallback" class="logoFallback">LOGO</div>
+        <div class="logo" title="Zama">
+          <img id="logoImg" src="zama-logo.png" alt="Zama logo" crossorigin="anonymous">
+          <div id="logoFallback" class="logoFallback">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><defs><linearGradient id="lg1" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#ffd24b"/><stop offset="100%" stop-color="#ff6b6b"/></linearGradient></defs><rect x="0" y="0" width="100" height="100" rx="12" fill="#08121a"/><path d="M0 0 L100 0 L0 100 Z" fill="url(#lg1)"/></svg>
+          </div>
         </div>
 
         <div class="title-wrap">
@@ -126,12 +94,12 @@
         </div>
       </div>
 
-      <div class="search-shell">
+      <div class="search-shell" role="search" aria-label="Search X handle">
         <div class="search-row">
           <div class="search-inner">
-            <input id="username" type="text" placeholder="@your_handle">
+            <input id="username" type="text" placeholder="@your_handle" aria-label="Search handle" />
           </div>
-          <div class="actions">
+          <div class="actions" role="group">
             <button id="searchBtn" class="btn btn-search">🔎 Search</button>
             <button id="clearBtn" class="btn btn-clear">Clear</button>
             <button id="shareCardBtn" class="btn btn-share">Share Card</button>
@@ -139,84 +107,134 @@
         </div>
       </div>
 
-      <div id="resultArea" class="results" style="display:none"></div>
+      <div id="resultArea" class="results" aria-live="polite" style="display:none"></div>
       <div id="emptyHint" class="results-empty">Search to show data</div>
     </div>
 
-    <footer class="site-footer" id="siteFooter">
+    <footer class="site-footer" id="siteFooter" aria-hidden="false">
       <div class="footer-inner">
-        <div>Made with ❤️ for Zama by Madara</div>
-        <a class="powered" href="https://x.com/0x_madara_" target="_blank">
-          <img id="poweredAvatar" src="madara.png">
+        <div class="footer-text">Made with ❤️ for Zama by Madara</div>
+        <a class="powered" href="https://x.com/0x_madara_" id="poweredLink" target="_blank" rel="noopener noreferrer">
+          <img id="poweredAvatar" src="madara.png" alt="madara" crossorigin="anonymous">
           <div id="poweredFallback" class="poweredFallback">MD</div>
         </a>
       </div>
     </footer>
   </div>
 
-<script>
-function revealAssets(){
-  const logoImg=document.getElementById('logoImg');
-  const fallback=document.getElementById('logoFallback');
-  const test=new Image();
-  test.onload=()=>{logoImg.style.display='block';fallback.style.display='none'};
-  test.onerror=()=>{logoImg.style.display='none';fallback.style.display='flex'};
-  test.src=logoImg.src;
+  <canvas id="cardCanvas" width="1400" height="900" style="display:none"></canvas>
 
-  const pImg=document.getElementById('poweredAvatar');
-  const pFall=document.getElementById('poweredFallback');
-  const t2=new Image();
-  t2.onload=()=>{pImg.style.display='block';pFall.style.display='none'};
-  t2.onerror=()=>{pImg.style.display='none';pFall.style.display='flex'};
-  t2.src=pImg.src;
+<script>
+/* small JS helpers + padding fallback to protect content from being hidden under the footer */
+
+/* reveal raster logo + footer avatar if available otherwise fallback */
+function revealAssets(){
+  const logoImg = document.getElementById('logoImg');
+  const logoFallback = document.getElementById('logoFallback');
+  if(logoImg){
+    logoImg.style.display='none'; logoFallback.style.display='flex';
+    const l = new Image(); l.crossOrigin='anonymous';
+    l.onload = ()=>{ logoImg.style.display='block'; logoFallback.style.display='none'; };
+    l.onerror = ()=>{ logoImg.style.display='none'; logoFallback.style.display='flex'; };
+    if(logoImg.src) l.src = logoImg.src;
+  }
+  const pImg = document.getElementById('poweredAvatar');
+  const pFallback = document.getElementById('poweredFallback');
+  if(pImg && pFallback){
+    pImg.style.display='none'; pFallback.style.display='flex';
+    const p = new Image(); p.crossOrigin='anonymous';
+    p.onload = ()=>{ pImg.style.display='block'; pFallback.style.display='none'; };
+    p.onerror = ()=>{ pImg.style.display='none'; pFallback.style.display='flex'; };
+    if(pImg.src) p.src = pImg.src;
+  }
 }
 revealAssets();
 
+/* ensure wrap has enough bottom padding so last card is above footer */
 function updateWrapPadding(){
-  const footer=document.getElementById('siteFooter');
-  const wrap=document.getElementById('wrap');
-  const rect=footer.getBoundingClientRect();
-  wrap.style.paddingBottom=(Math.ceil(rect.height)+18)+'px';
+  const footer = document.getElementById('siteFooter');
+  const wrap = document.getElementById('wrap');
+  if(!footer || !wrap) return;
+  // measure footer actual height (account for safe area)
+  const rect = footer.getBoundingClientRect();
+  const height = Math.ceil(rect.height);
+  wrap.style.paddingBottom = (height + 18) + 'px';
 }
+window.addEventListener('load', ()=>{ updateWrapPadding(); setTimeout(updateWrapPadding, 350); });
+window.addEventListener('resize', updateWrapPadding);
+window.addEventListener('orientationchange', ()=>setTimeout(updateWrapPadding, 200));
 
-window.addEventListener('load',()=>{updateWrapPadding();setTimeout(updateWrapPadding,350);});
-window.addEventListener('resize',updateWrapPadding);
+/* small UI/data helpers (kept minimal) */
+const $ = id => document.getElementById(id);
+function fmtNum(n,d=6){ if(n==null || !isFinite(Number(n))) return '-'; return Number(n).toFixed(d); }
+function progressToTop100(rank){ if(!isFinite(rank)) return 0; rank=Number(rank); if(rank<=100) return Math.max(0,Math.min(1,(100-rank)/99)); return Math.max(0,Math.min(1,(1500-rank)/(1500-100))); }
+function computeChange(curr,next){ const a=Number(curr?.mindshare), b=Number(next?.mindshare); if(!isFinite(a)||!isFinite(b)) return {dir:'same',pctText:'-',absText:''}; const diff=a-b; const pct=(b===0)?((a===0)?0:100):(diff/Math.abs(b)*100); const pr=Math.round(pct*10)/10; const abs=Math.round(diff*1000000)/1000000; const dir=(diff>0?'up':(diff<0?'down':'same')); const pctText=(dir==='same')?'0.0%':`${(pr>0?'+':'')}${Math.abs(pr)}%`; const absText=(abs===0?'':`(${abs>0?'+':''}${abs})`); return {dir,pctText,absText}; }
 
-function hideResults(){
-  document.getElementById('resultArea').style.display='none';
-  document.getElementById('emptyHint').style.display='block';
-}
-function showResults(){
-  document.getElementById('resultArea').style.display='grid';
-  document.getElementById('emptyHint').style.display='none';
-}
-
-/* MOCK SEARCH — same as your code */
-async function performSearch(){
-  const raw=document.getElementById('username').value.trim();
-  if(!raw) return;
-  showResults();
-  const container=document.getElementById('resultArea');
-
-  container.innerHTML='<div class="card"><h3>Loading…</h3></div>';
-  await new Promise(r=>setTimeout(r,350));
-
-  container.innerHTML=`
-    <div class="card"><h3>24h</h3><p>Rank: 186</p></div>
-    <div class="card"><h3>7d</h3><p>Rank: 174</p></div>
-    <div class="card"><h3>30d</h3><p>Rank: 289</p></div>
+function mkCard(title, meta, neighbor){
+  const el=document.createElement('div'); el.className='card';
+  const found=!!meta && meta.found===true && Number.isFinite(Number(meta.rank));
+  const rank = found?meta.rank:'-';
+  let prog = found?Math.round(progressToTop100(Number(rank))*100):0; if(prog>=97) prog=100;
+  const ms = found?meta.mindshare:'-';
+  const ch = computeChange(found?meta:{}, (neighbor && neighbor.found)?neighbor:{});
+  const changeHtml = (found && neighbor && neighbor.found) ? `<span class="ms-change ${ch.dir}">${ch.pctText} <span style="opacity:0.85;margin-left:6px">${ch.absText}</span></span>` : '-';
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3>${title}</h3>
+      <div style="font-weight:800;font-size:20px">${rank}</div>
+    </div>
+    <div class="row"><div class="label">Mindshare</div><div class="value mindshare">${fmtNum(ms,6)}</div></div>
+    <div class="row"><div class="label">Change vs next</div><div style="text-align:right">${changeHtml}</div></div>
+    <div style="margin-top:8px">
+      <div class="progress-shell"><div class="progress-bar" style="width:${found?Math.max(6,prog)+'%':'0%'}"></div></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">${found?`Progress to Top 100: ${prog}% • Total fetched: ${1500}`:`Search to show data • Total fetched: ${1500}`}</div>
+    </div>
   `;
-
-  setTimeout(updateWrapPadding,80);
+  return el;
 }
+
+/* performSearch — replace simulated data with your API call */
+let lastSearch = null;
+async function performSearch(){
+  const raw = ($('username').value||'').trim(); if(!raw){ $('username').focus(); return; }
+  const handle = raw.replace(/^@/,'');
+  showResults();
+  const container = $('resultArea'); container.innerHTML='';
+  for(let i=0;i<3;i++){ const s=document.createElement('div'); s.className='card'; s.innerHTML=`<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`; container.appendChild(s); }
+
+  // TODO: replace this with:
+  // const res = await fetch(`${API_BASE}?username=${encodeURIComponent(handle)}`);
+  // const data = await res.json();
+  await new Promise(r=>setTimeout(r,380));
+  const data = { results: {
+      '24h': { found:true, rank:186, mindshare:0.149065 },
+      '7d':  { found:true, rank:174, mindshare:0.138237 },
+      '30d': { found:true, rank:289, mindshare:0.083846 }
+  }};
+
+  const results = data.results || {};
+  container.innerHTML='';
+  const order = ['24h','7d','30d'];
+  for(let i=0;i<order.length;i++){
+    const k=order[i];
+    const neighbor = (i<order.length-1)?(results[order[i+1]]||null):null;
+    container.appendChild(mkCard(k, results[k]||{}, neighbor));
+  }
+  lastSearch = { handle, data };
+  // ensure padding still correct after render
+  setTimeout(updateWrapPadding, 80);
+}
+
+function hideResults(){ $('resultArea').style.display='none'; $('emptyHint').style.display='block'; }
+function showResults(){ $('resultArea').style.display='grid'; $('emptyHint').style.display='none'; }
 
 document.getElementById('searchBtn').addEventListener('click', performSearch);
-document.getElementById('clearBtn').addEventListener('click', ()=>{document.getElementById('username').value='';hideResults();});
-document.getElementById('username').addEventListener('keydown', e=>{if(e.key==='Enter') performSearch();});
+document.getElementById('clearBtn').addEventListener('click', ()=>{ $('username').value=''; lastSearch=null; hideResults(); });
+document.getElementById('username').addEventListener('keydown', e=>{ if(e.key==='Enter') performSearch(); });
 
+/* set initial wrap padding so content isn't hidden by fixed footer (will be updated on load/resize) */
+document.getElementById('wrap').style.paddingBottom = (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--footer-h')||'86',10) + 18) + 'px';
 hideResults();
-updateWrapPadding();
 </script>
-
 </body>
 </html>
