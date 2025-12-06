@@ -70,6 +70,14 @@
   .btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#061020; min-width:132px;}
 
   .results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start}
+
+  /* NEW: force 3 boxes in one row on desktop */
+  @media (min-width: 900px) {
+    .results {
+      grid-template-columns: repeat(3, minmax(260px, 1fr));
+    }
+  }
+
   .card{background: linear-gradient(180deg, rgba(255,255,255,0.016), rgba(255,255,255,0.008)); padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 28px rgba(0,0,0,0.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index:2}
   .card h3{margin:0 0 10px;font-size:14px}
   .row{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
@@ -441,7 +449,7 @@ function shareImageFromDataURL(dataUrl, handle, data){
     if(navigator.canShare && navigator.canShare({files:[file]})){
       navigator.share({
         files: [file],
-        text: `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`
+        text: `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-'}\nCheck: https://zama-rank.vercel.app`
       }).then(()=> { showToast('Shared successfully'); }).catch(()=> { showToast('Share cancelled or failed'); });
       return;
     }
@@ -450,7 +458,7 @@ function shareImageFromDataURL(dataUrl, handle, data){
     const a = document.createElement('a'); a.href = url; a.download = `${handle}-zama-rank.png`; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),2000);
     showToast('Image downloaded');
-    const text = `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`;
+    const text = `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-'}\nCheck: https://zama-rank.vercel.app`;
     window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
   }catch(err){
     showToast('Share failed'); alert('Share failed: '+(err.message||err));
