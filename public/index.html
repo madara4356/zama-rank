@@ -70,7 +70,6 @@
   .btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#061020; min-width:132px;}
 
   .results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start}
-  /* 3 cards in one row on desktop */
   @media (min-width: 900px) {
     .results {
       grid-template-columns: repeat(3, minmax(260px, 1fr));
@@ -86,7 +85,6 @@
   .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;font-size:13px}
   .badge.ok{background:rgba(62,230,168,0.12);color:var(--ok);border:1px solid rgba(62,230,168,0.12)}
 
-  /* these are still used for the share-image canvas */
   .progress-shell{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
   .progress-bar{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .6s ease}
 
@@ -166,7 +164,6 @@
     </footer>
   </div>
 
-  <!-- DPR-safe canvas: CSS size = logical size; internal buffer set by script -->
   <canvas id="cardCanvas" width="1200" height="630" style="display:none; width:1200px; height:630px" aria-hidden="true"></canvas>
 
 <script>
@@ -179,7 +176,7 @@ const SHARE_TOP = 100;
 /* Toggle this while testing — set to false for production */
 const DEBUG_CANVAS_PREVIEW = true;
 
-/* Small in-memory cache for results */
+/* cache */
 const resultsCache = new Map();
 
 /* helpers */
@@ -193,17 +190,25 @@ function progressToTop100(rank){
   return Math.max(0, Math.min(1, (1500-rank)/(1500-100)));
 }
 
-/* NEW: real change based on mindshareDelta from API */
+/* 🔥 NEW: compute change from delta (with fallbacks) */
 function computePeriodChange(meta) {
   const curr = Number(meta?.mindshare);
-  const delta = Number(meta?.mindshareDelta);
+
+  // try several possible field names, fall back to 0
+  let delta = meta?.mindshareDelta;
+  if (delta == null) delta = meta?.mindshare_delta;
+  if (delta == null) delta = meta?.delta;
+  if (delta == null) delta = 0;
+
+  delta = Number(delta);
 
   if (!isFinite(curr) || !isFinite(delta)) {
-    return { dir: 'same', pctText: '-', absText: '', pct: 0, abs: 0 };
+    // treat as no change instead of "-"
+    return { dir: 'same', pctText: '0.0%', absText: '', pct: 0, abs: 0 };
   }
 
   const prev = curr - delta;
-  const pct = prev === 0 ? 0 : (delta / Math.abs(prev)) * 100;
+  const pct  = prev === 0 ? 0 : (delta / Math.abs(prev)) * 100;
 
   const pctRounded = Math.round(pct * 10) / 10;
   const absRounded = Math.round(delta * 1e6) / 1e6;
@@ -223,7 +228,6 @@ function preloadStatic(){
 }
 preloadStatic();
 
-/* avatar from unavatar */
 async function loadAvatar(handle){
   return new Promise(resolve=>{
     const img = new Image(); img.crossOrigin='anonymous';
@@ -233,7 +237,7 @@ async function loadAvatar(handle){
   });
 }
 
-/* accessible toasts */
+/* toast */
 function showToast(msg, ms=2200){
   const existing = document.querySelector('.toast');
   if(existing) existing.remove();
@@ -254,7 +258,7 @@ function showToast(msg, ms=2200){
 function hideResults(){ $('resultArea').style.display = 'none'; $('emptyHint').style.display='block'; $('resultStatus').textContent = 'No results displayed'; }
 function showResults(){ $('resultArea').style.display = 'grid'; $('emptyHint').style.display='none'; }
 
-/* build a single card */
+/* build card */
 function mkCard(title, meta){
   const el = document.createElement('div'); el.className='card';
 
@@ -281,14 +285,12 @@ function mkCard(title, meta){
     title === '7d'  ? 'Change in last 7 days' :
                       'Change in last 30 days';
 
-  // badge for OG / revenue share
   let badgeHtml = '';
   if((title==='30d' || title==='month') && found){
     if(rank <= SHARE_TOP) badgeHtml = `<div style="margin-top:8px"><span class="badge ok">Eligible for OG NFT + Revenue Share</span></div>`;
     else if(rank <= OG_NFT_TOP) badgeHtml = `<div style="margin-top:8px"><span class="badge ok">Eligible for OG NFT</span></div>`;
   }
 
-  // payout row: 24h & 7d never; 30d only if eligible
   let payoutSectionHtml = '';
   if ((title === '30d' || title === 'month') && found && rank <= SHARE_TOP) {
     const topMin = 1500, topMax=2000, min100=150, max100=260;
@@ -319,7 +321,7 @@ function mkCard(title, meta){
   return el;
 }
 
-/* ===== DPR-safe share canvas (3 boxes row) ===== */
+/* share card canvas (unchanged except using computePeriodChange) */
 async function drawCanvasLayout(handle, data){
   const LOGICAL_W = 1200;
   const LOGICAL_H = 630;
@@ -348,7 +350,7 @@ async function drawCanvasLayout(handle, data){
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   ctx.clearRect(0, 0, LOGICAL_W, LOGICAL_H);
 
-  try { await (document.fonts && document.fonts.ready); } catch(e){ /* ignore */ }
+  try { await (document.fonts && document.fonts.ready); } catch(e){}
   await new Promise(r=> setTimeout(r, 40));
 
   const bg = ctx.createLinearGradient(0, 0, 0, LOGICAL_H);
@@ -430,18 +432,21 @@ async function drawCanvasLayout(handle, data){
     ctx.fillText('Mindshare: ' + msText, x + 12, y + 48);
 
     const ch = computePeriodChange(meta || {});
-    if(meta && meta.found && ch.pctText !== '-'){
+    if(meta && meta.found){
       const isUp = ch.dir === 'up';
-      ctx.fillStyle = isUp ? '#3ee6a8' : '#ff7b7b';
-      ctx.font = '800 13px Inter, Arial';
-      ctx.fillText((isUp ? '▲ ' : '▼ ') + ch.pctText, x + 12, y + 72);
-      if(ch.absText){
-        ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.font = '700 12px Inter, Arial'; ctx.textAlign = 'right';
-        ctx.fillText(ch.absText, x + w - 12, y + 72); ctx.textAlign = 'left';
+      if(ch.dir === 'same'){
+        ctx.fillStyle = '#9fb0bf';
+        ctx.font = '800 13px Inter, Arial';
+        ctx.fillText('0.0%', x + 12, y + 72);
+      } else {
+        ctx.fillStyle = isUp ? '#3ee6a8' : '#ff7b7b';
+        ctx.font = '800 13px Inter, Arial';
+        ctx.fillText((isUp ? '▲ ' : '▼ ') + ch.pctText, x + 12, y + 72);
+        if(ch.absText){
+          ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.font = '700 12px Inter, Arial'; ctx.textAlign = 'right';
+          ctx.fillText(ch.absText, x + w - 12, y + 72); ctx.textAlign = 'left';
+        }
       }
-    } else {
-      ctx.fillStyle = '#9fb0bf'; ctx.font = '400 12px Inter, Arial';
-      ctx.fillText('Change in period', x + 12, y + 72);
     }
 
     const barX = x + 12, barY = y + h - 28, barW = w - 24, barH = 10;
@@ -456,7 +461,7 @@ async function drawCanvasLayout(handle, data){
   }
 }
 
-/* export dataURL -> file and share */
+/* share image */
 function shareImageFromDataURL(dataUrl, handle, data){
   try{
     const byteString = atob(dataUrl.split(',')[1]);
@@ -485,7 +490,7 @@ function shareImageFromDataURL(dataUrl, handle, data){
   }
 }
 
-/* Debounce helper (kept for possible future use) */
+/* debounce (unused but kept) */
 function debounce(fn, wait){
   let t = null;
   return function(...args){ clearTimeout(t); t = setTimeout(()=> fn.apply(this, args), wait); };
@@ -540,7 +545,6 @@ async function performSearchImmediate(){
   }
 }
 
-/* debounced version if ever needed */
 const performSearch = debounce(performSearchImmediate, 300);
 
 function renderResults(handle, data){
@@ -575,12 +579,11 @@ $('shareCardBtn').addEventListener('click', async (e) => {
   }
 });
 
-/* Search/read interactions */
+/* Search / Enter */
 $('searchBtn').addEventListener('click', (e)=> {
   e.preventDefault();
   performSearchImmediate();
 });
-
 $('username').addEventListener('keydown', (e)=>{
   if(e.key==='Enter'){
     e.preventDefault();
@@ -588,9 +591,8 @@ $('username').addEventListener('keydown', (e)=>{
   }
 });
 
-/* IMPORTANT: typing no longer auto-searches
-$('username').addEventListener('input', (e)=> { performSearch(); });
-*/
+/* no auto-search while typing */
+/* $('username').addEventListener('input', (e)=> { performSearch(); }); */
 
 /* Clear */
 $('clearBtn').addEventListener('click', (e)=>{
@@ -601,7 +603,7 @@ $('clearBtn').addEventListener('click', (e)=>{
   showToast('Cleared');
 });
 
-/* footer hide/show on scroll */
+/* footer hide/show */
 (function setupFooterVisibility(){
   const footer = $('siteFooter'); if(!footer) return;
   let lastY = window.scrollY || 0; let ticking = false;
