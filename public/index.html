@@ -70,8 +70,7 @@
   .btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#061020; min-width:132px;}
 
   .results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start}
-
-  /* NEW: force 3 boxes in one row on desktop */
+  /* Force 3 boxes in one row on desktop */
   @media (min-width: 900px) {
     .results {
       grid-template-columns: repeat(3, minmax(260px, 1fr));
@@ -86,6 +85,7 @@
   .value.mindshare{ font-size:20px; color:var(--accent1); text-align:right; white-space:nowrap; }
   .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;font-size:13px}
   .badge.ok{background:rgba(62,230,168,0.12);color:var(--ok);border:1px solid rgba(62,230,168,0.12)}
+  /* progress-shell / progress-bar CSS can stay, but cards no longer use it */
   .progress-shell{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
   .progress-bar{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .6s ease}
   .ms-change{display:inline-flex;gap:8px;align-items:center;font-weight:800;white-space:nowrap;font-variant-numeric: tabular-nums}
@@ -246,11 +246,13 @@ function showResults(){ $('resultArea').style.display = 'grid'; $('emptyHint').s
 /* build a single card */
 function mkCard(title, meta, neighbor){
   const el = document.createElement('div'); el.className='card';
+
   const found = !!meta && meta.found === true && Number.isFinite(Number(meta.rank));
   const rank = found ? Number(meta.rank) : null;
   const ms = found ? meta.mindshare : null;
-  const prog = found ? Math.round(progressToTop100(rank)*100) : 0;
+
   const ch = computeChange(found ? meta : {}, (neighbor && neighbor.found===true)?neighbor:{});
+
   let changeHtml = '-';
   if(found){
     if(ch.dir === 'same') changeHtml = `<span class="ms-change">${ch.pctText}</span>`;
@@ -259,20 +261,36 @@ function mkCard(title, meta, neighbor){
       changeHtml = `<span class="ms-change ${ch.dir}">${arrow} ${ch.pctText}<span class="abs">${ch.absText}</span></span>`;
     }
   }
+
   const mindshareHtml = found ? `<div class="value mindshare">${fmtNum(ms,6)}</div>` : `<div class="value mindshare">-</div>`;
+
+  // badge for OG / revenue share
   let badgeHtml = '';
   if((title==='30d' || title==='month') && found){
     if(rank <= SHARE_TOP) badgeHtml = `<div style="margin-top:8px"><span class="badge ok">Eligible for OG NFT + Revenue Share</span></div>`;
     else if(rank <= OG_NFT_TOP) badgeHtml = `<div style="margin-top:8px"><span class="badge ok">Eligible for OG NFT</span></div>`;
   }
-  let payoutHtml = '-';
-  if((title==='30d' || title==='month') && found && rank <= SHARE_TOP){
+
+  // payout row:
+  // - 24h & 7d: never show
+  // - 30d: show only if eligible (rank <= SHARE_TOP)
+  let payoutSectionHtml = '';
+  if ((title === '30d' || title === 'month') && found && rank <= SHARE_TOP) {
     const topMin = 1500, topMax=2000, min100=150, max100=260;
     const t = (Math.min(100, Math.max(1, rank)) - 1)/99;
     const min = Math.round(topMin + (min100 - topMin)*t);
     const max = Math.round(topMax + (max100 - topMax)*t);
-    payoutHtml = `${money(min)} - ${money(max)}`;
+    const payoutHtml = `${money(min)} - ${money(max)}`;
+
+    payoutSectionHtml = `
+      <hr class="sep" />
+      <div class="row">
+        <div class="label">Assumed payout (if eligible)</div>
+        <div class="value">${payoutHtml}</div>
+      </div>
+    `;
   }
+
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center">
       <h3>${title}</h3>
@@ -280,13 +298,8 @@ function mkCard(title, meta, neighbor){
     </div>
     <div class="row"><div class="label">Mindshare</div>${mindshareHtml}</div>
     <div class="row"><div class="label">Change vs next</div><div style="text-align:right">${found? changeHtml : '-'}</div></div>
-    <div style="margin-top:8px">
-      <div class="progress-shell" aria-hidden="true"><div class="progress-bar" style="width:${found?prog+'%':'0%'}"></div></div>
-      <div style="font-size:12px;color:var(--muted);margin-top:6px">${found ? `Progress to Top 100: ${prog}% • Total fetched: ${TOTAL_FETCHED}` : `Search to show data • Total fetched: ${TOTAL_FETCHED}`}</div>
-    </div>
     ${badgeHtml}
-    <hr class="sep" />
-    <div class="row"><div class="label">Assumed payout (if eligible)</div><div class="value">${payoutHtml}</div></div>
+    ${payoutSectionHtml}
   `;
   return el;
 }
@@ -297,10 +310,8 @@ async function drawCanvasLayout(handle, data){
   const LOGICAL_H = 630;
   const canvas = $('cardCanvas');
 
-  // debug preview flag controls whether canvas is briefly shown for testing
   const showPreview = DEBUG_CANVAS_PREVIEW;
 
-  // show canvas preview while drawing if debug enabled
   if(showPreview){
     canvas.style.display = 'block';
     canvas.style.position = 'fixed';
@@ -322,22 +333,17 @@ async function drawCanvasLayout(handle, data){
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   ctx.clearRect(0, 0, LOGICAL_W, LOGICAL_H);
 
-  // ensure fonts ready
   try { await (document.fonts && document.fonts.ready); } catch(e){ /* ignore */ }
-  // small wait for avatar load if caller recently requested it
   await new Promise(r=> setTimeout(r, 40));
 
-  // background
   const bg = ctx.createLinearGradient(0, 0, 0, LOGICAL_H);
   bg.addColorStop(0, '#081822'); bg.addColorStop(1, '#00121a');
   ctx.fillStyle = bg; ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
 
-  // panel area
   const pad = 28;
   const panelX = pad, panelY = pad, panelW = LOGICAL_W - pad*2, panelH = LOGICAL_H - pad*2;
   roundRectFill(ctx, panelX, panelY, panelW, panelH, 20, 'rgba(255,255,255,0.02)');
 
-  // avatar + handle
   const avatarSize = 96, leftColX = panelX + 26, leftColY = panelY + 20, avatarX = leftColX, avatarY = leftColY;
   if(_pre.avatar){
     ctx.save();
@@ -357,7 +363,6 @@ async function drawCanvasLayout(handle, data){
   ctx.fillStyle = '#fff'; fitText(ctx, handleText, avatarX + avatarSize + 18, avatarY + 34, panelW * 0.28, { weight:700, size:28, family:'Inter, Arial' });
   ctx.fillStyle = '#9fb0bf'; ctx.font = '400 14px Inter, Arial'; ctx.fillText('Zama rank card', avatarX + avatarSize + 18, avatarY + 56);
 
-  // compute boxes row sizes (three equal boxes)
   const leftReserve = avatarX + avatarSize + 26;
   const rightReserve = 36;
   const boxesX = panelX + leftReserve;
@@ -376,20 +381,16 @@ async function drawCanvasLayout(handle, data){
   drawStatBox(ctx, boxesX + 1*(boxW+gap), boxY, boxW, boxH, '7D', r7, true);
   drawStatBox(ctx, boxesX + 2*(boxW+gap), boxY, boxW, boxH, '30D', r30b, true);
 
-  // watermark
   ctx.fillStyle = 'rgba(255,255,255,0.6)';
   ctx.font = '500 12px Inter, Arial';
   ctx.fillText('Powered by madara — zama-rank.vercel.app', panelX + 18, panelY + panelH - 16);
 
-  // auto-hide preview in debug mode
   if(showPreview){
     setTimeout(()=>{ try{ canvas.style.display='none'; }catch(e){} }, 1200);
   }
 
-  // return dataURL
   return canvas.toDataURL('image/png');
 
-  /* helpers */
   function roundRectFill(ctx, x, y, w, h, r, fillStyle){
     ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.closePath();
     ctx.fillStyle = fillStyle; ctx.fill();
@@ -449,7 +450,7 @@ function shareImageFromDataURL(dataUrl, handle, data){
     if(navigator.canShare && navigator.canShare({files:[file]})){
       navigator.share({
         files: [file],
-        text: `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-'}\nCheck: https://zama-rank.vercel.app`
+        text: `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`
       }).then(()=> { showToast('Shared successfully'); }).catch(()=> { showToast('Share cancelled or failed'); });
       return;
     }
@@ -458,23 +459,21 @@ function shareImageFromDataURL(dataUrl, handle, data){
     const a = document.createElement('a'); a.href = url; a.download = `${handle}-zama-rank.png`; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),2000);
     showToast('Image downloaded');
-    const text = `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-'}\nCheck: https://zama-rank.vercel.app`;
+    const text = `${handle} — Zama Rank (30d): ${data.results?.['30d']?.rank || data.results?.month?.rank || '-'} • Mindshare: ${data.results?.month?.mindshare || '-' }\nCheck: https://zama-rank.vercel.app`;
     window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
   }catch(err){
     showToast('Share failed'); alert('Share failed: '+(err.message||err));
   }
 }
 
-/* Debounce helper */
+/* Debounce helper (kept for future use, but no longer used on input) */
 function debounce(fn, wait){
   let t = null;
   return function(...args){ clearTimeout(t); t = setTimeout(()=> fn.apply(this, args), wait); };
 }
 
-/* UI flow */
 let lastSearch = null;
 
-/* performSearch with cache + accessibility announcements */
 async function performSearchImmediate(){
   const raw = ($('username').value||'').trim();
   if(!raw){ $('username').focus(); return; }
@@ -482,12 +481,21 @@ async function performSearchImmediate(){
   showResults(); const status = $('resultStatus'); status.textContent = 'Fetching data…';
   $('resultArea').innerHTML = '';
 
-  for(let i=0;i<3;i++){ const s=document.createElement('div'); s.className='card'; s.innerHTML = `<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`; $('resultArea').appendChild(s); }
+  for(let i=0;i<3;i++){
+    const s=document.createElement('div');
+    s.className='card';
+    s.innerHTML = `<h3>Loading…</h3><div style="color:var(--muted);margin-top:6px">Fetching data</div>`;
+    $('resultArea').appendChild(s);
+  }
 
   await loadAvatar(handle);
 
   if(resultsCache.has(handle)){
-    const data = resultsCache.get(handle); renderResults(handle, data); status.textContent = `Showing cached results for ${handle}`; lastSearch = { handle, data }; return;
+    const data = resultsCache.get(handle);
+    renderResults(handle, data);
+    status.textContent = `Showing cached results for ${handle}`;
+    lastSearch = { handle, data };
+    return;
   }
 
   try{
@@ -498,55 +506,100 @@ async function performSearchImmediate(){
     if(!results['30d'] && results['month']) results['30d'] = results['month'];
     if(!results['month'] && results['30d']) results['month'] = results['30d'];
     resultsCache.set(handle, data);
-    renderResults(handle, data); status.textContent = `Results loaded for ${handle}`; lastSearch = { handle, data };
+    renderResults(handle, data);
+    status.textContent = `Results loaded for ${handle}`;
+    lastSearch = { handle, data };
   }catch(err){
-    const el = document.createElement('div'); el.className='card'; el.innerHTML = `<h3>Error</h3><div style="color:var(--muted);margin-top:6px">${err.message}</div>`; $('resultArea').innerHTML = ''; $('resultArea').appendChild(el);
-    status.textContent = `Error fetching results`; lastSearch = null; showToast('Error fetching data');
+    const el = document.createElement('div');
+    el.className='card';
+    el.innerHTML = `<h3>Error</h3><div style="color:var(--muted);margin-top:6px">${err.message}</div>`;
+    $('resultArea').innerHTML = '';
+    $('resultArea').appendChild(el);
+    status.textContent = `Error fetching results`;
+    lastSearch = null;
+    showToast('Error fetching data');
   }
 }
 
-/* debounced search (300ms) */
+/* we keep debounced version but don't bind it to input anymore */
 const performSearch = debounce(performSearchImmediate, 300);
 
-/* render helper */
 function renderResults(handle, data){
   const container = $('resultArea'); container.innerHTML = '';
   const results = data.results || {};
   if(!results['30d'] && results['month']) results['30d'] = results['month'];
   if(!results['month'] && results['30d']) results['month'] = results['30d'];
   const order = ['24h','7d','30d'];
-  for(let i=0;i<order.length;i++){ const k = order[i]; const neighbor = (i<order.length-1) ? (results[order[i+1]] || null) : null; container.appendChild( mkCard(k, results[k]||{}, neighbor) ); }
+  for(let i=0;i<order.length;i++){
+    const k = order[i];
+    const neighbor = (i<order.length-1) ? (results[order[i+1]] || null) : null;
+    container.appendChild( mkCard(k, results[k]||{}, neighbor) );
+  }
   showResults();
 }
 
 /* Share button */
 $('shareCardBtn').addEventListener('click', async (e) => {
-  if(!lastSearch){ showToast('Run a search first'); $('username').focus(); return; }
+  e.preventDefault();
+  if(!lastSearch){
+    showToast('Run a search first');
+    $('username').focus();
+    return;
+  }
   const { handle, data } = lastSearch;
   try{
     const dataUrl = await drawCanvasLayout(handle, data);
     shareImageFromDataURL(dataUrl, handle, data);
   }catch(err){
-    showToast('Share failed'); console.error(err); alert('Share failed: '+(err.message||err));
+    showToast('Share failed');
+    console.error(err);
+    alert('Share failed: '+(err.message||err));
   }
 });
 
 /* Search/read interactions */
-$('searchBtn').addEventListener('click', (e)=> { e.preventDefault(); performSearchImmediate(); });
-$('username').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); performSearchImmediate(); } });
-$('username').addEventListener('input', (e)=> { performSearch(); });
+$('searchBtn').addEventListener('click', (e)=> {
+  e.preventDefault();
+  performSearchImmediate();
+});
+$('username').addEventListener('keydown', (e)=>{
+  if(e.key==='Enter'){
+    e.preventDefault();
+    performSearchImmediate();
+  }
+});
+
+/* IMPORTANT: removed auto-search-on-typing so data only loads after Search/Enter */
+/* $('username').addEventListener('input', (e)=> { performSearch(); }); */
 
 /* Clear */
 $('clearBtn').addEventListener('click', (e)=>{
-  e.preventDefault(); $('username').value = ''; lastSearch = null; hideResults(); showToast('Cleared');
+  e.preventDefault();
+  $('username').value = '';
+  lastSearch = null;
+  hideResults();
+  showToast('Cleared');
 });
 
 /* footer hide/show on scroll */
 (function setupFooterVisibility(){
   const footer = $('siteFooter'); if(!footer) return;
   let lastY = window.scrollY || 0; let ticking = false;
-  function onScroll(){ const y = window.scrollY || 0; if (y > lastY + 6) { footer.classList.add('hidden'); } else if (y < lastY - 6) { footer.classList.remove('hidden'); } lastY = y; ticking = false; }
-  window.addEventListener('scroll', function(){ if (ticking) return; ticking = true; requestAnimationFrame(onScroll); }, { passive: true });
+  function onScroll(){
+    const y = window.scrollY || 0;
+    if (y > lastY + 6) {
+      footer.classList.add('hidden');
+    } else if (y < lastY - 6) {
+      footer.classList.remove('hidden');
+    }
+    lastY = y;
+    ticking = false;
+  }
+  window.addEventListener('scroll', function(){
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(onScroll);
+  }, { passive: true });
   window.addEventListener('touchstart', ()=> footer.classList.remove('hidden'), {passive:true});
   window.addEventListener('load', ()=> footer.classList.remove('hidden'));
 })();
