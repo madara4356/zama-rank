@@ -1,5 +1,5 @@
 // api/check.js
-// Converted from your server.js for Vercel serverless functions
+// Fixed version with proper mindshareDelta support
 
 const BASE = "https://leaderboard-bice-mu.vercel.app/api/zama";
 const TIMEFRAMES = [
@@ -44,44 +44,42 @@ function getArrayFromResponse(json) {
   return [];
 }
 
-// Normalize entry object -> { rank, username, mindshare, raw }
+/* -----------------------------------------------------
+   FIXED normalize() → NOW extracts mindshareDelta !!!
+------------------------------------------------------ */
 function normalize(entry, pageIdx, idxInPage, fallbackPageSize = 100) {
   if (!entry || typeof entry !== "object") return null;
 
   const keys = Object.keys(entry);
+
+  // detect username
   let username = null;
   for (const k of keys) {
     const lk = k.toLowerCase();
-    if (lk.includes("username") || lk.includes("user") || lk.includes("handle") || lk.includes("twitter") || lk.includes("name") || lk.includes("creator")) {
+    if (
+      lk.includes("username") ||
+      lk.includes("user") ||
+      lk.includes("twitter") ||
+      lk.includes("handle") ||
+      lk.includes("name") ||
+      lk.includes("creator")
+    ) {
       username = String(entry[k]);
       break;
     }
   }
 
+  // detect mindshare
   let mindshare = null;
-  for (const k of keys) {
-    const lk = k.toLowerCase();
-    if (lk.includes("mindshare") || lk.includes("score") || lk.includes("ms") || lk.includes("value") || lk.includes("points")) {
-      const v = Number(entry[k]);
-      if (!Number.isNaN(v)) {
-        mindshare = v;
-        break;
-      }
-    }
-  }
+  if (entry.mindshare != null) mindshare = Number(entry.mindshare);
 
-  let rank = null;
-  for (const k of keys) {
-    const lk = k.toLowerCase();
-    if (lk.includes("rank") || lk.includes("position")) {
-      const v = Number(entry[k]);
-      if (!Number.isNaN(v)) {
-        rank = v;
-        break;
-      }
-    }
-  }
+  // detect mindshareDelta  🔥🔥🔥 FIXED
+  let mindshareDelta = null;
+  if (entry.mindshareDelta != null) mindshareDelta = Number(entry.mindshareDelta);
+  if (entry.mindshare_delta != null) mindshareDelta = Number(entry.mindshare_delta);
 
+  // detect rank
+  let rank = Number(entry.rank);
   if (!Number.isFinite(rank)) {
     rank = (pageIdx - 1) * fallbackPageSize + (idxInPage + 1);
   }
@@ -89,6 +87,7 @@ function normalize(entry, pageIdx, idxInPage, fallbackPageSize = 100) {
   if (typeof username === "string") {
     username = username.trim().replace(/^@/, "");
   } else {
+    // fallback: try values starting with @
     for (const v of Object.values(entry)) {
       if (typeof v === "string" && v.startsWith("@")) {
         username = v.replace(/^@/, "");
@@ -98,9 +97,10 @@ function normalize(entry, pageIdx, idxInPage, fallbackPageSize = 100) {
   }
 
   return {
-    rank: Number(rank),
-    username: username || null,
+    rank,
+    username,
     mindshare: Number.isFinite(mindshare) ? mindshare : null,
+    mindshareDelta: Number.isFinite(mindshareDelta) ? mindshareDelta : null, // 🔥 INCLUDED
     raw: entry
   };
 }
@@ -123,7 +123,6 @@ async function fetchAllPagesForTimeframe(timeframeKey, maxPages = 20, pageSizeHi
         if (normalized && normalized.username) results.push(normalized);
       }
     } catch (err) {
-      // log in serverless environment to Vercel logs
       console.warn("fetch page error", err.message);
       break;
     }
@@ -150,16 +149,18 @@ export default async function handler(req, res) {
 
     for (const bucket of all) {
       const entries = bucket.entries || [];
-      const you = entries.find(e => e.username && e.username.toLowerCase() === username);
+      const you = entries.find(
+        (e) => e.username && e.username.toLowerCase() === username
+      );
 
-      let rank100 = entries.find(e => Number(e.rank) === 100);
+      let rank100 = entries.find((e) => Number(e.rank) === 100);
       if (!rank100) {
-        const withMs = entries.filter(e => Number.isFinite(e.mindshare));
+        const withMs = entries.filter((e) => Number.isFinite(e.mindshare));
         if (withMs.length >= 100) {
-          withMs.sort((a,b) => b.mindshare - a.mindshare);
+          withMs.sort((a, b) => b.mindshare - a.mindshare);
           rank100 = withMs[99];
         } else {
-          const sortedByRank = entries.slice().sort((a,b) => a.rank - b.rank);
+          const sortedByRank = entries.slice().sort((a, b) => a.rank - b.rank);
           if (sortedByRank.length >= 100) rank100 = sortedByRank[99];
         }
       }
@@ -175,9 +176,18 @@ export default async function handler(req, res) {
         obj.found = true;
         obj.rank = you.rank;
         obj.mindshare = you.mindshare;
-        obj.needed_mindshare = (rank100 && Number.isFinite(rank100.mindshare) && Number.isFinite(you.mindshare))
-          ? Math.max(0, rank100.mindshare - you.mindshare)
-          : null;
+
+        /* ---------------------------------------------------
+             🔥🔥🔥 FIXED — SEND MINDHSARE DELTA TO FRONTEND
+        ----------------------------------------------------*/
+        obj.mindshareDelta = you.mindshareDelta ?? null;
+
+        obj.needed_mindshare =
+          rank100 &&
+          Number.isFinite(rank100.mindshare) &&
+          Number.isFinite(you.mindshare)
+            ? Math.max(0, rank100.mindshare - you.mindshare)
+            : null;
       }
 
       output.results[bucket.key] = obj;
