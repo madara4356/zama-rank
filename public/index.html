@@ -70,7 +70,7 @@
   .btn-share{background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:#061020; min-width:132px;}
 
   .results{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start}
-  /* Force 3 boxes in one row on desktop */
+  /* 3 cards in one row on desktop */
   @media (min-width: 900px) {
     .results {
       grid-template-columns: repeat(3, minmax(260px, 1fr));
@@ -85,9 +85,11 @@
   .value.mindshare{ font-size:20px; color:var(--accent1); text-align:right; white-space:nowrap; }
   .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:700;font-size:13px}
   .badge.ok{background:rgba(62,230,168,0.12);color:var(--ok);border:1px solid rgba(62,230,168,0.12)}
-  /* progress-shell / progress-bar CSS can stay, but cards no longer use it */
+
+  /* these are still used for the share-image canvas */
   .progress-shell{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
   .progress-bar{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .6s ease}
+
   .ms-change{display:inline-flex;gap:8px;align-items:center;font-weight:800;white-space:nowrap;font-variant-numeric: tabular-nums}
   .ms-change.up{color:var(--ok)} .ms-change.down{color:var(--bad)}
   .ms-change .abs{font-weight:700;color:rgba(255,255,255,0.85);font-size:0.95em;margin-left:6px}
@@ -190,17 +192,26 @@ function progressToTop100(rank){
   if(rank <= 100) return Math.max(0, Math.min(1, (100-rank)/99));
   return Math.max(0, Math.min(1, (1500-rank)/(1500-100)));
 }
-function computeChange(curr, next) {
-  const a = Number(curr?.mindshare);
-  const b = Number(next?.mindshare);
-  if (!isFinite(a) || !isFinite(b)) return { dir: 'same', pctText: '-', absText: '', pct: 0, abs: 0 };
-  const diff = a - b;
-  const pct = (b === 0) ? ((a === 0) ? 0 : 100) : (diff / Math.abs(b) * 100);
+
+/* NEW: real change based on mindshareDelta from API */
+function computePeriodChange(meta) {
+  const curr = Number(meta?.mindshare);
+  const delta = Number(meta?.mindshareDelta);
+
+  if (!isFinite(curr) || !isFinite(delta)) {
+    return { dir: 'same', pctText: '-', absText: '', pct: 0, abs: 0 };
+  }
+
+  const prev = curr - delta;
+  const pct = prev === 0 ? 0 : (delta / Math.abs(prev)) * 100;
+
   const pctRounded = Math.round(pct * 10) / 10;
-  const absRounded = Math.round(diff * 1000000) / 1000000;
-  const dir = (diff > 0 ? 'up' : (diff < 0 ? 'down' : 'same'));
-  const pctText = (dir === 'same') ? '0.0%' : `${Math.abs(pctRounded)}%`;
-  const absText = (absRounded === 0 ? '' : `(${absRounded>0?'+':''}${absRounded})`);
+  const absRounded = Math.round(delta * 1e6) / 1e6;
+
+  const dir = delta > 0 ? 'up' : delta < 0 ? 'down' : 'same';
+  const pctText = dir === 'same' ? '0.0%' : `${Math.abs(pctRounded)}%`;
+  const absText = absRounded === 0 ? '' : `(${absRounded>0?'+':''}${absRounded})`;
+
   return { dir, pctText, absText, pct: pctRounded, abs: absRounded };
 }
 
@@ -244,25 +255,31 @@ function hideResults(){ $('resultArea').style.display = 'none'; $('emptyHint').s
 function showResults(){ $('resultArea').style.display = 'grid'; $('emptyHint').style.display='none'; }
 
 /* build a single card */
-function mkCard(title, meta, neighbor){
+function mkCard(title, meta){
   const el = document.createElement('div'); el.className='card';
 
   const found = !!meta && meta.found === true && Number.isFinite(Number(meta.rank));
   const rank = found ? Number(meta.rank) : null;
   const ms = found ? meta.mindshare : null;
 
-  const ch = computeChange(found ? meta : {}, (neighbor && neighbor.found===true)?neighbor:{});
+  const ch = computePeriodChange(found ? meta : {});
 
   let changeHtml = '-';
   if(found){
-    if(ch.dir === 'same') changeHtml = `<span class="ms-change">${ch.pctText}</span>`;
-    else {
+    if(ch.dir === 'same') {
+      changeHtml = `<span class="ms-change">${ch.pctText}</span>`;
+    } else {
       const arrow = ch.dir === 'up' ? '▲' : '▼';
       changeHtml = `<span class="ms-change ${ch.dir}">${arrow} ${ch.pctText}<span class="abs">${ch.absText}</span></span>`;
     }
   }
 
   const mindshareHtml = found ? `<div class="value mindshare">${fmtNum(ms,6)}</div>` : `<div class="value mindshare">-</div>`;
+
+  const labelForChange =
+    title === '24h' ? 'Change in last 24h' :
+    title === '7d'  ? 'Change in last 7 days' :
+                      'Change in last 30 days';
 
   // badge for OG / revenue share
   let badgeHtml = '';
@@ -271,9 +288,7 @@ function mkCard(title, meta, neighbor){
     else if(rank <= OG_NFT_TOP) badgeHtml = `<div style="margin-top:8px"><span class="badge ok">Eligible for OG NFT</span></div>`;
   }
 
-  // payout row:
-  // - 24h & 7d: never show
-  // - 30d: show only if eligible (rank <= SHARE_TOP)
+  // payout row: 24h & 7d never; 30d only if eligible
   let payoutSectionHtml = '';
   if ((title === '30d' || title === 'month') && found && rank <= SHARE_TOP) {
     const topMin = 1500, topMax=2000, min100=150, max100=260;
@@ -297,7 +312,7 @@ function mkCard(title, meta, neighbor){
       <div style="text-align:right;font-weight:800;font-size:20px">${found?rank:'-'}</div>
     </div>
     <div class="row"><div class="label">Mindshare</div>${mindshareHtml}</div>
-    <div class="row"><div class="label">Change vs next</div><div style="text-align:right">${found? changeHtml : '-'}</div></div>
+    <div class="row"><div class="label">${labelForChange}</div><div style="text-align:right">${found? changeHtml : '-'}</div></div>
     ${badgeHtml}
     ${payoutSectionHtml}
   `;
@@ -356,7 +371,7 @@ async function drawCanvasLayout(handle, data){
     ctx.arc(avatarX + avatarSize/2, avatarY + avatarSize/2, avatarSize/2 - 3, 0, Math.PI*2);
     ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.stroke();
   } else {
-    roundRectFill(ctx, avatarX, avatarY, avatarSize, avatarSize, 10, '#ffd24b');
+    roundRectFill(ctx, avatarX, avatarY, avatarSize, 10, '#ffd24b');
   }
 
   const handleText = handle.startsWith('@') ? handle : '@' + handle;
@@ -377,9 +392,9 @@ async function drawCanvasLayout(handle, data){
   const r7  = data.results?.['7d'] || {};
   const r30b = data.results?.['30d'] || data.results?.month || {};
 
-  drawStatBox(ctx, boxesX + 0*(boxW+gap), boxY, boxW, boxH, '24H', r24, true);
-  drawStatBox(ctx, boxesX + 1*(boxW+gap), boxY, boxW, boxH, '7D', r7, true);
-  drawStatBox(ctx, boxesX + 2*(boxW+gap), boxY, boxW, boxH, '30D', r30b, true);
+  drawStatBox(ctx, boxesX + 0*(boxW+gap), boxY, boxW, boxH, '24H', r24);
+  drawStatBox(ctx, boxesX + 1*(boxW+gap), boxY, boxW, boxH, '7D', r7);
+  drawStatBox(ctx, boxesX + 2*(boxW+gap), boxY, boxW, boxH, '30D', r30b);
 
   ctx.fillStyle = 'rgba(255,255,255,0.6)';
   ctx.font = '500 12px Inter, Arial';
@@ -403,15 +418,18 @@ async function drawCanvasLayout(handle, data){
     ctx.textAlign = 'left'; ctx.fillText(text, x, y);
   }
 
-  function drawStatBox(ctx, x, y, w, h, title, meta, drawOutline=false){
+  function drawStatBox(ctx, x, y, w, h, title, meta){
     roundRectFill(ctx, x, y, w, h, 12, 'rgba(255,255,255,0.02)');
-    if(drawOutline){ ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 2; ctx.strokeRect(x+1, y+1, w-2, h-2); }
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 2; ctx.strokeRect(x+1, y+1, w-2, h-2);
+
     ctx.fillStyle = '#9fb0bf'; ctx.font = '700 13px Inter, Arial'; ctx.fillText(title, x + 12, y + 22);
     const rankVal = (meta && meta.found && isFinite(Number(meta.rank))) ? String(meta.rank) : '-';
     ctx.font = '800 22px Inter, Arial'; ctx.fillStyle = '#fff'; ctx.textAlign = 'right'; ctx.fillText(rankVal, x + w - 12, y + 26); ctx.textAlign = 'left';
+
     ctx.font = '400 12px Inter, Arial'; ctx.fillStyle = '#9fb0bf'; const msText = (meta && meta.found) ? Number(meta.mindshare).toFixed(8) : '-';
     ctx.fillText('Mindshare: ' + msText, x + 12, y + 48);
-    const ch = computeChange(meta || {}, {});
+
+    const ch = computePeriodChange(meta || {});
     if(meta && meta.found && ch.pctText !== '-'){
       const isUp = ch.dir === 'up';
       ctx.fillStyle = isUp ? '#3ee6a8' : '#ff7b7b';
@@ -423,8 +441,9 @@ async function drawCanvasLayout(handle, data){
       }
     } else {
       ctx.fillStyle = '#9fb0bf'; ctx.font = '400 12px Inter, Arial';
-      ctx.fillText('Change vs next', x + 12, y + 72);
+      ctx.fillText('Change in period', x + 12, y + 72);
     }
+
     const barX = x + 12, barY = y + h - 28, barW = w - 24, barH = 10;
     roundRectFill(ctx, barX, barY, barW, barH, 999, 'rgba(255,255,255,0.03)');
     const prog = (meta && meta.found && Number.isFinite(Number(meta.rank))) ? Math.round(progressToTop100(Number(meta.rank))*100) : 0;
@@ -466,7 +485,7 @@ function shareImageFromDataURL(dataUrl, handle, data){
   }
 }
 
-/* Debounce helper (kept for future use, but no longer used on input) */
+/* Debounce helper (kept for possible future use) */
 function debounce(fn, wait){
   let t = null;
   return function(...args){ clearTimeout(t); t = setTimeout(()=> fn.apply(this, args), wait); };
@@ -521,7 +540,7 @@ async function performSearchImmediate(){
   }
 }
 
-/* we keep debounced version but don't bind it to input anymore */
+/* debounced version if ever needed */
 const performSearch = debounce(performSearchImmediate, 300);
 
 function renderResults(handle, data){
@@ -532,8 +551,7 @@ function renderResults(handle, data){
   const order = ['24h','7d','30d'];
   for(let i=0;i<order.length;i++){
     const k = order[i];
-    const neighbor = (i<order.length-1) ? (results[order[i+1]] || null) : null;
-    container.appendChild( mkCard(k, results[k]||{}, neighbor) );
+    container.appendChild( mkCard(k, results[k]||{}) );
   }
   showResults();
 }
@@ -562,6 +580,7 @@ $('searchBtn').addEventListener('click', (e)=> {
   e.preventDefault();
   performSearchImmediate();
 });
+
 $('username').addEventListener('keydown', (e)=>{
   if(e.key==='Enter'){
     e.preventDefault();
@@ -569,8 +588,9 @@ $('username').addEventListener('keydown', (e)=>{
   }
 });
 
-/* IMPORTANT: removed auto-search-on-typing so data only loads after Search/Enter */
-/* $('username').addEventListener('input', (e)=> { performSearch(); }); */
+/* IMPORTANT: typing no longer auto-searches
+$('username').addEventListener('input', (e)=> { performSearch(); });
+*/
 
 /* Clear */
 $('clearBtn').addEventListener('click', (e)=>{
